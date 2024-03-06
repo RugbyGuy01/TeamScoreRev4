@@ -1,4 +1,4 @@
-package com.golfpvcc.teamscore_rev4.ui.screens.courses
+package com.golfpvcc.teamscore_rev4.ui.screens.coursedetail
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite

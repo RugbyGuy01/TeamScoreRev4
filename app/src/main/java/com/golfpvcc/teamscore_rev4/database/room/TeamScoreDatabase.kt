@@ -1,11 +1,8 @@
 package com.golfpvcc.teamscore_rev4.database.room
 
-import android.content.Context
 import androidx.room.Database
-import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.golfpvcc.teamscore_rev4.Constants.DATABASE_NAME
 import com.golfpvcc.teamscore_rev4.database.converters.DataConverter
 import com.golfpvcc.teamscore_rev4.database.dao.CourseDao
 import com.golfpvcc.teamscore_rev4.database.dao.PlayerDao

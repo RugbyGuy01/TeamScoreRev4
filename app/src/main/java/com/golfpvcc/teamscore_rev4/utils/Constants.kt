@@ -1,4 +1,4 @@
-package com.golfpvcc.teamscore_rev4
+package com.golfpvcc.teamscore_rev4.utils
 
 import com.golfpvcc.teamscore_rev4.database.model.CourseRecord
 
@@ -14,6 +14,10 @@ object Constants {
     const val MINIMUM_LEN_OF_PLAYER_NAME = 2
     const val DISPLAY_CONFIGATION_SCREEN = "Configuration"
     const val DATABASE_NAME = "TeamDatabase"
+
+    const val USER_CANCEL = 100
+
+
     val courseDetailPlaceHolder = CourseRecord(
         "No Course","", IntArray(18), IntArray(18), 0
     )

@@ -13,6 +13,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import com.golfpvcc.teamscore_rev4.ui.navigation.SetupNavGraph
 import com.golfpvcc.teamscore_rev4.ui.theme.TeamScore_Rev4Theme
 
 class MainActivity : ComponentActivity() {
@@ -29,6 +32,13 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+    @Composable
+    fun TeamScoreAppl(){
+        lateinit var navHostController : NavHostController
+
+        navHostController = rememberNavController()
+        SetupNavGraph(navHostController)
     }
 }
 
