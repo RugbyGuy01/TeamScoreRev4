@@ -1,6 +1,7 @@
 package com.golfpvcc.teamscore_rev4.utils
 
 import com.golfpvcc.teamscore_rev4.database.model.CourseRecord
+import com.golfpvcc.teamscore_rev4.utils.Constants.courseDetailPlaceHolder
 
 object Constants {
     const val SCORE_CARD_REC_ID = 2024
@@ -17,8 +18,18 @@ object Constants {
 
     const val USER_CANCEL = 100
 
+    fun List<CourseRecord>?.orCourseRecHolderList(): List<CourseRecord> {
+        fun courseRecHolderList(): List<CourseRecord> {
+            return listOf(CourseRecord("No Course", "", IntArray(18){4}, IntArray(18)))
+        }
+        return if (this != null && this.isNotEmpty()){
+            this
+        } else courseRecHolderList()
+    }
 
     val courseDetailPlaceHolder = CourseRecord(
-        "No Course","", IntArray(18), IntArray(18), 0
+        "No Course", "", IntArray(18){4}, IntArray(18)
     )
 }
+
+
