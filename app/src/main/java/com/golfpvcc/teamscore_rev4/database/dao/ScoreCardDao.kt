@@ -1,0 +1,16 @@
+package com.golfpvcc.teamscore_rev4.database.dao
+
+import androidx.room.Dao
+import androidx.room.Query
+import androidx.room.Upsert
+import com.golfpvcc.teamscore_rev4.database.model.ScoreCardRecord
+import kotlinx.coroutines.flow.Flow
+@Dao
+interface ScoreCardDao {
+    /* Score Card DAO interfaces */
+    @Upsert
+    suspend fun addUpdateScoreCardRecord(scoreCardRecord: ScoreCardRecord)
+
+    @Query("Select * FROM ScoreCardRecord WHERE scoreCardRec_Id = :scoreCardId ")
+    fun getScoreCardRecord(scoreCardId: Int): ScoreCardRecord
+}
