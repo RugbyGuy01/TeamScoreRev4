@@ -109,6 +109,7 @@ fun CoursesScreen(
                 courseToDelete = courseToDelete,
                 action = {
                     courseToDelete.value.forEach {
+                        Log.d("VIN", "Deleted cours ${it.mId}")
                         courseViewModel.deleteCourse(it)
                     }
                 })
@@ -213,7 +214,7 @@ fun CourseItem(
                 onClick = {
                     if (course.mId != 0) {
                         openDialog.value = true
-                        deleteText.value = "Are you sure you want to delete this note ?"
+                        deleteText.value = "Are you sure you want to delete this course ?"
                         courseToDelete.value = mutableListOf(course)
                     }
                 }

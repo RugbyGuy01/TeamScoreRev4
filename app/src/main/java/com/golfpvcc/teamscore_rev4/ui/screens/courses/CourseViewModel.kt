@@ -1,5 +1,6 @@
 package com.golfpvcc.teamscore_rev4.ui.screens.courses
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -26,6 +27,7 @@ class CoursesViewModel(
 
 
     fun deleteCourse(courseRecord: CourseRecord) {
+        Log.d("VIN", "Deleted cours ${courseRecord.mId}")
         viewModelScope.launch(Dispatchers.IO) {
             courseDao.deleteCourseRecord(courseRecord)
         }

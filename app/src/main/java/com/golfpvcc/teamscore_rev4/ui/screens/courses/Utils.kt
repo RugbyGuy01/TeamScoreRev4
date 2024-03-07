@@ -1,5 +1,6 @@
 package com.golfpvcc.teamscore_rev4.ui.screens.courses
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -18,6 +19,7 @@ fun DeleteDialog(
     action: () -> Unit,
     courseToDelete: MutableState<List<CourseRecord>>
 ) {
+    Log.d("VIN", "Deleted course ")
     if (openDialog.value) {
         AlertDialog(
             onDismissRequest = {
@@ -32,7 +34,7 @@ fun DeleteDialog(
                 { Text(text = "OK") }
             },
             dismissButton = {
-                TextButton(onClick = {})
+                TextButton(onClick = { openDialog.value = false})
                 { Text(text = "Cancel") }
             },
             title = { Text(text = "Delete Course") },
