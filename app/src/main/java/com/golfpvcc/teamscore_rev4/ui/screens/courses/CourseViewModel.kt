@@ -31,14 +31,13 @@ class CoursesViewModel(
         }
     }
 
-    fun addOrUpdateCourse(courseName: String, par: IntArray, handicap: IntArray) {
-        val courseRecord = CourseRecord(courseName, "NC", par, handicap)
+    fun addOrUpdateCourse(courseRecord: CourseRecord) {
         viewModelScope.launch(Dispatchers.IO) {
             courseDao.addUpdateCourseRecord(courseRecord)
         }
     }
 
-    suspend fun getCourseById(courseId: Int): CourseRecord? {
+    suspend fun getCourseById(courseId: Int?): CourseRecord? {
         return courseDao.getCourseRecord(courseId)
     }
 

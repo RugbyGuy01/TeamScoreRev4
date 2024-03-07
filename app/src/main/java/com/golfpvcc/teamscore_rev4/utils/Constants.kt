@@ -17,6 +17,8 @@ object Constants {
     const val DATABASE_NAME = "TeamDatabase"
 
     const val USER_CANCEL = 100
+    const val USER_SAVE = 101
+    const val USER_ACTION = 102
 
     fun List<CourseRecord>?.orCourseRecHolderList(): List<CourseRecord> {
         fun courseRecHolderList(): List<CourseRecord> {

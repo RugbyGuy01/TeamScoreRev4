@@ -41,6 +41,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.BlendMode.Companion.Screen
@@ -168,56 +169,63 @@ fun CourseItem(
     navController: NavController,
     courseToDelete: MutableState<List<CourseRecord>>
 ) {
-
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(5.dp)
-            .height(70.dp)
-            .clickable {
-                Log.d("VIN:", "CourseItem onItemClick navigate to Player Setup")
-                navController.navigate(route = TeamScoreScreen.PlayerSetup.passId(course.mId))
-            }
-
-    ) {
-        Text(
-            text = course.mCoursename,
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Normal
-        )
-        Spacer(modifier = Modifier.size(14.dp))
-        IconButton(
-            onClick = {
-                Log.d("VIN", "CourseDetail?id={${course.mId}}")
-                if (course.mId != 0) {
-                    navController.navigate(route = TeamScoreScreen.DetailCourse.passId(course.mId))  // goto detail screen
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(5.dp)
+                .height(70.dp)
+                .clickable {
+                    Log.d("VIN:", "CourseItem onItemClick navigate to Player Setup")
+                    navController.navigate(route = TeamScoreScreen.PlayerSetup.passId(course.mId))
                 }
-            }
+
         ) {
-            Icon(
-                imageVector = Icons.Rounded.Edit,
-                contentDescription = "Edit Course",
-                modifier = Modifier.size(35.dp),
-                tint = MaterialTheme.colorScheme.onPrimaryContainer
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(15.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ){
+            Text(
+                text = course.mCoursename,
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Normal
             )
-        }
-        Spacer(modifier = Modifier.size(14.dp))
-        IconButton(
-            onClick = {
-                if (course.mId != 0) {
-                    openDialog.value = true
-                    deleteText.value = "Are you sure you want to delete this note ?"
-                    courseToDelete.value = mutableListOf(course)
+            Spacer(modifier = Modifier.size(14.dp))
+            IconButton(
+                onClick = {
+                    Log.d("VIN", "CourseDetail?id={${course.mId}}")
+                    if (course.mId != 0) {
+                        navController.navigate(route = TeamScoreScreen.DetailCourse.passId(course.mId))  // goto detail screen
+                    }
                 }
+            ) {
+                Icon(
+                    imageVector = Icons.Rounded.Edit,
+                    contentDescription = "Edit Course",
+                    modifier = Modifier.size(35.dp),
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer
+                )
             }
-        ) {
-            Icon(
-                imageVector = Icons.Rounded.Delete,
-                contentDescription = "Delete Note",
-                modifier = Modifier.size(35.dp),
-                tint = MaterialTheme.colorScheme.onPrimaryContainer
-            )
-        }
-    }
+            Spacer(modifier = Modifier.size(14.dp))
+            IconButton(
+                onClick = {
+                    if (course.mId != 0) {
+                        openDialog.value = true
+                        deleteText.value = "Are you sure you want to delete this note ?"
+                        courseToDelete.value = mutableListOf(course)
+                    }
+                }
+            ) {
+                Icon(
+                    imageVector = Icons.Rounded.Delete,
+                    contentDescription = "Delete Note",
+                    modifier = Modifier.size(35.dp),
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+            }
+        } // end of row
+    } // end of card
 }
 
