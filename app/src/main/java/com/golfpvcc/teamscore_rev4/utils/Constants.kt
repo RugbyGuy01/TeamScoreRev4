@@ -18,7 +18,8 @@ object Constants {
 
     const val USER_CANCEL = 100
     const val USER_SAVE = 101
-    const val USER_ACTION = 102
+    const val USER_TEXT_SAVE = 102
+    const val USER_TEXT_UPDATE = 103
 
     fun List<CourseRecord>?.orCourseRecHolderList(): List<CourseRecord> {
         fun courseRecHolderList(): List<CourseRecord> {

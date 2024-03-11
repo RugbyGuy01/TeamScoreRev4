@@ -1,6 +1,6 @@
 package com.golfpvcc.teamscore_rev4.ui.screens.coursedetail
 
-import android.net.Uri
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
@@ -16,17 +16,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.AlertDialogDefaults.shape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -43,24 +39,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
-import com.golfpvcc.teamscore_rev4.R
 import com.golfpvcc.teamscore_rev4.database.model.CourseRecord
-import com.golfpvcc.teamscore_rev4.ui.screens.GenericAppBar
 import com.golfpvcc.teamscore_rev4.ui.screens.courses.CoursesViewModel
-import com.golfpvcc.teamscore_rev4.utils.Constants.USER_ACTION
+import com.golfpvcc.teamscore_rev4.ui.screens.courses.DropDownSelectHolePar
 import com.golfpvcc.teamscore_rev4.utils.Constants.USER_CANCEL
 import com.golfpvcc.teamscore_rev4.utils.Constants.USER_SAVE
+import com.golfpvcc.teamscore_rev4.utils.Constants.USER_TEXT_SAVE
+import com.golfpvcc.teamscore_rev4.utils.Constants.USER_TEXT_UPDATE
 import com.golfpvcc.teamscore_rev4.utils.Constants.courseDetailPlaceHolder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -81,7 +73,8 @@ fun CourseDetailScreen(
     val currentCoursename = remember { mutableStateOf(courseRec.value.mCoursename) }
     val currentHandicap = remember { mutableStateOf(courseRec.value.mHandicap) }
     val currentPar = remember { mutableStateOf(courseRec.value.mPar) }
-    val saveButtonState = remember { mutableStateOf(0) }
+
+   val saveButtonState = remember { mutableStateOf(USER_TEXT_SAVE) }
     val currentFlipButton = remember { mutableStateOf(false) }
 
     LaunchedEffect(true) {
@@ -90,6 +83,8 @@ fun CourseDetailScreen(
             currentCoursename.value = courseRec.value.mCoursename
             currentHandicap.value = courseRec.value.mHandicap
             currentPar.value = courseRec.value.mPar
+            saveButtonState.value =
+                if (courseRec.value.mId == 0) USER_TEXT_SAVE else USER_TEXT_UPDATE
         }
     }
 
@@ -102,11 +97,10 @@ fun CourseDetailScreen(
                 currentCoursename,
                 currentHandicap,
                 currentPar,
-                navController,
                 currentFlipButton,
                 saveButtonState,
-            )
-            if (saveButtonState.value != 0) {
+                )
+            if (!(saveButtonState.value == USER_TEXT_UPDATE || saveButtonState.value == USER_TEXT_SAVE)) {
                 if (saveButtonState.value == USER_SAVE)
                     courseViewModel.addOrUpdateCourse(
                         CourseRecord(
@@ -117,7 +111,7 @@ fun CourseDetailScreen(
                         )
                     )
                 navController.popBackStack()
-                saveButtonState.value = 0
+                saveButtonState.value = USER_TEXT_UPDATE
             }
         }
     }
@@ -130,11 +124,10 @@ fun CourseDetailEntry(
     currentCoursename: MutableState<String>,
     currentHandicap: MutableState<IntArray>,
     currentPar: MutableState<IntArray>,
-    navController: NavController,
     currentFlipButton: MutableState<Boolean>,
     saveButtonState: MutableState<Int>,
 ) {
-    //viewModel.setHandicapAvailable()
+
     Column(
         modifier = modifier
             .padding(5.dp)
@@ -152,16 +145,21 @@ fun CourseDetailEntry(
             currentHandicap,
             currentPar,
         )
+//        if (parCurrentHoleIdx.value != -1) {     // the function is called many time, if click par/hdcp button then popup select hole will be set
+//            val holeIdx = parCurrentHoleIdx
+//            Log.d("VIN", "before Popup par Hole ${parCurrentHoleIdx.value + 1} par $parCurrentHole")
+//            DropDownSelectHolePar(parCurrentHole, parCurrentHoleIdx)
+//            Log.d("VIN", "after Popup par Hole ${parCurrentHoleIdx.value + 1} par ${parCurrentHole.value}")
+//        }
         Spacer(modifier = Modifier.size(12.dp))
         Divider(color = Color.Blue, thickness = 1.dp)
         Spacer(modifier = Modifier.size(12.dp))
-        DisplaySaveCancelButtons(navController, saveButtonState)
+        DisplaySaveCancelButtons(saveButtonState)
     }
 }
 
 @Composable
 fun DisplaySaveCancelButtons(
-    navController: NavController,
     saveButtonState: MutableState<Int>,
 ) {
 
@@ -171,27 +169,27 @@ fun DisplaySaveCancelButtons(
     ) {
         Button(
             onClick = {
-                saveButtonState.value = USER_SAVE
-            },
-            modifier = Modifier
-                .height(40.dp),  //vpg
-        ) {
-            Text(
-                text = if (saveButtonState.value == USER_ACTION) {
-                    "Update"
-                } else {
-                    "Save"
-                }
-            )
-        }
-        Button(
-            onClick = {
                 saveButtonState.value = USER_CANCEL
             },
             modifier = Modifier
                 .height(40.dp),  //vpg
         ) {
             Text(text = "Cancel")
+        }
+        Button(
+            onClick = {
+                saveButtonState.value = USER_SAVE
+            },
+            modifier = Modifier
+                .height(40.dp),  //vpg
+        ) {
+            Text(
+                text = if (saveButtonState.value == USER_TEXT_UPDATE) {
+                    "Update"
+                } else {
+                    "Save"
+                }
+            )
         }
     }
 }
@@ -205,12 +203,13 @@ fun ShowHoleDetailsList(
 
     LazyColumn(modifier) {
         items(currentPar.value.size) { idx ->
-            HoleDetail(currentHandicap, currentPar, idx)
+            HoleDetail(currentHandicap, currentPar, idx,)
         }
 
     }
-//    if (parHoleInx != -1) {     // the function is called many time, if click par/hdcp button then popup select hole will be set
-//        DropDownSelectHolePar(viewModel, parHoleInx)
+//    if (parCurrentHole.value != -1) {     // the function is called many time, if click par/hdcp button then popup select hole will be set
+//        DropDownSelectHolePar(parCurrentHole, parCurrentHoleIdx)
+//        Log.d("VIN", "Popup par Hole ${parCurrentHoleIdx.value + 1} par $parCurrentHole")
 //    }
 //    if (hdcpHoleInx != -1) {
 //        DropDownSelectHoleHandicap(viewModel, hdcpHoleInx)
@@ -221,7 +220,7 @@ fun ShowHoleDetailsList(
 fun HoleDetail(
     currentHandicap: MutableState<IntArray>,
     currentPar: MutableState<IntArray>,
-    holeIdx: Int
+    holeIdx: Int,
 ) {
 
     Card(
@@ -238,7 +237,9 @@ fun HoleDetail(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             TextButton(
-                onClick = { },
+                onClick = {
+
+                },
             ) {
                 Text(
                     text = "Par ${currentPar.value[holeIdx]}",
@@ -272,12 +273,16 @@ fun GetCourseName(
     val mMaxLength = 15
     val mContext = LocalContext.current
 
+    if (courseDetailPlaceHolder.mCoursename == currentCoursename.value) {
+        currentCoursename.value = ""
+    }
+
     OutlinedTextField(
         modifier = Modifier.width(200.dp),
         value = currentCoursename.value,
         textStyle = MaterialTheme.typography.bodyLarge,
         singleLine = true,
-        onValueChange = {value ->
+        onValueChange = { value ->
             if (value.length <= mMaxLength) currentCoursename.value = value
             else Toast.makeText(
                 mContext,

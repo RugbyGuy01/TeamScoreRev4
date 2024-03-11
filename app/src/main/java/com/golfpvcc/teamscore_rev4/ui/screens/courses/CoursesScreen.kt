@@ -170,24 +170,24 @@ fun CourseItem(
     navController: NavController,
     courseToDelete: MutableState<List<CourseRecord>>
 ) {
-        Card(
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(5.dp)
+            .height(70.dp)
+            .clickable {
+                Log.d("VIN:", "CourseItem onItemClick navigate to Player Setup")
+                navController.navigate(route = TeamScoreScreen.PlayerSetup.passId(course.mId))
+            }
+
+    ) {
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(5.dp)
-                .height(70.dp)
-                .clickable {
-                    Log.d("VIN:", "CourseItem onItemClick navigate to Player Setup")
-                    navController.navigate(route = TeamScoreScreen.PlayerSetup.passId(course.mId))
-                }
-
+                .padding(15.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(15.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ){
             Text(
                 text = course.mCoursename,
                 style = MaterialTheme.typography.headlineMedium,
@@ -210,18 +210,20 @@ fun CourseItem(
                 )
             }
             Spacer(modifier = Modifier.size(14.dp))
+            Log.d("VIN", "IconButton Delete Course ${course.mId}")
             IconButton(
                 onClick = {
                     if (course.mId != 0) {
                         openDialog.value = true
-                        deleteText.value = "Are you sure you want to delete this course ?"
+                        deleteText.value = "Are you sure you want to delete this course - ${course.mCoursename}?"
                         courseToDelete.value = mutableListOf(course)
+                        Log.d("VIN", "Delete Course ${course.mId}")
                     }
                 }
             ) {
                 Icon(
                     imageVector = Icons.Rounded.Delete,
-                    contentDescription = "Delete Note",
+                    contentDescription = "Delete course",
                     modifier = Modifier.size(35.dp),
                     tint = MaterialTheme.colorScheme.onPrimaryContainer
                 )
