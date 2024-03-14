@@ -22,7 +22,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -46,9 +45,8 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.golfpvcc.teamscore_rev4.database.model.CourseRecord
 import com.golfpvcc.teamscore_rev4.ui.screens.courses.CoursesViewModel
-import com.golfpvcc.teamscore_rev4.ui.screens.courses.DropDownSelectHolePar
+import com.golfpvcc.teamscore_rev4.ui.screens.courses.SaveCourseRecord
 import com.golfpvcc.teamscore_rev4.utils.Constants.USER_CANCEL
 import com.golfpvcc.teamscore_rev4.utils.Constants.USER_SAVE
 import com.golfpvcc.teamscore_rev4.utils.Constants.USER_TEXT_SAVE
@@ -69,20 +67,20 @@ fun CourseDetailScreen(
     val courseRec = remember {
         mutableStateOf(courseDetailPlaceHolder)
     }
+    val recDetail = remember { CourseDetailViewModel() }
 
-    val currentCoursename = remember { mutableStateOf(courseRec.value.mCoursename) }
-    val currentHandicap = remember { mutableStateOf(courseRec.value.mHandicap) }
-    val currentPar = remember { mutableStateOf(courseRec.value.mPar) }
-
-   val saveButtonState = remember { mutableStateOf(USER_TEXT_SAVE) }
+    val saveButtonState = remember { mutableStateOf(USER_TEXT_SAVE) }
     val currentFlipButton = remember { mutableStateOf(false) }
 
     LaunchedEffect(true) {
         scope.launch(Dispatchers.IO) {
             courseRec.value = courseViewModel.getCourseById(courseID) ?: courseDetailPlaceHolder
-            currentCoursename.value = courseRec.value.mCoursename
-            currentHandicap.value = courseRec.value.mHandicap
-            currentPar.value = courseRec.value.mPar
+            Log.d("VIN", "Get mCoursename = ${courseRec.value.mCoursename}")
+            recDetail.onCourseNameChange(courseRec.value.mCoursename)
+            recDetail.setHandicap(courseRec.value.mHandicap)
+            recDetail.setPar(courseRec.value.mPar)
+            recDetail.setCourseId(courseRec.value.mId)
+
             saveButtonState.value =
                 if (courseRec.value.mId == 0) USER_TEXT_SAVE else USER_TEXT_UPDATE
         }
@@ -92,69 +90,41 @@ fun CourseDetailScreen(
         Scaffold()
         {
             Spacer(modifier = Modifier.padding(it))
-            CourseDetailEntry(
-                Modifier,
-                currentCoursename,
-                currentHandicap,
-                currentPar,
-                currentFlipButton,
-                saveButtonState,
+            Column(
+                modifier = Modifier
+                    .padding(5.dp)
+                    .fillMaxHeight()
+            ) {
+                Row {
+//                    GetCourseName(currentCoursename)
+                    GetCourseName(recDetail)
+                    DisplayFlipHdcpsButtons(currentFlipButton)
+                }
+                Spacer(modifier = Modifier.size(12.dp))
+                Divider(color = Color.Blue, thickness = 1.dp)
+                Spacer(modifier = Modifier.size(12.dp))
+                ShowHoleDetailsList(
+                    modifier = Modifier.weight(1f),
+                    recDetail,
                 )
-            if (!(saveButtonState.value == USER_TEXT_UPDATE || saveButtonState.value == USER_TEXT_SAVE)) {
-                if (saveButtonState.value == USER_SAVE)
-                    courseViewModel.addOrUpdateCourse(
-                        CourseRecord(
-                            mId = courseRec.value.mId,
-                            mCoursename = currentCoursename.value,
-                            mHandicap = currentHandicap.value,
-                            mPar = currentPar.value
-                        )
-                    )
-                navController.popBackStack()
-                saveButtonState.value = USER_TEXT_UPDATE
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun CourseDetailEntry(
-    modifier: Modifier = Modifier,
-    currentCoursename: MutableState<String>,
-    currentHandicap: MutableState<IntArray>,
-    currentPar: MutableState<IntArray>,
-    currentFlipButton: MutableState<Boolean>,
-    saveButtonState: MutableState<Int>,
-) {
-
-    Column(
-        modifier = modifier
-            .padding(5.dp)
-            .fillMaxHeight()
-    ) {
-        Row {
-            GetCourseName(currentCoursename)
-            DisplayFlipHdcpsButtons(currentFlipButton)
-        }
-        Spacer(modifier = Modifier.size(12.dp))
-        Divider(color = Color.Blue, thickness = 1.dp)
-        Spacer(modifier = Modifier.size(12.dp))
-        ShowHoleDetailsList(
-            modifier = Modifier.weight(1f),
-            currentHandicap,
-            currentPar,
-        )
 //        if (parCurrentHoleIdx.value != -1) {     // the function is called many time, if click par/hdcp button then popup select hole will be set
 //            val holeIdx = parCurrentHoleIdx
 //            Log.d("VIN", "before Popup par Hole ${parCurrentHoleIdx.value + 1} par $parCurrentHole")
 //            DropDownSelectHolePar(parCurrentHole, parCurrentHoleIdx)
 //            Log.d("VIN", "after Popup par Hole ${parCurrentHoleIdx.value + 1} par ${parCurrentHole.value}")
 //        }
-        Spacer(modifier = Modifier.size(12.dp))
-        Divider(color = Color.Blue, thickness = 1.dp)
-        Spacer(modifier = Modifier.size(12.dp))
-        DisplaySaveCancelButtons(saveButtonState)
+                Spacer(modifier = Modifier.size(12.dp))
+                Divider(color = Color.Blue, thickness = 1.dp)
+                Spacer(modifier = Modifier.size(12.dp))
+                DisplaySaveCancelButtons(saveButtonState)
+                SaveCourseRecord(
+                    navController,
+                    saveButtonState,
+                    courseViewModel,
+                    recDetail,
+                )
+            }
+        }
     }
 }
 
@@ -197,13 +167,12 @@ fun DisplaySaveCancelButtons(
 @Composable
 fun ShowHoleDetailsList(
     modifier: Modifier,
-    currentHandicap: MutableState<IntArray>,
-    currentPar: MutableState<IntArray>,
+    recDetail: CourseDetailViewModel,
 ) {
 
     LazyColumn(modifier) {
-        items(currentPar.value.size) { idx ->
-            HoleDetail(currentHandicap, currentPar, idx,)
+        items(recDetail.state.mPar.size) { idx ->
+            HoleDetail(recDetail, idx)
         }
 
     }
@@ -218,8 +187,7 @@ fun ShowHoleDetailsList(
 
 @Composable
 fun HoleDetail(
-    currentHandicap: MutableState<IntArray>,
-    currentPar: MutableState<IntArray>,
+    recDetail: CourseDetailViewModel,
     holeIdx: Int,
 ) {
 
@@ -242,7 +210,7 @@ fun HoleDetail(
                 },
             ) {
                 Text(
-                    text = "Par ${currentPar.value[holeIdx]}",
+                    text = "Par ${recDetail.state.mPar[holeIdx]}",
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
@@ -255,7 +223,7 @@ fun HoleDetail(
                 onClick = { },
             ) {
                 val displayText =
-                    if (currentHandicap.value[holeIdx] == 0) " --  " else currentHandicap.value[holeIdx]
+                    if (recDetail.state.mHandicap[holeIdx] == 0) " --  " else recDetail.state.mHandicap[holeIdx]
                 Text(
                     text = "Hdcp $displayText",
                     style = MaterialTheme.typography.bodyMedium
@@ -267,23 +235,25 @@ fun HoleDetail(
 
 @Composable
 fun GetCourseName(
-    currentCoursename: MutableState<String>,
+    recDetail: CourseDetailViewModel
+//    currentCoursename: MutableState<String>,
+
 ) {
     val focusManager = LocalFocusManager.current
     val mMaxLength = 15
     val mContext = LocalContext.current
 
-    if (courseDetailPlaceHolder.mCoursename == currentCoursename.value) {
-        currentCoursename.value = ""
+    if (courseDetailPlaceHolder.mCoursename == recDetail.state.mCoursename) {
+        recDetail.onCourseNameChange("")
     }
 
     OutlinedTextField(
         modifier = Modifier.width(200.dp),
-        value = currentCoursename.value,
+        value = recDetail.state.mCoursename,
         textStyle = MaterialTheme.typography.bodyLarge,
         singleLine = true,
         onValueChange = { value ->
-            if (value.length <= mMaxLength) currentCoursename.value = value
+            if (value.length <= mMaxLength) recDetail.onCourseNameChange(value)
             else Toast.makeText(
                 mContext,
                 "Cannot be more than $mMaxLength Characters",
@@ -324,3 +294,4 @@ fun DisplayFlipHdcpsButtons(currentFlipButton: MutableState<Boolean>) {
         if (currentFlipButton.value) Text(text = "Normal") else Text(text = "Hdcp Flip")
     }
 }
+

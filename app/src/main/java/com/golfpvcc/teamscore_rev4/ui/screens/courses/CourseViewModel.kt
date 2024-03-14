@@ -40,6 +40,7 @@ class CoursesViewModel(
     }
 
     suspend fun getCourseById(courseId: Int?): CourseRecord? {
+        Log.d("VIN", "Get course id = $courseId")
         return courseDao.getCourseRecord(courseId)
     }
 

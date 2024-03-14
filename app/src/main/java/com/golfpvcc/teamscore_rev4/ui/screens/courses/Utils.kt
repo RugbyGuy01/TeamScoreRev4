@@ -23,10 +23,33 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
+import androidx.navigation.NavController
 import com.golfpvcc.teamscore_rev4.database.model.CourseRecord
+import com.golfpvcc.teamscore_rev4.ui.screens.coursedetail.CourseDetailViewModel
+import com.golfpvcc.teamscore_rev4.utils.Constants
 import com.golfpvcc.teamscore_rev4.utils.TeamObjects
 
-
+@Composable
+fun SaveCourseRecord(
+    navController: NavController,
+    saveButtonState: MutableState<Int>,
+    courseViewModel:CoursesViewModel,
+    recDetail: CourseDetailViewModel
+) {
+    if (!(saveButtonState.value == Constants.USER_TEXT_UPDATE || saveButtonState.value == Constants.USER_TEXT_SAVE)) {
+        if (saveButtonState.value == Constants.USER_SAVE)
+            courseViewModel.addOrUpdateCourse(
+                CourseRecord(
+                    mId = recDetail.state.mId,
+                    mCoursename = recDetail.state.mCoursename,
+                    mHandicap = recDetail.state.mHandicap,
+                    mPar = recDetail.state.mPar
+                )
+            )
+        navController.popBackStack()
+        saveButtonState.value = Constants.USER_TEXT_UPDATE
+    }
+}
 @Composable  // holeIdx is zero base index
 fun DropDownSelectHolePar(
     parCurrentHole: MutableState<Int>,
@@ -73,7 +96,10 @@ fun DropDownSelectHolePar(
                             .padding(8.dp)
                             .clickable {
                                 parCurrentHole.value = it.Par
-                                Log.d("VIN", "after Popup par Hole ${parCurrentHoleIdx.value + 1} par ${parCurrentHole.value}")
+                                Log.d(
+                                    "VIN",
+                                    "after Popup par Hole ${parCurrentHoleIdx.value + 1} par ${parCurrentHole.value}"
+                                )
                                 parCurrentHoleIdx.value = -1
                             }
                     )
