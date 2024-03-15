@@ -70,7 +70,6 @@ fun CourseDetailScreen(
     val recDetail = remember { CourseDetailViewModel() }
 
     val saveButtonState = remember { mutableStateOf(USER_TEXT_SAVE) }
-    val currentFlipButton = remember { mutableStateOf(false) }
 
     LaunchedEffect(true) {
         scope.launch(Dispatchers.IO) {
@@ -83,6 +82,8 @@ fun CourseDetailScreen(
 
             saveButtonState.value =
                 if (courseRec.value.mId == 0) USER_TEXT_SAVE else USER_TEXT_UPDATE
+
+            recDetail.setHandicapAvailable()
         }
     }
 
@@ -96,9 +97,9 @@ fun CourseDetailScreen(
                     .fillMaxHeight()
             ) {
                 Row {
-//                    GetCourseName(currentCoursename)
+
                     GetCourseName(recDetail)
-                    DisplayFlipHdcpsButtons(currentFlipButton)
+                    DisplayFlipHdcpsButtons(recDetail)
                 }
                 Spacer(modifier = Modifier.size(12.dp))
                 Divider(color = Color.Blue, thickness = 1.dp)
@@ -107,12 +108,6 @@ fun CourseDetailScreen(
                     modifier = Modifier.weight(1f),
                     recDetail,
                 )
-//        if (parCurrentHoleIdx.value != -1) {     // the function is called many time, if click par/hdcp button then popup select hole will be set
-//            val holeIdx = parCurrentHoleIdx
-//            Log.d("VIN", "before Popup par Hole ${parCurrentHoleIdx.value + 1} par $parCurrentHole")
-//            DropDownSelectHolePar(parCurrentHole, parCurrentHoleIdx)
-//            Log.d("VIN", "after Popup par Hole ${parCurrentHoleIdx.value + 1} par ${parCurrentHole.value}")
-//        }
                 Spacer(modifier = Modifier.size(12.dp))
                 Divider(color = Color.Blue, thickness = 1.dp)
                 Spacer(modifier = Modifier.size(12.dp))
@@ -169,20 +164,22 @@ fun ShowHoleDetailsList(
     modifier: Modifier,
     recDetail: CourseDetailViewModel,
 ) {
+    val parHoleInx = recDetail.getPopupSelectHolePar()
+    val hdcpHoleInx = recDetail.getPopupSelectHoleHandicap()
 
     LazyColumn(modifier) {
         items(recDetail.state.mPar.size) { idx ->
             HoleDetail(recDetail, idx)
+            Spacer(modifier = Modifier.size(10.dp))
         }
 
     }
-//    if (parCurrentHole.value != -1) {     // the function is called many time, if click par/hdcp button then popup select hole will be set
-//        DropDownSelectHolePar(parCurrentHole, parCurrentHoleIdx)
-//        Log.d("VIN", "Popup par Hole ${parCurrentHoleIdx.value + 1} par $parCurrentHole")
-//    }
-//    if (hdcpHoleInx != -1) {
-//        DropDownSelectHoleHandicap(viewModel, hdcpHoleInx)
-//    }
+    if (parHoleInx != -1) {     // the function is called many time, if click par/hdcp button then popup select hole will be set
+        DropDownSelectHolePar(recDetail, parHoleInx)
+    }
+    if (hdcpHoleInx != -1) {
+        DropDownSelectHoleHandicap(recDetail, hdcpHoleInx)
+    }
 }
 
 @Composable
@@ -206,7 +203,7 @@ fun HoleDetail(
         ) {
             TextButton(
                 onClick = {
-
+                    recDetail.setPopupSelectHolePar(holeIdx)
                 },
             ) {
                 Text(
@@ -220,7 +217,7 @@ fun HoleDetail(
                 style = MaterialTheme.typography.bodyLarge,
             )
             TextButton(
-                onClick = { },
+                onClick = {recDetail.setPopupSelectHoleHdcp(holeIdx) },
             ) {
                 val displayText =
                     if (recDetail.state.mHandicap[holeIdx] == 0) " --  " else recDetail.state.mHandicap[holeIdx]
@@ -281,17 +278,4 @@ fun GetCourseName(
     )
 }
 
-@Composable
-fun DisplayFlipHdcpsButtons(currentFlipButton: MutableState<Boolean>) {
-    Button(
-        modifier = Modifier
-            .padding(top = 20.dp, start = 20.dp)
-            .height(40.dp),
-        onClick = {
-            currentFlipButton.value = !currentFlipButton.value
-        },
-    ) {
-        if (currentFlipButton.value) Text(text = "Normal") else Text(text = "Hdcp Flip")
-    }
-}
 

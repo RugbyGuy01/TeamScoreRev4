@@ -1,5 +1,6 @@
 package com.golfpvcc.teamscore_rev4.ui.screens.coursedetail
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -21,14 +22,51 @@ class CourseDetailViewModel (){
         state = state.copy(mId = id)
     }
 
-
     fun getFlipHdcps(): Boolean {
         return state.mFlipHdcps
     }
 
-    fun onFlipHdcpsChange(newValue: Boolean) {
+    fun setFlipHdcpsChange(newValue: Boolean) {
         state = state.copy(mFlipHdcps = !newValue)
     }
+
+    //  par configuration
+    fun getPopupSelectHolePar(): Int {
+        return (state.isPopupSelectHolePar)
+    }
+    fun setPopupSelectHolePar(holeIdx: Int) {
+        state = state.copy(isPopupSelectHolePar = holeIdx)
+    }
+    fun getHolePar(holeIdx: Int): Int {
+        val newValue = state.mPar[holeIdx]
+        Log.d("VIN", "getHolePar Inx$holeIdx - Par $newValue")
+        return newValue
+    }
+    fun onParChange(holeIdx: Int, newValue: Int) {
+        Log.d("VIN", "onParChange Inx$holeIdx - Par $newValue")
+        state.mPar[holeIdx] = newValue
+    }
+    // end of par configuration
+    // Configure course Handicap
+    fun getPopupSelectHoleHandicap(): Int {
+        return (state.isPopupSelectHoleHdcp)
+    }
+    fun setPopupSelectHoleHdcp(holeIdx: Int) {
+        state = state.copy(isPopupSelectHoleHdcp = holeIdx)
+    }
+    fun getHoleHandicap(holeIdx: Int): Int {
+        val newValue = state.mHandicap[holeIdx]
+        Log.d("VIN", "getHoleHandicap Inx$holeIdx - Hdcp $newValue")
+        return newValue
+    }
+    fun onHandicapChange(holeIdx: Int, newHdcp: Int) {
+        Log.d("VIN", "onHandicapChange Card Hole-$holeIdx - Hdcp $newHdcp")
+        state.mHandicap[holeIdx] = newHdcp
+    }
+    fun setHandicapAvailable() {
+        currentHandicapConfiguration(state.mHandicap, state.availableHandicap)
+    }
+    // end of Configure course Handicap
 }
 data class CourseDetailState(
     val mId: Int = 0,

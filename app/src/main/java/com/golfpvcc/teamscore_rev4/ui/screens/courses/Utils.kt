@@ -50,64 +50,7 @@ fun SaveCourseRecord(
         saveButtonState.value = Constants.USER_TEXT_UPDATE
     }
 }
-@Composable  // holeIdx is zero base index
-fun DropDownSelectHolePar(
-    parCurrentHole: MutableState<Int>,
-    parCurrentHoleIdx: MutableState<Int>,
-    showParPopup: Boolean,
-)  {
-    var expanded = showParPopup  // will show popu
 
-    Popup(
-        alignment = Alignment.CenterEnd,
-        onDismissRequest = {
-            parCurrentHoleIdx.value = -1 // close popup
-            expanded
-        }
-    ) {     // Composable content to be shown in the Popup
-        Surface(
-            modifier = Modifier.padding(1.dp),
-            shape = RoundedCornerShape(12.dp),
-            color = MaterialTheme.colorScheme.surface,
-            border = BorderStroke(1.dp, Color.Red)
-        ) //Well, its a border)
-        {
-            Column(
-                modifier = Modifier
-                    .padding(3.dp)
-                    .width(110.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    modifier = Modifier.padding(15.dp),
-                    text = "Hole ${parCurrentHoleIdx.value + 1}"
-                )
-                Divider(color = Color.Blue, thickness = 1.dp)
-                TeamObjects.holeParList.forEach {
-                    Divider(color = Color.Green, thickness = 1.dp)
-                    Text(
-                        text = "      ${it.Par}     ",
-                        textAlign = TextAlign.Center,
-                        color = if (parCurrentHole.value == it.Par) Color.White else Color.Unspecified,
-                        style = if (parCurrentHole.value == it.Par) TextStyle(background = Color.Black) else TextStyle(
-                            background = Color.Yellow
-                        ),
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .clickable {
-                                parCurrentHole.value = it.Par
-                                Log.d(
-                                    "VIN",
-                                    "after Popup par Hole ${parCurrentHoleIdx.value + 1} par ${parCurrentHole.value}"
-                                )
-                                parCurrentHoleIdx.value = -1
-                            }
-                    )
-                }
-            }
-        }
-    }
-}
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DeleteDialog(
