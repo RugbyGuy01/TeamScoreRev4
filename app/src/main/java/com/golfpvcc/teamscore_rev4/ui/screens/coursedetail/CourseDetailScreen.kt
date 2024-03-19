@@ -233,8 +233,6 @@ fun HoleDetail(
 @Composable
 fun GetCourseName(
     recDetail: CourseDetailViewModel
-//    currentCoursename: MutableState<String>,
-
 ) {
     val focusManager = LocalFocusManager.current
     val mMaxLength = 15

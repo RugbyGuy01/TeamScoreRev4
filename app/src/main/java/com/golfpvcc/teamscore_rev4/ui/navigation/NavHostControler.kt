@@ -1,6 +1,5 @@
 package com.golfpvcc.teamscore_rev4.ui.navigation
 
-import androidx.compose.ui.graphics.BlendMode.Companion.Screen
 import com.golfpvcc.teamscore_rev4.ui.screens.coursedetail.CourseDetailScreen
 import com.golfpvcc.teamscore_rev4.ui.screens.courses.CoursesScreen
 import com.golfpvcc.teamscore_rev4.utils.Constants
@@ -17,6 +16,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
+import com.golfpvcc.teamscore_rev4.ui.screens.playersetup.PlayerSetupScreen
 
 
 @Composable
@@ -25,12 +25,12 @@ fun SetupNavGraph(
 ) {
     NavHost(
         navController = navHostController,
-        startDestination = Constants.DISPLAY_CONFIGATION_SCREEN
+        startDestination = Constants.DISPLAY_CONFIGURATION_SCREEN
     ) {
 
         navigation(
             startDestination = TeamScoreScreen.Courses.route,
-            route = Constants.DISPLAY_CONFIGATION_SCREEN
+            route = Constants.DISPLAY_CONFIGURATION_SCREEN
         ) {
             composable(route = TeamScoreScreen.Courses.route) {
 //                val viewModel = it.sharedViewModel<ScreensViewModel>(navHostController)
@@ -50,17 +50,17 @@ fun SetupNavGraph(
                 )
             }
 
-//            composable(route = TeamScoreScreen.PlayerSetup.route,
-//                arguments = listOf(
-//                    navArgument(name = "id") {
-//                        type = NavType.IntType
-//                        defaultValue = -1
-//                    }
-//                )) { id ->
-//                PlayerSetupScreen(
-//                    navHostController, id.arguments?.getInt("id")
-//                )
-//            }
+            composable(route = TeamScoreScreen.PlayerSetup.route,
+                arguments = listOf(
+                    navArgument(name = "id") {
+                        type = NavType.IntType
+                        defaultValue = -1
+                    }
+                )) { id ->
+                PlayerSetupScreen(
+                    navHostController, id.arguments?.getInt("id")
+                )
+            }
         } // end of nested navation
 
 //        navigation(

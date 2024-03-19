@@ -13,7 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class CoursesViewModel(
-    private val courseDao: CourseDao    // = Graph.courseRepository
+    private val courseDao: CourseDao    // are companion object
 ) : ViewModel() {
 
     var courses: LiveData<List<CourseRecord>> = courseDao.getAllCoursesRecordAsc()
@@ -47,12 +47,3 @@ class CoursesViewModel(
 }
 
 
-class PlayerSetupViewModelFactor(
-    private val courseRepo: CourseRepository
-) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return CoursesViewModel(
-            courseDao = TeamScoreCardApp.getCourseDao()
-        ) as T
-    }
-}
