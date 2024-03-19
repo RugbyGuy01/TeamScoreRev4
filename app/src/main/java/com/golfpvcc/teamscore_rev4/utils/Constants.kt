@@ -13,7 +13,7 @@ object Constants {
     const val DISPLAY_SCORE_CARD_SCREEN = 6
     const val DISPLAY_COURSES_SCREEN = 7
     const val MINIMUM_LEN_OF_PLAYER_NAME = 2
-    const val DISPLAY_CONFIGURATION_SCREEN = "Configuration"
+
     const val DATABASE_NAME = "TeamDatabase"
 
     const val USER_CANCEL = 100
@@ -21,8 +21,7 @@ object Constants {
     const val USER_TEXT_SAVE = 102
     const val USER_TEXT_UPDATE = 103
 
-    val playerRecordPlaceHolder = PlayerRecord()
-    val courseDetailPlaceHolder = CourseRecord(
+        val courseDetailPlaceHolder = CourseRecord(
         "No Course", "", IntArray(18){4}, IntArray(18)
     )
     fun List<CourseRecord>?.orCourseRecHolderList(): List<CourseRecord> {

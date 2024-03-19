@@ -13,7 +13,9 @@ import com.golfpvcc.teamscore_rev4.database.model.CourseRecord
 import com.golfpvcc.teamscore_rev4.database.model.PlayerRecord
 import com.golfpvcc.teamscore_rev4.database.model.ScoreCardRecord
 import com.golfpvcc.teamscore_rev4.utils.Constants
+import com.golfpvcc.teamscore_rev4.utils.Constants.DISPLAY_SCORE_CARD_SCREEN
 import com.golfpvcc.teamscore_rev4.utils.Constants.MINIMUM_LEN_OF_PLAYER_NAME
+import com.golfpvcc.teamscore_rev4.utils.Constants.SCORE_CARD_REC_ID
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -42,16 +44,33 @@ class PlayerSetupViewModel(
     }
 
     suspend fun getCourseById(courseId: Int?) {
-        val courseRecord : CourseRecord = courseDao.getCourseRecord(courseId)
-        updateScoreCard(courseRecord )
+        val courseRecord: CourseRecord = courseDao.getCourseRecord(courseId)
+        updateCourseRecord(courseRecord)
+        saveScoreCardRecord()       // make sure we have a record
+        val scoreCardRecord: ScoreCardRecord = scoreCardDao.getScoreCardRecord(SCORE_CARD_REC_ID)
+        updateScoreCard(scoreCardRecord)
+        val playerRecord :List<PlayerRecord> = playerDao.getAllPlayerRecords()
+
+        updatePlayers()
         Log.d("VIN", "Get course id = $courseId")
     }
-    fun updateScoreCard(courseRec : CourseRecord){
+
+    private fun updateCourseRecord(courseRec: CourseRecord) {
         state = state.copy(mCourseName = courseRec.mCoursename)
         state = state.copy(mPar = courseRec.mPar)
         state = state.copy(mHandicap = courseRec.mHandicap)
+    }
+
+    private fun updateScoreCard(scoreCard: ScoreCardRecord) {
+        state = state.copy(mTee = scoreCard.mTee)
+        state = state.copy(mCurrentHole = scoreCard.mCurrentHole)
         saveScoreCardRecord()
     }
+
+    fun updatePlayers() {
+
+    }
+
     fun onTeeStateChange(tee: String) {
         Log.d("VIN", "onTeeStateChange  Name ${state.mTee} Tee string $tee ")
         state = state.copy(mTee = tee)
@@ -85,10 +104,10 @@ class PlayerSetupViewModel(
 
     fun onButtonNewGame(): Int {
         viewModelScope.launch {
- //           deleteAllPlayerRecords()
+            //           deleteAllPlayerRecords()
             savePlayersRecord()
             saveScoreCardRecord()
-//            scoreCardState.mNextScreen = Constants.DISPLAY_SCORE_CARD_SCREEN
+            state = state.copy(mNextScreen = DISPLAY_SCORE_CARD_SCREEN)
         }
         return 0
     }
@@ -101,7 +120,7 @@ class PlayerSetupViewModel(
         viewModelScope.launch {
             savePlayersRecord()
             saveScoreCardRecord()
-//            scoreCardState.mNextScreen = Constants.DISPLAY_SCORE_CARD_SCREEN
+            state = state.copy(mNextScreen = DISPLAY_SCORE_CARD_SCREEN)
         }
         return 0
     }
@@ -128,7 +147,7 @@ class PlayerSetupViewModel(
 }
 
 data class ScoreCardState(
-    val nextScreen:Int = 0,
+    val nextScreen: Int = 0,
     val mCourseName: String = "",    // current course name from the course list dtabase
     val mTee: String = "",                   // the tee's played or the course yardage
     val mCurrentHole: Int = 0,      // the current hole being played in the game
@@ -138,8 +157,9 @@ data class ScoreCardState(
     val mTeamTotalScore: IntArray = IntArray(18),
     val mHoleUsedByPlayers: IntArray = IntArray(18),
     val mPlayerRecords: Array<PlayerRecord> = Array<PlayerRecord>(4) { PlayerRecord() },
-    val scoreCardRecId: Int = 10,    // score card record ID
+    val scoreCardRecId: Int = SCORE_CARD_REC_ID,    // score card record ID
     val observer: Boolean = false,
     val readDatabase: Boolean = true,
+    val mNextScreen: Int = 0,
 )
 

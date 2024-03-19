@@ -27,7 +27,9 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.golfpvcc.teamscore_rev4.database.model.PlayerRecord
+import com.golfpvcc.teamscore_rev4.ui.navigation.ROUTE_CONFIGURATION
+import com.golfpvcc.teamscore_rev4.ui.navigation.ROUTE_GAME_ON
+import com.golfpvcc.teamscore_rev4.ui.navigation.TeamScoreScreen
 import com.golfpvcc.teamscore_rev4.ui.theme.shape
 import com.golfpvcc.teamscore_rev4.utils.Constants
 
@@ -188,19 +190,19 @@ fun DisplayPlayerSetupButtons(
                 navHostController.popBackStack() // display courses screen
             }
         },
-//        shape = shape.large
+        shape = shape.large
     ) {
         Text(text = buttonText)
     }
 }
+fun moveToNextScreen(viewModel: PlayerSetupViewModel,navController: NavHostController, scoreCardId:Int) {
 
-//fun moveToNextScreen( viewModel: PlayerSetupViewModel,) {
-//    if (viewModel.  scoreCardState.mNextScreen == Constants.DISPLAY_SCORE_CARD_SCREEN) {
-//        Log.d("VIN", "On to game on")
-//        navController.navigate(route = Screen.ScoreCard.route) {
-//            popUpTo(Constants.DISPLAY_CONFIGATION_SCREEN) {
-//                inclusive = true
-//            }
-//        }
-//    }
-//}
+    if (viewModel.state.mNextScreen == Constants.DISPLAY_SCORE_CARD_SCREEN) {
+        Log.d("VIN", "On to game on")
+        navController.navigate(ROUTE_GAME_ON) {
+            popUpTo(ROUTE_CONFIGURATION) {
+                inclusive = true
+            }
+        }
+    }
+}

@@ -19,6 +19,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.BlendMode.Companion.Screen
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -26,8 +27,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.golfpvcc.teamscore_rev4.ui.navigation.TeamScoreScreen
 import com.golfpvcc.teamscore_rev4.ui.screens.coursedetail.CourseDetailViewModel
 import com.golfpvcc.teamscore_rev4.utils.Constants
+import com.golfpvcc.teamscore_rev4.utils.Constants.SCORE_CARD_REC_ID
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -47,7 +50,7 @@ fun PlayerSetupScreen(
     LaunchedEffect(true) {
         if (courseId != -1) {
             scope.launch(Dispatchers.IO) {
-                val courseRec = viewModel.getCourseById(courseId)
+                viewModel.getCourseById(courseId)
             }
         } else {
             Log.d("VIN", "Record ID not passed to Player setup screen!!")
@@ -69,6 +72,7 @@ fun PlayerSetupScreen(
             }
             Spacer(modifier = Modifier.size(20.dp))
             DisplayBottomButtons(modifier, viewModel, navController)
+            moveToNextScreen(viewModel, navController, scoreCardId = SCORE_CARD_REC_ID)
         }
     }
 }
@@ -109,7 +113,7 @@ fun DisplayBottomButtons(
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly,
-    ){
+    ) {
         DisplayPlayerSetupButtons(viewModel::onButtonNewGame, "New Game", navController)
         DisplayPlayerSetupButtons(viewModel::onButtonCancel, "Cancel", navController)
         DisplayPlayerSetupButtons(viewModel::onButtonUpdate, "Update", navController)
