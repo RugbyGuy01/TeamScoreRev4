@@ -49,9 +49,9 @@ class PlayerSetupViewModel(
         saveScoreCardRecord()       // make sure we have a record
         val scoreCardRecord: ScoreCardRecord = scoreCardDao.getScoreCardRecord(SCORE_CARD_REC_ID)
         updateScoreCard(scoreCardRecord)
-        val playerRecord :List<PlayerRecord> = playerDao.getAllPlayerRecords()
+        val playerRecords: List<PlayerRecord> = playerDao.getAllPlayerRecords()
+        updatePlayers(playerRecords)
 
-        updatePlayers()
         Log.d("VIN", "Get course id = $courseId")
     }
 
@@ -67,8 +67,11 @@ class PlayerSetupViewModel(
         saveScoreCardRecord()
     }
 
-    fun updatePlayers() {
+    fun updatePlayers(playerRecords: List<PlayerRecord>) {
 
+        for ((idx, playerRecord) in playerRecords.withIndex()) {
+            state.mPlayerRecords[idx] = playerRecord
+        }
     }
 
     fun onTeeStateChange(tee: String) {
@@ -103,8 +106,8 @@ class PlayerSetupViewModel(
     }
 
     fun onButtonNewGame(): Int {
-        viewModelScope.launch {
-            //           deleteAllPlayerRecords()
+        viewModelScope.launch(Dispatchers.IO) {
+            deleteAllPlayerRecords()
             savePlayersRecord()
             saveScoreCardRecord()
             state = state.copy(mNextScreen = DISPLAY_SCORE_CARD_SCREEN)
@@ -123,6 +126,10 @@ class PlayerSetupViewModel(
             state = state.copy(mNextScreen = DISPLAY_SCORE_CARD_SCREEN)
         }
         return 0
+    }
+
+    private fun deleteAllPlayerRecords() {
+        playerDao.deleteAllPlayersRecord()
     }
 
     suspend fun savePlayersRecord() {
@@ -148,7 +155,7 @@ class PlayerSetupViewModel(
 
 data class ScoreCardState(
     val nextScreen: Int = 0,
-    val mCourseName: String = "",    // current course name from the course list dtabase
+    val mCourseName: String = "",    // current course name from the course list database
     val mTee: String = "",                   // the tee's played or the course yardage
     val mCurrentHole: Int = 0,      // the current hole being played in the game
     val mPar: IntArray = IntArray(18),        // the current course Par,         // the current course Par

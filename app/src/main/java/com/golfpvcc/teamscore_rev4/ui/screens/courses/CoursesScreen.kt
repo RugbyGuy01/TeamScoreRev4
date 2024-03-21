@@ -1,5 +1,7 @@
 package com.golfpvcc.teamscore_rev4.ui.screens.courses
 
+import android.app.Activity
+import android.content.pm.ActivityInfo
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
@@ -43,10 +45,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.BlendMode.Companion.Screen
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -70,7 +68,9 @@ fun CoursesScreen(
     val deleteText = remember { mutableStateOf("\"Are you sure you want to delete course?") }
     val courseToDelete = remember { mutableStateOf(listOf<CourseRecord>()) }
     val courses = courseViewModel.courses.observeAsState()
-    val context = LocalContext.current
+    val activity = LocalContext.current as Activity
+
+    activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.primary) {
         Scaffold(

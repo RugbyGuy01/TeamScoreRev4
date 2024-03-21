@@ -1,5 +1,7 @@
 package com.golfpvcc.teamscore_rev4.ui.screens.coursedetail
 
+import android.app.Activity
+import android.content.pm.ActivityInfo
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
@@ -68,8 +70,9 @@ fun CourseDetailScreen(
         mutableStateOf(courseDetailPlaceHolder)
     }
     val recDetail = remember { CourseDetailViewModel() }
-
     val saveButtonState = remember { mutableStateOf(USER_TEXT_SAVE) }
+    val activity = LocalContext.current as Activity
+    activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
     LaunchedEffect(true) {
         scope.launch(Dispatchers.IO) {

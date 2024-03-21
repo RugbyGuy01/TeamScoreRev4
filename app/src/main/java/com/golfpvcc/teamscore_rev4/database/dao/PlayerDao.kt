@@ -11,7 +11,7 @@ interface PlayerDao {
     @Query("Select * FROM PlayerRecord")
     fun getAllPlayerRecords(): List<PlayerRecord>
 
-    @Query("DELETE FROM PlayerRecord")
+    @Query("DELETE  FROM PlayerRecord")
     fun  deleteAllPlayersRecord()
 
     @Upsert

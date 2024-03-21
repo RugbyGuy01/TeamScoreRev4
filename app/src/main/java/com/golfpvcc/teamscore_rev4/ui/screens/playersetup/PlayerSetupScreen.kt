@@ -1,5 +1,7 @@
 package com.golfpvcc.teamscore_rev4.ui.screens.playersetup
 
+import android.app.Activity
+import android.content.pm.ActivityInfo
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -20,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.BlendMode.Companion.Screen
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -46,6 +49,8 @@ fun PlayerSetupScreen(
     val scope = rememberCoroutineScope()
     val scoreRecState = remember { mutableStateOf(viewModel.state) }
     val modifier: Modifier = Modifier
+    val activity = LocalContext.current as Activity
+    activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
     LaunchedEffect(true) {
         if (courseId != -1) {

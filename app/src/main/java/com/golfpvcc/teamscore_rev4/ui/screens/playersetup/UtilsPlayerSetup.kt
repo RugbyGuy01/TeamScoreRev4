@@ -27,6 +27,7 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.golfpvcc.teamscore_rev4.ui.navigation.ROOT_GRAPH_ROUTE
 import com.golfpvcc.teamscore_rev4.ui.navigation.ROUTE_CONFIGURATION
 import com.golfpvcc.teamscore_rev4.ui.navigation.ROUTE_GAME_ON
 import com.golfpvcc.teamscore_rev4.ui.navigation.TeamScoreScreen
@@ -90,7 +91,7 @@ fun GetPlayerSetupInformation(
     OutlinedTextField(
         modifier = Modifier.width(200.dp),
         value = nameOrHandicap,
-        textStyle = MaterialTheme.typography.bodyLarge,
+        textStyle = MaterialTheme.typography.displaySmall,
         singleLine = true,
         onValueChange = { playerData ->
             if (!playerData.contains('.')) {
@@ -104,7 +105,7 @@ fun GetPlayerSetupInformation(
         },
         label = { Text(text = placeHolder) },
         placeholder = { Text(text = placeHolder) },
-        shape = shape.large,
+        shape = shape.small,
         colors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = Color.Red,
             unfocusedBorderColor = Color.Blue,
@@ -140,7 +141,7 @@ fun GetTeeInformation(
     OutlinedTextField(
         modifier = Modifier.width(200.dp),        // clear the Tee field white, green
         value = playerData,
-        textStyle = MaterialTheme.typography.bodyLarge,
+        textStyle = MaterialTheme.typography.headlineSmall,
         singleLine = true,
         onValueChange = { teeData ->
             if (teeData.length <= mMaxLength) updatedData(teeData)
@@ -152,7 +153,7 @@ fun GetTeeInformation(
         },
         label = { Text(text = placeHolder) },
         placeholder = { Text(text = placeHolder) },
-        shape = shape.large,
+        shape = shape.small,
         colors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = Color.Red,
             unfocusedBorderColor = Color.Blue,
@@ -200,7 +201,7 @@ fun moveToNextScreen(viewModel: PlayerSetupViewModel,navController: NavHostContr
     if (viewModel.state.mNextScreen == Constants.DISPLAY_SCORE_CARD_SCREEN) {
         Log.d("VIN", "On to game on")
         navController.navigate(ROUTE_GAME_ON) {
-            popUpTo(ROUTE_CONFIGURATION) {
+            popUpTo(ROOT_GRAPH_ROUTE) {
                 inclusive = true
             }
         }
