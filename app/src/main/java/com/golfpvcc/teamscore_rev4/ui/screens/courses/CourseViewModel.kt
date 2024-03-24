@@ -8,7 +8,6 @@ import androidx.lifecycle.viewModelScope
 import com.golfpvcc.teamscore_rev4.TeamScoreCardApp
 import com.golfpvcc.teamscore_rev4.database.dao.CourseDao
 import com.golfpvcc.teamscore_rev4.database.model.CourseRecord
-import com.golfpvcc.teamscore_rev4.repository.CourseRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
