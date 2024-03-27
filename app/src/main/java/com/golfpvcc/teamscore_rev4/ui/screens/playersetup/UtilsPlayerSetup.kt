@@ -53,6 +53,7 @@ fun EnterPlayerInfo(
             updatedData = viewModel::onPlayerNameChange,
             keyboardType = KeyboardType.Text,
             imeAction = ImeAction.Next,
+            modifier = modifier.width(175.dp),
         )
 
         val keyboardType: ImeAction
@@ -69,7 +70,8 @@ fun EnterPlayerInfo(
             viewModel.state.mPlayerRecords[index].mHandicap.toString(),
             updatedData = viewModel::onPlayerHandicapChange,
             KeyboardType.Number,
-            keyboardType
+            imeAction = keyboardType,
+            modifier = modifier.width(100.dp),
         )
 
     }
@@ -84,14 +86,15 @@ fun GetPlayerSetupInformation(
     updatedData: (Int, String) -> Unit,
     keyboardType: KeyboardType,
     imeAction: ImeAction,
+    modifier: Modifier,
 ) {
     val focusManager = LocalFocusManager.current
     val mContext = LocalContext.current
 
     OutlinedTextField(
-        modifier = Modifier.width(200.dp),
+        modifier = modifier,
         value = nameOrHandicap,
-        textStyle = MaterialTheme.typography.displaySmall,
+        textStyle = MaterialTheme.typography.headlineSmall, //to small for screen bodyLarge -- to large for screen - displaySmall
         singleLine = true,
         onValueChange = { playerData ->
             if (!playerData.contains('.')) {
@@ -134,12 +137,13 @@ fun GetTeeInformation(
     updatedData: (String) -> Unit,
     keyboardType: KeyboardType,
     imeAction: ImeAction,
+    modifier : Modifier,
 ) {
     val focusManager = LocalFocusManager.current
     val mContext = LocalContext.current
 
     OutlinedTextField(
-        modifier = Modifier.width(200.dp),        // clear the Tee field white, green
+        modifier = modifier,    // clear the Tee field white, green
         value = playerData,
         textStyle = MaterialTheme.typography.headlineSmall,
         singleLine = true,
@@ -196,7 +200,12 @@ fun DisplayPlayerSetupButtons(
         Text(text = buttonText)
     }
 }
-fun moveToNextScreen(viewModel: PlayerSetupViewModel,navController: NavHostController, scoreCardId:Int) {
+
+fun moveToNextScreen(
+    viewModel: PlayerSetupViewModel,
+    navController: NavHostController,
+    scoreCardId: Int
+) {
 
     if (viewModel.state.mNextScreen == Constants.DISPLAY_SCORE_CARD_SCREEN) {
         Log.d("VIN", "On to game on")

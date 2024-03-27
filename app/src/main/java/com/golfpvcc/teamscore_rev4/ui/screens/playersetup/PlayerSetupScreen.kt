@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -87,26 +88,42 @@ fun DisplayCourseNameAndTeeSelection(
     modifier: Modifier,
     viewModel: PlayerSetupViewModel,
 ) {
-    Row(
-        modifier = Modifier
-            .padding(10.dp)
-            .fillMaxWidth(),
-    ) {
-        Text(
-            text = "Course Name:\n ${viewModel.state.mCourseName}",
-            style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Normal
-        )
-        Spacer(modifier = Modifier.size(14.dp))
-        GetTeeInformation(
-            mMaxLength = Constants.MAX_COURSE_YARDAGE,
-            placeHolder = "Tee or Yardage",
-            playerData = viewModel.state.mTee,
-            updatedData = viewModel::onTeeStateChange,
-            keyboardType = KeyboardType.Text,
-            imeAction = ImeAction.Next,
-        )
+    Column(modifier = Modifier) {
+        Row(
+            modifier = Modifier
+                .padding(10.dp)
+                .fillMaxWidth(),
+        ) {
+            Text(
+                text = "Course Name:\n ${viewModel.state.mCourseName}",
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Normal
+            )
+            Spacer(modifier = Modifier.size(14.dp))
+            GetTeeInformation(
+                mMaxLength = Constants.MAX_COURSE_YARDAGE,
+                placeHolder = "Tee or Yardage",
+                playerData = viewModel.state.mTee,
+                updatedData = viewModel::onTeeStateChange,
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Next,
+                modifier.width(200.dp)
+            )
+        }
+        Spacer(modifier = Modifier.size(10.dp))
+        Row(){
+            GetTeeInformation(
+                mMaxLength = Constants.MAX_STARTING_HOLE,
+                placeHolder = "Starting Hole",
+                playerData = viewModel.state.mStartingHole,
+                updatedData = viewModel::onStartingHoleChange,
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Next,
+                modifier.width(100.dp)
+            )
+        }
     }
+
 }
 
 @Composable

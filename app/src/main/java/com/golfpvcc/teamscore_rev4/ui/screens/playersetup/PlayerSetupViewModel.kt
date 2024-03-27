@@ -63,7 +63,7 @@ class PlayerSetupViewModel(
 
     private fun updateScoreCard(scoreCard: ScoreCardRecord) {
         state = state.copy(mTee = scoreCard.mTee)
-        state = state.copy(mCurrentHole = scoreCard.mCurrentHole)
+        state = state.copy(mStartingHole = scoreCard.mCurrentHole.toString())
         saveScoreCardRecord()
     }
 
@@ -79,11 +79,27 @@ class PlayerSetupViewModel(
         state = state.copy(mTee = tee)
     }
 
+    fun onStartingHoleChange(startingHole: String) {
+        state = if(startingHole.isNotEmpty()) {
+            val validateStartingHole: Int = startingHole.toInt()
+            if (validateStartingHole in 1..18)
+                state.copy(mStartingHole = startingHole)
+            else
+                state.copy(mStartingHole = "1")
+        } else
+            state.copy(mStartingHole = "")
+
+        Log.d("VIN", "onStartingHoleChange  Name ${state.mStartingHole} start ingHole $startingHole ")
+    }
+
     fun saveScoreCardRecord() {
+        if(state.mStartingHole.isEmpty())
+           state =  state.copy(mStartingHole = "1")
+
         val scoreCardRecord: ScoreCardRecord = ScoreCardRecord(
             mCourseName = state.mCourseName,
             mTee = state.mTee,
-            mCurrentHole = state.mCurrentHole,
+            mCurrentHole = state.mStartingHole.toInt(),
             mPar = state.mPar,
             mHandicap = state.mHandicap,
             scoreCardRec_Id = state.scoreCardRecId
@@ -158,6 +174,7 @@ data class ScoreCardState(
     val mCourseName: String = "",    // current course name from the course list database
     val mTee: String = "",                   // the tee's played or the course yardage
     val mCurrentHole: Int = 0,      // the current hole being played in the game
+    val mStartingHole: String = "1",
     val mPar: IntArray = IntArray(18),        // the current course Par,         // the current course Par
     val mHandicap: IntArray = IntArray(18),        // the current course Par,       // current course handicap
     val mTeamHoleScore: IntArray = IntArray(18),

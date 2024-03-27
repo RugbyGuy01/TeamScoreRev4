@@ -65,30 +65,18 @@ fun CourseDetailScreen(
     val courseViewModel = viewModel<CoursesViewModel>(
         factory = CoursesViewModel.CoursesViewModelFactor()
     )
-    val scope = rememberCoroutineScope()
-    val courseRec = remember {
-        mutableStateOf(courseDetailPlaceHolder)
-    }
+
     val recDetail = remember { CourseDetailViewModel() }
     val saveButtonState = remember { mutableStateOf(USER_TEXT_SAVE) }
     val activity = LocalContext.current as Activity
     activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
-    LaunchedEffect(true) {
-        scope.launch(Dispatchers.IO) {
-            courseRec.value = courseViewModel.getCourseById(courseID) ?: courseDetailPlaceHolder
-            Log.d("VIN", "Get mCoursename = ${courseRec.value.mCoursename}")
-            recDetail.onCourseNameChange(courseRec.value.mCoursename)
-            recDetail.setHandicap(courseRec.value.mHandicap)
-            recDetail.setPar(courseRec.value.mPar)
-            recDetail.setCourseId(courseRec.value.mId)
-
-            saveButtonState.value =
-                if (courseRec.value.mId == 0) USER_TEXT_SAVE else USER_TEXT_UPDATE
-
-            recDetail.setHandicapAvailable()
-        }
-    }
+    GetCourseRecord(
+        courseViewModel,
+        recDetail,
+        courseID,
+        saveButtonState,
+    )
 
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.primary) {
         Scaffold()
@@ -122,6 +110,36 @@ fun CourseDetailScreen(
                     recDetail,
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun GetCourseRecord(
+    courseViewModel: CoursesViewModel,
+    recDetail: CourseDetailViewModel,
+    courseID: Int?,
+    saveButtonState: MutableState<Int>,
+) {
+    val scope = rememberCoroutineScope()
+    val courseRec = remember {
+        mutableStateOf(courseDetailPlaceHolder)
+    }
+
+
+    LaunchedEffect(true) {
+        scope.launch(Dispatchers.IO) {
+            courseRec.value = courseViewModel.getCourseById(courseID) ?: courseDetailPlaceHolder
+            Log.d("VIN", "Get mCoursename = ${courseRec.value.mCoursename}")
+            recDetail.onCourseNameChange(courseRec.value.mCoursename)
+            recDetail.setHandicap(courseRec.value.mHandicap)
+            recDetail.setPar(courseRec.value.mPar)
+            recDetail.setCourseId(courseRec.value.mId)
+
+            saveButtonState.value =
+                if (courseRec.value.mId == 0) USER_TEXT_SAVE else USER_TEXT_UPDATE
+
+            recDetail.setHandicapAvailable()
         }
     }
 }
@@ -220,7 +238,7 @@ fun HoleDetail(
                 style = MaterialTheme.typography.bodyLarge,
             )
             TextButton(
-                onClick = {recDetail.setPopupSelectHoleHdcp(holeIdx) },
+                onClick = { recDetail.setPopupSelectHoleHdcp(holeIdx) },
             ) {
                 val displayText =
                     if (recDetail.state.mHandicap[holeIdx] == 0) " --  " else recDetail.state.mHandicap[holeIdx]
