@@ -35,6 +35,7 @@ import com.golfpvcc.teamscore_rev4.ui.navigation.TeamScoreScreen
 import com.golfpvcc.teamscore_rev4.ui.screens.coursedetail.CourseDetailViewModel
 import com.golfpvcc.teamscore_rev4.utils.Constants
 import com.golfpvcc.teamscore_rev4.utils.Constants.SCORE_CARD_REC_ID
+import com.golfpvcc.teamscore_rev4.utils.setScreenOrientation
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -50,9 +51,8 @@ fun PlayerSetupScreen(
     val scope = rememberCoroutineScope()
     val scoreRecState = remember { mutableStateOf(viewModel.state) }
     val modifier: Modifier = Modifier
-    val activity = LocalContext.current as Activity
-    activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
+    setScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
     LaunchedEffect(true) {
         if (courseId != -1) {
             scope.launch(Dispatchers.IO) {

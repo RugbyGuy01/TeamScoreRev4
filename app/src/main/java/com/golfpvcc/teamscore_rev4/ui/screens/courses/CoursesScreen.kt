@@ -2,6 +2,7 @@ package com.golfpvcc.teamscore_rev4.ui.screens.courses
 
 import android.app.Activity
 import android.content.pm.ActivityInfo
+import android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
@@ -56,6 +57,7 @@ import androidx.navigation.NavHostController
 import com.golfpvcc.teamscore_rev4.database.model.CourseRecord
 import com.golfpvcc.teamscore_rev4.ui.navigation.TeamScoreScreen
 import com.golfpvcc.teamscore_rev4.utils.Constants.orCourseRecHolderList
+import com.golfpvcc.teamscore_rev4.utils.setScreenOrientation
 
 @Composable
 fun CoursesScreen(
@@ -70,7 +72,7 @@ fun CoursesScreen(
     val courses = courseViewModel.courses.observeAsState()
     val activity = LocalContext.current as Activity
 
-    activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+    setScreenOrientation(SCREEN_ORIENTATION_PORTRAIT)
 
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.primary) {
         Scaffold(
@@ -176,8 +178,10 @@ fun CourseItem(
             .padding(5.dp)
             .height(70.dp)
             .clickable {
-                Log.d("VIN:", "CourseItem onItemClick navigate to Player Setup")
-                navController.navigate(route = TeamScoreScreen.PlayerSetup.passId(course.mId))
+                if (0 < course.mId) {
+                    Log.d("VIN:", "CourseItem onItemClick navigate to Player Setup")
+                    navController.navigate(route = TeamScoreScreen.PlayerSetup.passId(course.mId))
+                }
             }
 
     ) {
@@ -215,7 +219,8 @@ fun CourseItem(
                 onClick = {
                     if (course.mId != 0) {
                         openDialog.value = true
-                        deleteText.value = "Are you sure you want to delete this course - ${course.mCoursename}?"
+                        deleteText.value =
+                            "Are you sure you want to delete this course - ${course.mCoursename}?"
                         courseToDelete.value = mutableListOf(course)
                         Log.d("VIN", "Delete Course ${course.mId}")
                     }

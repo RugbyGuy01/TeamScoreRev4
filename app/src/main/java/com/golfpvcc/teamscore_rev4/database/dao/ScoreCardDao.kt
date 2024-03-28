@@ -19,5 +19,5 @@ interface ScoreCardDao {
 
     @Transaction
     @Query("Select * FROM ScoreCardRecord WHERE scoreCardRec_Id = :scoreCardId ")
-    fun getScoreRecordWithPlayers(scoreCardId: Int?): ScoreCardWithPlayers
+    fun getScoreRecordWithPlayers(scoreCardId: Int?): List<ScoreCardWithPlayers>
 }

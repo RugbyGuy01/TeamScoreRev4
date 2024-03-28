@@ -4,24 +4,41 @@ import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Button
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color.Companion.LightGray
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.golfpvcc.teamscore_rev4.utils.Constants
 import com.golfpvcc.teamscore_rev4.utils.Constants.COLUMN_TOTAL_WIDTH
 import com.golfpvcc.teamscore_rev4.utils.Constants.SCORE_CARD_TEXT
-import com.golfpvcc.teamscore_rev4.utils.Constants.VIN_LIGHT_GRAY
+import com.golfpvcc.teamscore_rev4.utils.VIN_LIGHT_GRAY
+import com.golfpvcc.teamscore_rev4.utils.VIN_HOLE_PLAYED
+
+@Composable
+fun FlipNineDisplay(scoreCardViewModel: ScoreCardViewModel) {
+    val buttonText: String =
+        if (scoreCardViewModel.state.mWhatNineIsBeingDisplayed) "Back Nine" else "Front Nine"
+    Button(
+        onClick = {
+            scoreCardViewModel.flipFrontNineBackNine()
+        },
+        modifier = Modifier
+            .height(40.dp),  //vpg
+    ) {
+        Text(text = buttonText)
+    }
+}
 
 @Composable
 fun DisplayMainScoreCard(
@@ -50,18 +67,33 @@ fun DisplayScoreCardHeader(
         ) {
             Column {
                 for (rowHeading in rowHeadings) {
-                    DisplayRowHeading(rowHeading = rowHeading.mName, modifier, Color(VIN_LIGHT_GRAY))
+                    DisplayRowHeading(
+                        rowHeading = rowHeading.mName,
+                        modifier,
+                        Color(VIN_LIGHT_GRAY)
+                    )
                 }
             }
             Column {
-                for (rowHeaderCell in rowHeaderCells) {
-                    DisplayScoreCardCell(Modifier, rowHeaderCell.mHole, Color(VIN_LIGHT_GRAY))
+                for (idx in rowHeaderCells.indices) { // here's how the current hole played is high lighted
+                    val color: Long =
+                        if (rowHeaderCells[idx].vinTag == HOLE_CELL)  VIN_HOLE_PLAYED else VIN_LIGHT_GRAY
+
+                    DisplayScoreCardCell(
+                        Modifier,
+                        rowHeaderCells[idx].mHole,
+                        Color(color),
+                        scoreCardViewModel
+                    )
                 }
             }
             Column {
                 modifier = Modifier.width(COLUMN_TOTAL_WIDTH.dp)
-                for (rowHeaderTotal in rowHeaderTotals) {
-                    DisplayRowHeading(rowHeaderTotal.mName, modifier, Color(VIN_LIGHT_GRAY))
+                for (idx in rowHeaderTotals.indices ) {
+                    if (rowHeaderTotals[idx].vinTag == PAR_TOTAL) {
+                        rowHeaderTotals[idx].mName = scoreCardViewModel.getTotalForNineCell(rowHeaderCells[idx].mHole)
+                    }
+                    DisplayRowHeading(rowHeaderTotals[idx].mName, modifier, Color(VIN_LIGHT_GRAY))
                 }
             }
         }
@@ -86,7 +118,12 @@ fun DisplayScoreCardNames(
             }
             Column {
                 for (rowPlayerCell in rowPlayerCells) {
-                    DisplayScoreCardCell(Modifier, rowPlayerCell.mHole, Color.Transparent)
+                    DisplayScoreCardCell(
+                        Modifier,
+                        rowPlayerCell.mHole,
+                        Color.Transparent,
+                        scoreCardViewModel
+                    )
                 }
             }
             Column {
@@ -118,7 +155,12 @@ fun DisplayScoreCardTeams(
             }
             Column {
                 for (rowTeamCell in rowTeamCells) {
-                    DisplayScoreCardCell(Modifier, rowTeamCell.mHole, Color(VIN_LIGHT_GRAY))
+                    DisplayScoreCardCell(
+                        Modifier,
+                        rowTeamCell.mHole,
+                        Color(VIN_LIGHT_GRAY),
+                        scoreCardViewModel
+                    )
                 }
             }
             Column {
@@ -136,20 +178,22 @@ fun DisplayScoreCardCell(
     modifier: Modifier,
     cellData: IntArray,
     color: Color,
+    scoreCardViewModel: ScoreCardViewModel
 ) {
     Row()
     {
-        val displayData = cellData.drop(9)
-        for (cell in displayData) {
+        val startingCell: Int = scoreCardViewModel.getStartingHole()
+        val endingCell: Int = scoreCardViewModel.getEndingHole()
+        for (idx in startingCell until endingCell) {
             Surface(
                 modifier = modifier.width(45.dp),
                 border = BorderStroke(Dp.Hairline, color = Color.Blue),
-                color = color,
+                color = scoreCardViewModel.setHighLightCurrentHole(idx, color),
                 contentColor = contentColorFor(Color.Transparent),
             ) {
-                Log.d("VIN", "DisplayScoreCardCell $cell")
+                Log.d("VIN", "DisplayScoreCardCell $cellData[idx]")
                 Text(
-                    text = cell.toString(),
+                    text = cellData[idx].toString(),
                     fontSize = SCORE_CARD_TEXT.sp,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(4.dp),
