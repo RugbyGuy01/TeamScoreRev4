@@ -80,7 +80,7 @@ class PlayerSetupViewModel(
     }
 
     fun onStartingHoleChange(startingHole: String) {
-        state = if(startingHole.isNotEmpty()) {
+        state = if (startingHole.isNotEmpty()) {
             val validateStartingHole: Int = startingHole.toInt()
             if (validateStartingHole in 1..18)
                 state.copy(mStartingHole = startingHole)
@@ -89,12 +89,15 @@ class PlayerSetupViewModel(
         } else
             state.copy(mStartingHole = "")
 
-        Log.d("VIN", "onStartingHoleChange  Name ${state.mStartingHole} start ingHole $startingHole ")
+        Log.d(
+            "VIN",
+            "onStartingHoleChange  Name ${state.mStartingHole} start ingHole $startingHole "
+        )
     }
 
     fun saveScoreCardRecord() {
-        if(state.mStartingHole.isEmpty())
-           state =  state.copy(mStartingHole = "1")
+        if (state.mStartingHole.isEmpty())
+            state = state.copy(mStartingHole = "1")
 
         val scoreCardRecord: ScoreCardRecord = ScoreCardRecord(
             mCourseName = state.mCourseName,
@@ -151,7 +154,12 @@ class PlayerSetupViewModel(
     suspend fun savePlayersRecord() {
         var count: Int = 0
         for (player in state.mPlayerRecords) {
+
             if (MINIMUM_LEN_OF_PLAYER_NAME < player.mName.length) {
+                if (player.mHandicap.length < 1) {
+                    player.mHandicap = "0"
+                }
+
                 val playerRecord: PlayerRecord = PlayerRecord(
                     player.mName,
                     player.mHandicap,

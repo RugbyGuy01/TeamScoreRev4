@@ -95,4 +95,5 @@ fun GetScoreCardRecord(
 @Composable
 fun DisplayControlButtons(scoreCardViewModel: ScoreCardViewModel) {
     FlipNineDisplay(scoreCardViewModel)
+    //EnterPlayersScores(scoreCardViewModel)
 }

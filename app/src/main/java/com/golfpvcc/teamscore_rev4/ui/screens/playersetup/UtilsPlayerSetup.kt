@@ -71,7 +71,7 @@ fun EnterPlayerInfo(
             updatedData = viewModel::onPlayerHandicapChange,
             KeyboardType.Number,
             imeAction = keyboardType,
-            modifier = modifier.width(100.dp),
+            modifier = modifier.width(120.dp),
         )
 
     }

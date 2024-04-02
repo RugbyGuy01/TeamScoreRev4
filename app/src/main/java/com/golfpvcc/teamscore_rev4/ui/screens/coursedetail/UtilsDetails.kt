@@ -117,7 +117,7 @@ fun DropDownSelectHoleHandicap(
         alignment = Alignment.CenterEnd,
         onDismissRequest = {
             recDetail.setPopupSelectHoleHdcp(-1)
-            expanded
+           // expanded
         }
     ) {     // Composable content to be shown in the Popup
         Surface(
@@ -130,7 +130,7 @@ fun DropDownSelectHoleHandicap(
             Column(
                 modifier = Modifier
                     .padding(3.dp)
-                    .width(110.dp),
+                    .width(100.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
@@ -144,7 +144,7 @@ fun DropDownSelectHoleHandicap(
                         if (courseHdcp[inx].available || currentHoleHdcp == courseHdcp[inx].holeHandicap) {
                             Divider(color = Color.Green, thickness = 1.dp)
                             Text(
-                                text = "      ${courseHdcp[inx].holeHandicap}     ",
+                                text = "  ${courseHdcp[inx].holeHandicap}  ",
                                 textAlign = TextAlign.Center,
                                 color = if (currentHoleHdcp == courseHdcp[inx].holeHandicap) Color.White else Color.Unspecified,
                                 style = if (currentHoleHdcp == courseHdcp[inx].holeHandicap) TextStyle(
@@ -153,7 +153,7 @@ fun DropDownSelectHoleHandicap(
                                     background = Color.Yellow
                                 ),
                                 modifier = Modifier
-                                    .padding(8.dp)
+                                    .padding(5.dp)
                                     .clickable {
                                         if (currentHoleHdcp != courseHdcp[inx].holeHandicap) {
                                             val returnHdcpToPool =

@@ -218,8 +218,8 @@ fun HoleDetail(
     ) {
         Row(
             modifier = Modifier
-                .width(210.dp)
-                .padding(10.dp),
+                .width(220.dp)
+                .padding(5.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             TextButton(

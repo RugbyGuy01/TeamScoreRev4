@@ -7,4 +7,40 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <color name="one_stroke_hole">#fff9c4</color>
+    <color name="two_stroke_hole">#ffe0b2</color>
+    <color name="no_stroke_hole">#ffffff</color>
+    <color name="default_hole_color">#ffffff</color>
+    <color name="active_hole_color">#80cbc4</color>
+    <color name="course_setup_table_background">#c0d077</color>
+    <color name="two_under_color">#aa00ff</color>
+    <color name="one_under_color">#d50000</color>
+    <color name="par_hole_color">#000000</color>
+    <color name="one_over_color">#000000</color>
+    <color name="two_over_color">#000000</color>
+    <color name="three_over_color">#000000</color>
+    <color name="four_over_color">#000000</color>
+    <color name="other_over_color">#000000</color>
+    <color name="skin_hole">#4caf50</color>
+    <color name="no_skins_hole">#4fc3f7</color>
+
+    <color name="team_single_score">#ff9800</color>
+    <color name="team_double_score">#E65100</color>
+
+    <!-- properties colors used for team scoring -->
+    <color name="team_box_high_light_gross_used_once">#ad281a</color>
+    <color name="team_box_high_light_net_used_once">#bda27b</color>
+
+    <color name="team_box_high_light_net_twice">#1d694e</color>
+    <color name="team_box_high_light_gross_twice">#684231</color>
+
+    <color name="team_eagle_score_used_once">#d500F9</color>
+    <color name="team_eagle_score_used_twice">#ea80FC</color>
+    <color name="team_birdie_score_used_once">#ff1744</color>
+    <color name="team_birdie_score_used_twice">#ff8A80</color>
+    <color name="team_par_score_used_once">#8D6E63 </color>
+    <color name="team_par_score_used_twice">#D7CCC8</color>
+    <color name="team_other_score_used_once">#00C853 </color>
+    <color name="team_other_score_used_twice">#69F0AE</color>
 </resources>

@@ -17,6 +17,8 @@ import com.golfpvcc.teamscore_rev4.utils.Constants
 import com.golfpvcc.teamscore_rev4.utils.Constants.SCORE_CARD_REC_ID
 import com.golfpvcc.teamscore_rev4.utils.FRONT_NINE_DISPLAY
 import com.golfpvcc.teamscore_rev4.utils.FRONT_NINE_IS_DISPLAYED
+import com.golfpvcc.teamscore_rev4.utils.GETS_1_STROKES
+import com.golfpvcc.teamscore_rev4.utils.GETS_2_STROKES
 import com.golfpvcc.teamscore_rev4.utils.VIN_LIGHT_GRAY
 import com.golfpvcc.teamscore_rev4.utils.VIN_HOLE_PLAYED
 
@@ -40,7 +42,7 @@ class ScoreCardViewModel(
         Log.d("VIN", "scoreCardWithPlayers size ${scoreCardWithPlayers.size}  ")
         Log.d("VIN", "playerRecords size ${scoreCardWithPlayers[0].playerRecords.size}  ")
 
-        if (0 < scoreCardWithPlayers.size)
+        if (0 < scoreCardWithPlayers.size)      // found score record with players
             updateScoreCardRecord(scoreCardWithPlayers[0])
     }
 
@@ -50,18 +52,32 @@ class ScoreCardViewModel(
         state = state.copy(mCourseName = scoreCardRecord.mCourseName)
         state = state.copy(mCurrentHole = (scoreCardRecord.mCurrentHole - 1))   // zero based
 
-        val parCell: ScoreCardCell? = state.rowHeaderCells.find { it.vinTag == PAR_CELL }
+        val parCell: HdcpParHoleHeading? = state.hdcpParHoleHeading.find { it.vinTag == PAR_HEADER }
         if (parCell != null) {
             parCell.mHole = scoreCardRecord.mPar
         }
-        val hdcpCell: ScoreCardCell? = state.rowHeaderCells.find { it.vinTag == HDCP_CELL }
+        val hdcpCell: HdcpParHoleHeading? =
+            state.hdcpParHoleHeading.find { it.vinTag == HDCP_HEADER }
         if (hdcpCell != null) {
             hdcpCell.mHole = scoreCardRecord.mHandicap
         }
-        for(idx in scoreCardWithPlayers.playerRecords.indices){
-            state.rowPlayerNames += RowHeading(PLAYER_1_NAME + idx, scoreCardWithPlayers.playerRecords[idx].mName)
+        for (idx in scoreCardWithPlayers.playerRecords.indices) { // player name and handicap
+            state.playerHeading += PlayerHeading(
+                PLAYER_1_NAME + idx,
+                mName = scoreCardWithPlayers.playerRecords[idx].mName,
+                mHdcp = scoreCardWithPlayers.playerRecords[idx].mHandicap,
+                mScore = scoreCardWithPlayers.playerRecords[idx].mScore
+            ) // add the player's name to the score card
         }
+    }
 
+    fun getHoleHdcps(): IntArray {
+        val hdcpCell: HdcpParHoleHeading? =
+            state.hdcpParHoleHeading.find { it.vinTag == HDCP_HEADER }
+        if (hdcpCell != null) {
+            return (hdcpCell.mHole)
+        } else
+            return (IntArray(18) { 0 })
     }
 
     fun getStartingHole(): Int {
@@ -70,6 +86,19 @@ class ScoreCardViewModel(
 
     fun getEndingHole(): Int {
         return if (state.mWhatNineIsBeingDisplayed) FRONT_NINE_DISPLAY else BACK_NINE_DISPLAY
+    }
+
+    fun getStokeOnHolePlayerColor(playerHdcp: String, holeHdcp: Int): Color {
+        var backGroundColor: Color = Color.Transparent
+        var playerIntHdcp = playerHdcp.toInt()
+
+        if (holeHdcp <= playerIntHdcp) {
+            backGroundColor = Color(GETS_1_STROKES)
+            playerIntHdcp -= 18
+            if (holeHdcp <= playerIntHdcp)
+                backGroundColor = Color(GETS_2_STROKES)
+        }
+        return (backGroundColor)
     }
 
     fun getTotalForNineCell(Holes: IntArray): String {
@@ -81,7 +110,7 @@ class ScoreCardViewModel(
             total += Holes[idx]
         }
         Log.d("VIN", "getTotalForNineCell sum $total")
-        return total.toString()
+        return if (total == 0) " " else total.toString()
     }
 
 
@@ -102,8 +131,8 @@ class ScoreCardViewModel(
 
     fun setHoleScore(playerIdx: Int, idx: Int, score: Int) {
         Log.d("VIN", "SetHoleScore $idx  Score $score")
-        state.rowPlayerCells[playerIdx].mHole[idx] = score
-        Log.d("VIN", "SetHoleScore ${state.rowPlayerCells[playerIdx].mHole[idx]}")
+        state.playerHeading[playerIdx].mScore[idx] = score
+        Log.d("VIN", "SetHoleScore ${state.playerHeading[playerIdx].mScore[idx]}")
         state = state.copy(mRepaintScreen = true)
     }
 
@@ -114,61 +143,38 @@ data class ScoreCard(
     val mCourseName: String = "",    // current course name from the course list database
     val mCurrentHole: Int = 0,      // the current hole being played in the game
     val mWhatNineIsBeingDisplayed: Boolean = FRONT_NINE_IS_DISPLAYED,
-    val rowHeadings: List<RowHeading> = listOf(
-        RowHeading(HDCP_HEADER, "HdCp"),
-        RowHeading(PAR_HEADER, "Par"),
-        RowHeading(HOLE_HEADER, "Hole"),
-    ),
-    val rowHeaderCells: List<ScoreCardCell> = listOf(
-        ScoreCardCell(HDCP_CELL, IntArray(18) { i -> i + 1 }), // Handicap
-        ScoreCardCell(PAR_CELL, IntArray(18) { 4 }),          // Par
-        ScoreCardCell(HOLE_CELL, IntArray(18) { i -> i + 1 }), // hole
-    ),
-    val rowHeaderTotals: List<RowHeading> = listOf(
-        RowHeading(HDCP_TOTAL, ""),         // Handicap - blank
-        RowHeading(PAR_TOTAL, ""),       // determine by the score card record
-        RowHeading(TOTAL_TOTAL, "Total"),
+    val hdcpParHoleHeading: List<HdcpParHoleHeading> = listOf(
+        HdcpParHoleHeading(HDCP_HEADER, "HdCp"),
+        HdcpParHoleHeading(PAR_HEADER, "Par"),
+        HdcpParHoleHeading(HOLE_HEADER, mName="Hole", mTotal="Total"),
     ),
 
-    var rowPlayerNames: List<RowHeading> = emptyList(),
+    var playerHeading: List<PlayerHeading> = emptyList(),
 
-    val rowPlayerCells: List<ScoreCardCell> = listOf(
-        ScoreCardCell(PLAYER_1_CELL, IntArray(18) { 5 }),
-        ScoreCardCell(PLAYER_2_CELL, IntArray(18) { 3 }),
-        ScoreCardCell(PLAYER_3_CELL, IntArray(18) { 5 }),
-        ScoreCardCell(PLAYER_4_CELL, IntArray(18) { 3 })
+    val teamUsedHeading: List<TeamUsedHeading> = listOf(
+        TeamUsedHeading(TEAM_HEADER, "Team"),
+        TeamUsedHeading(USED_HEADER, "Used"),
     ),
-    val rowPlayerTotals: List<RowHeading> = listOf(
-        // determine by the score card record
-        RowHeading(PLAYER_1_TOTAL, "40"),
-        RowHeading(PLAYER_2_TOTAL, "45"),
-        RowHeading(PLAYER_3_TOTAL, "36"),
-        RowHeading(PLAYER_4_TOTAL, "43"),
-    ),
-
-    val rowTeams: List<RowHeading> = listOf(
-        RowHeading(TEAM_HEADER, "Team"),
-        RowHeading(USED_HEADER, "Used"),
-    ),
-
-    val rowTeamCells: List<ScoreCardCell> = listOf(
-        ScoreCardCell(TEAM_CELL, IntArray(18) { 5 }),
-        ScoreCardCell(USED_CELL, IntArray(18) { 3 }),
-    ),
-    val rowTeamTotals: List<RowHeading> = listOf(
-        // determine by the score card record
-        RowHeading(TEAM_TOTAL, "40"),
-        RowHeading(USED_TOTAL, "45"),
-    )
 )
 
-
-data class RowHeading(
-    val vinTag: Int,
-    var mName: String = ""
+data class HdcpParHoleHeading(
+    val vinTag: Int = 0,
+    var mName: String = "",
+    var mHole: IntArray = IntArray(18) { i -> i + 1 },
+    var mTotal: String = "",
 )
 
-data class ScoreCardCell(
-    val vinTag: Int,
+data class PlayerHeading(
+    val vinTag: Int = 0,
+    var mHdcp: String = "",     // not used on the screen
+    var mName: String = "",
+    var mScore: IntArray = IntArray(18),
+    var mTotal: String = "",
+)
+
+data class TeamUsedHeading(
+    val vinTag: Int = 0,
+    var mName: String = "",
     var mHole: IntArray = IntArray(18),
+    var mTotal: String = "",
 )

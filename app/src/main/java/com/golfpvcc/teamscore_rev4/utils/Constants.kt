@@ -9,6 +9,8 @@ const val FRONT_NINE_DISPLAY = 9
 const val BACK_NINE_DISPLAY = 18
 const val VIN_LIGHT_GRAY = 0xFFE0E0E0
 const val VIN_HOLE_PLAYED = 0xFF48EFF0
+const val GETS_1_STROKES = 0xFFFFF887
+const val GETS_2_STROKES = 0xFFFFE4C5
 const val FRONT_NINE_TOTAL_DISPLAYED = true
 const val BACK_NINE_TOTAL_DISPLAYED = false
 const val FRONT_NINE_IS_DISPLAYED = true
@@ -17,7 +19,7 @@ object Constants {
     const val SCORE_CARD_REC_ID = 2024
     const val MAX_PLAYERS = 4
     const val MAX_PLAYER_NAME = 8
-    const val MAX_HANDICAP = 3
+    const val MAX_HANDICAP = 2
     const val MAX_COURSE_YARDAGE = 5
     const val MAX_STARTING_HOLE = 2
     const val LAST_PLAYER = MAX_PLAYERS - 1
@@ -27,6 +29,7 @@ object Constants {
 
     const val DATABASE_NAME = "TeamDatabase"
     const val SCORE_CARD_TEXT = 18
+    const val SCORE_CARD_COURSE_NAME_TEXT = 15
 
     const val COLUMN_TOTAL_WIDTH = 65
 
