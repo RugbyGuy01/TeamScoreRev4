@@ -111,6 +111,7 @@ fun DisplayCourseNameAndTeeSelection(
             )
         }
         Spacer(modifier = Modifier.size(10.dp))
+
         Row(){
             GetTeeInformation(
                 mMaxLength = Constants.MAX_STARTING_HOLE,

@@ -24,19 +24,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.golfpvcc.teamscore_rev4.ui.navigation.ROOT_GRAPH_ROUTE
-import com.golfpvcc.teamscore_rev4.ui.navigation.ROUTE_CONFIGURATION
-import com.golfpvcc.teamscore_rev4.ui.navigation.ROUTE_GAME_ON
-import com.golfpvcc.teamscore_rev4.ui.screens.coursedetail.DisplayFlipHdcpsButtons
-import com.golfpvcc.teamscore_rev4.ui.screens.coursedetail.DisplaySaveCancelButtons
-import com.golfpvcc.teamscore_rev4.ui.screens.coursedetail.GetCourseName
-import com.golfpvcc.teamscore_rev4.ui.screens.coursedetail.ShowHoleDetailsList
-import com.golfpvcc.teamscore_rev4.ui.screens.courses.SaveCourseRecord
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.dialogenterscore.ButtonEnterScore
 import com.golfpvcc.teamscore_rev4.utils.setScreenOrientation
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -70,7 +61,8 @@ fun ScoreCardScreen(
                 Column(
                     modifier = Modifier
                         .padding(5.dp)
-                        .fillMaxHeight()
+                        .fillMaxHeight(),
+                    horizontalAlignment = Alignment.End
                 ) {
                     DisplayControlButtons(scoreCardViewModel)
                 }
@@ -95,5 +87,6 @@ fun GetScoreCardRecord(
 @Composable
 fun DisplayControlButtons(scoreCardViewModel: ScoreCardViewModel) {
     FlipNineDisplay(scoreCardViewModel)
-    //EnterPlayersScores(scoreCardViewModel)
+    Spacer(modifier = Modifier.size(12.dp))
+    ButtonEnterScore(scoreCardViewModel, scoreCardViewModel::dialogAction)
 }

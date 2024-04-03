@@ -7,6 +7,7 @@ import com.golfpvcc.teamscore_rev4.database.model.CourseRecord
 
 const val FRONT_NINE_DISPLAY = 9
 const val BACK_NINE_DISPLAY = 18
+const val TOTAL_18_HOLE = 18
 const val VIN_LIGHT_GRAY = 0xFFE0E0E0
 const val VIN_HOLE_PLAYED = 0xFF48EFF0
 const val GETS_1_STROKES = 0xFFFFF887

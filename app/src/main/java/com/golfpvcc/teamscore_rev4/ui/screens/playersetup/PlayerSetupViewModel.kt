@@ -63,7 +63,16 @@ class PlayerSetupViewModel(
 
     private fun updateScoreCard(scoreCard: ScoreCardRecord) {
         state = state.copy(mTee = scoreCard.mTee)
-        state = state.copy(mStartingHole = scoreCard.mCurrentHole.toString())
+        if(scoreCard.mCurrentHole < 0) {
+            state = state.copy(mCurrentHole = 0)  // make it zero bases
+            state = state.copy(mStartingHole = "1")
+        } else {
+            state = state.copy(mStartingHole = (scoreCard.mCurrentHole + 1).toString()) // mCurrentHole is zero based; mStartingHole is 1 bases
+        }
+        Log.d(
+            "VIN",
+            "updateScoreCard  starting Hole ${state.mStartingHole} "
+        )
         saveScoreCardRecord()
     }
 
@@ -87,7 +96,7 @@ class PlayerSetupViewModel(
             else
                 state.copy(mStartingHole = "1")
         } else
-            state.copy(mStartingHole = "")
+            state.copy(mStartingHole = "1")
 
         Log.d(
             "VIN",
@@ -96,13 +105,16 @@ class PlayerSetupViewModel(
     }
 
     fun saveScoreCardRecord() {
-        if (state.mStartingHole.isEmpty())
+        if (state.mStartingHole.isEmpty() || state.mStartingHole.toInt() < 0)
             state = state.copy(mStartingHole = "1")
-
+        Log.d(
+            "VIN",
+            "saveScoreCardRecord  starting Hole ${state.mStartingHole} "
+        )
         val scoreCardRecord: ScoreCardRecord = ScoreCardRecord(
             mCourseName = state.mCourseName,
             mTee = state.mTee,
-            mCurrentHole = state.mStartingHole.toInt(),
+            mCurrentHole = state.mStartingHole.toInt() -1,  // the value is 1 make it zero base
             mPar = state.mPar,
             mHandicap = state.mHandicap,
             scoreCardRec_Id = state.scoreCardRecId
