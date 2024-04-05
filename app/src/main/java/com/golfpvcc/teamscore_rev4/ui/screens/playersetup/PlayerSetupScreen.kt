@@ -1,8 +1,6 @@
 package com.golfpvcc.teamscore_rev4.ui.screens.playersetup
 
-import android.app.Activity
 import android.content.pm.ActivityInfo
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,28 +14,19 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.BlendMode.Companion.Screen
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.golfpvcc.teamscore_rev4.ui.navigation.TeamScoreScreen
-import com.golfpvcc.teamscore_rev4.ui.screens.coursedetail.CourseDetailViewModel
 import com.golfpvcc.teamscore_rev4.utils.Constants
 import com.golfpvcc.teamscore_rev4.utils.Constants.SCORE_CARD_REC_ID
-import com.golfpvcc.teamscore_rev4.utils.setScreenOrientation
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.golfpvcc.teamscore_rev4.utils.SetScreenOrientation
 
 
 @Composable
@@ -52,16 +41,16 @@ fun PlayerSetupScreen(
     val scoreRecState = remember { mutableStateOf(viewModel.state) }
     val modifier: Modifier = Modifier
 
-    setScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
-    LaunchedEffect(true) {
-        if (courseId != -1) {
-            scope.launch(Dispatchers.IO) {
-                viewModel.getCourseById(courseId)
-            }
-        } else {
-            Log.d("VIN", "Record ID not passed to Player setup screen!!")
-        }
-    }
+    SetScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+//    LaunchedEffect(true) {
+//        if (courseId != -1) {
+//            scope.launch(Dispatchers.IO) {
+//                viewModel.getCourseById(courseId)
+//            }
+//        } else {
+//            Log.d("VIN", "Record ID not passed to Player setup screen!!")
+//        }
+//    }
 
 
     Scaffold {
@@ -71,14 +60,16 @@ fun PlayerSetupScreen(
                 .padding(5.dp)
                 .fillMaxHeight()
         ) {
-            DisplayCourseNameAndTeeSelection(modifier, viewModel)
-            Spacer(modifier = Modifier.size(20.dp))
-            scoreRecState.value.mPlayerRecords.forEachIndexed { index, playerRecord ->
-                EnterPlayerInfo(modifier, viewModel, index)
+            if(viewModel.state.mReadDatabaseComplete) {
+                DisplayCourseNameAndTeeSelection(modifier, viewModel)
+                Spacer(modifier = Modifier.size(20.dp))
+                scoreRecState.value.mPlayerRecords.forEachIndexed { index, playerRecord ->
+                    EnterPlayerInfo(modifier, viewModel, index)
+                }
+                Spacer(modifier = Modifier.size(20.dp))
+                DisplayBottomButtons(modifier, viewModel, navController)
+                moveToNextScreen(viewModel, navController, scoreCardId = SCORE_CARD_REC_ID)
             }
-            Spacer(modifier = Modifier.size(20.dp))
-            DisplayBottomButtons(modifier, viewModel, navController)
-            moveToNextScreen(viewModel, navController, scoreCardId = SCORE_CARD_REC_ID)
         }
     }
 }

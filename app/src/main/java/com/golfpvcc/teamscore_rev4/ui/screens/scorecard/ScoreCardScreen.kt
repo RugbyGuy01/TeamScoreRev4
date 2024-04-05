@@ -1,24 +1,16 @@
 package com.golfpvcc.teamscore_rev4.ui.screens.scorecard
 
-import android.app.Activity
-import android.content.pm.ActivityInfo
 import android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-import android.util.Log
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Button
-import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
@@ -28,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.dialogenterscore.ButtonEnterScore
-import com.golfpvcc.teamscore_rev4.utils.setScreenOrientation
+import com.golfpvcc.teamscore_rev4.utils.SetScreenOrientation
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -37,7 +29,7 @@ fun ScoreCardScreen(
     navController: NavHostController,
     id: Int?,
 ) {
-    setScreenOrientation(SCREEN_ORIENTATION_LANDSCAPE)
+    SetScreenOrientation(SCREEN_ORIENTATION_LANDSCAPE)
 
     val scoreCardViewModel = viewModel<ScoreCardViewModel>(
         factory = ScoreCardViewModel.ScoreCardViewModelFactor()

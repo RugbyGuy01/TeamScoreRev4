@@ -13,11 +13,14 @@ import com.golfpvcc.teamscore_rev4.database.model.ScoreCardRecord
 import com.golfpvcc.teamscore_rev4.database.model.ScoreCardWithPlayers
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.dialogenterscore.DialogAction
 import com.golfpvcc.teamscore_rev4.utils.BACK_NINE_DISPLAY
+
 import com.golfpvcc.teamscore_rev4.utils.Constants.SCORE_CARD_REC_ID
 import com.golfpvcc.teamscore_rev4.utils.FRONT_NINE_DISPLAY
 import com.golfpvcc.teamscore_rev4.utils.FRONT_NINE_IS_DISPLAYED
+
 import com.golfpvcc.teamscore_rev4.utils.GETS_1_STROKES
 import com.golfpvcc.teamscore_rev4.utils.GETS_2_STROKES
+import com.golfpvcc.teamscore_rev4.utils.JUST_RAW_SCORE
 import com.golfpvcc.teamscore_rev4.utils.TOTAL_18_HOLE
 import com.golfpvcc.teamscore_rev4.utils.VIN_LIGHT_GRAY
 import com.golfpvcc.teamscore_rev4.utils.VIN_HOLE_PLAYED
@@ -88,6 +91,14 @@ class ScoreCardViewModel(
             return (hdcpCell.mHole)
         } else
             return (IntArray(18) { 0 })
+    }
+    fun getHoleHandicap(hole:Int): Int {
+        val hdcpCell: HdcpParHoleHeading? =
+            state.hdcpParHoleHeading.find { it.vinTag == HDCP_HEADER }
+        if (hdcpCell != null) {
+            return (hdcpCell.mHole[hole])
+        } else
+            return (0)
     }
 
     fun getStartingHole(): Int {
@@ -169,6 +180,10 @@ class ScoreCardViewModel(
     fun ButtonEnterScore() {
         Log.d("VIN", "ButtonEnterScore")
         state = state.copy(mDialogDisplayed = true)
+        if (state.mCurrentHole < FRONT_NINE_DISPLAY) {
+            state = state.copy(mWhatNineIsBeingDisplayed = FRONT_NINE_IS_DISPLAYED)
+        } else
+            state = state.copy(mWhatNineIsBeingDisplayed = !FRONT_NINE_IS_DISPLAYED)
     }
 
     fun setGrossScore(playerIdx: Int) {
@@ -180,20 +195,13 @@ class ScoreCardViewModel(
     }
 
     fun finishedScoringDialog() {
-        Log.d("VIN", "finishedScoringDialog")
+        Log.d("HOLE", "finishedScoringDialog current hole ${state.mCurrentHole}")
         state = state.copy(mDialogDisplayed = false)
-
-        // need to pause the display when the user enters the score on the ninth hole amd 18th hole
         state = if ((state.mCurrentHole + 1) < TOTAL_18_HOLE) {
             state.copy(mCurrentHole = (state.mCurrentHole + 1))
         } else {
             state.copy(mCurrentHole = 0)
         }
-
-
-        state = state.copy(mWhatNineIsBeingDisplayed = !state.mWhatNineIsBeingDisplayed)
-
-
     }
 
     private fun clearOneScore() {
@@ -202,6 +210,8 @@ class ScoreCardViewModel(
     }
 
     fun scoreEnter(score: Int) {
+        Log.d("HOLE", "scoreEnter current hole ${state.mCurrentHole}")
+
         var dialogCurrentPlayer: Int = getDialogCurrentPlayer()
 
         setHoleScore(dialogCurrentPlayer, getCurrentHole(), score)

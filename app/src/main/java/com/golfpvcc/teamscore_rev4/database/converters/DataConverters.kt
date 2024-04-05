@@ -16,6 +16,7 @@ open class DataConverter {
         }
         return str
     }
+
     @TypeConverter
     fun stringToArray(arrayString: String): IntArray {
         var holesList: List<String> = arrayString.split(",") // return a list of strings

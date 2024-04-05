@@ -14,10 +14,10 @@ interface ScoreCardDao {
     @Upsert
     suspend fun addUpdateScoreCardRecord(scoreCardRecord: ScoreCardRecord)
 
-    @Query("Select * FROM ScoreCardRecord WHERE scoreCardRec_Id = :scoreCardId ")
+    @Query("Select * FROM ScoreCardRecord WHERE scoreCardRecId = :scoreCardId ")
     fun getScoreCardRecord(scoreCardId: Int): ScoreCardRecord
 
     @Transaction
-    @Query("Select * FROM ScoreCardRecord WHERE scoreCardRec_Id = :scoreCardId ")
+    @Query("Select * FROM ScoreCardRecord WHERE scoreCardRecId = :scoreCardId ")
     fun getScoreRecordWithPlayers(scoreCardId: Int?): List<ScoreCardWithPlayers>
 }

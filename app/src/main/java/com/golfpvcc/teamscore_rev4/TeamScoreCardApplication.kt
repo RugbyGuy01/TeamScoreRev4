@@ -25,7 +25,8 @@ class TeamScoreCardApp : Application() {
             db = Room.databaseBuilder(
                 instance!!.applicationContext,
                 TeamScoreDatabase::class.java, DATABASE_NAME
-            ).fallbackToDestructiveMigration().build()
+            ).fallbackToDestructiveMigration()
+                .build()
 
             return db!!
         }
@@ -37,9 +38,11 @@ class TeamScoreCardApp : Application() {
         fun getCourseDao(): CourseDao {
             return instance!!.getDb().courseDao()
         }
+
         fun getScoreCardDao(): ScoreCardDao {
             return instance!!.getDb().scoreCardDao()
         }
+
         fun getPlayerDao(): PlayerDao {
             return instance!!.getDb().playerDao()
         }

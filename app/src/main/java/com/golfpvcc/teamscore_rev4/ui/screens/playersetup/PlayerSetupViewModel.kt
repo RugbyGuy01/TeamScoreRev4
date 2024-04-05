@@ -40,19 +40,28 @@ class PlayerSetupViewModel(
     }
 
     init {
-
+        viewModelScope.launch(Dispatchers.IO) {
+            if (courseId != -1) {
+                getCourseById(courseId)
+            } else {
+                Log.d("VIN", "Record ID not passed to Player setup screen!!")
+            }
+        }
     }
 
     suspend fun getCourseById(courseId: Int?) {
         val courseRecord: CourseRecord = courseDao.getCourseRecord(courseId)
         updateCourseRecord(courseRecord)
-        saveScoreCardRecord()       // make sure we have a record
-        val scoreCardRecord: ScoreCardRecord = scoreCardDao.getScoreCardRecord(SCORE_CARD_REC_ID)
-        updateScoreCard(scoreCardRecord)
+        val scoreCardRec: ScoreCardRecord = saveScoreCardRecord()       // make sure we have a record ??
+        val scoreCardDbRec: ScoreCardRecord = scoreCardDao.getScoreCardRecord(SCORE_CARD_REC_ID)
+
+
+        Log.d("VIN", "scoreCardDao.getScoreCardRecord $scoreCardRec")
+        updateScoreCard(scoreCardRec)
         val playerRecords: List<PlayerRecord> = playerDao.getAllPlayerRecords()
         updatePlayers(playerRecords)
-
         Log.d("VIN", "Get course id = $courseId")
+        state = state.copy(mReadDatabaseComplete = true)
     }
 
     private fun updateCourseRecord(courseRec: CourseRecord) {
@@ -63,17 +72,18 @@ class PlayerSetupViewModel(
 
     private fun updateScoreCard(scoreCard: ScoreCardRecord) {
         state = state.copy(mTee = scoreCard.mTee)
-        if(scoreCard.mCurrentHole < 0) {
+        if (scoreCard.mCurrentHole < 0) {
             state = state.copy(mCurrentHole = 0)  // make it zero bases
             state = state.copy(mStartingHole = "1")
         } else {
-            state = state.copy(mStartingHole = (scoreCard.mCurrentHole + 1).toString()) // mCurrentHole is zero based; mStartingHole is 1 bases
+            state =
+                state.copy(mStartingHole = (scoreCard.mCurrentHole + 1).toString()) // mCurrentHole is zero based; mStartingHole is 1 bases
         }
         Log.d(
             "VIN",
             "updateScoreCard  starting Hole ${state.mStartingHole} "
         )
-        saveScoreCardRecord()
+//        saveScoreCardRecord()
     }
 
     fun updatePlayers(playerRecords: List<PlayerRecord>) {
@@ -96,7 +106,7 @@ class PlayerSetupViewModel(
             else
                 state.copy(mStartingHole = "1")
         } else
-            state.copy(mStartingHole = "1")
+            state.copy(mStartingHole = "")
 
         Log.d(
             "VIN",
@@ -104,24 +114,23 @@ class PlayerSetupViewModel(
         )
     }
 
-    fun saveScoreCardRecord() {
+    private fun saveScoreCardRecord() : ScoreCardRecord{
         if (state.mStartingHole.isEmpty() || state.mStartingHole.toInt() < 0)
             state = state.copy(mStartingHole = "1")
-        Log.d(
-            "VIN",
-            "saveScoreCardRecord  starting Hole ${state.mStartingHole} "
-        )
+        Log.d("VIN", "saveScoreCardRecord  starting Hole ${state.mStartingHole} ")
+
         val scoreCardRecord: ScoreCardRecord = ScoreCardRecord(
             mCourseName = state.mCourseName,
             mTee = state.mTee,
-            mCurrentHole = state.mStartingHole.toInt() -1,  // the value is 1 make it zero base
+            mCurrentHole = state.mStartingHole.toInt() - 1,  // the value is 1 make it zero base
             mPar = state.mPar,
             mHandicap = state.mHandicap,
-            scoreCardRec_Id = state.scoreCardRecId
+            scoreCardRecId = state.scoreCardRecId
         )
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             scoreCardDao.addUpdateScoreCardRecord(scoreCardRecord)
         }
+        return (scoreCardRecord)
     }
 
     fun onPlayerNameChange(idx: Int, newValue: String) {
@@ -203,7 +212,7 @@ data class ScoreCardState(
     val mPlayerRecords: Array<PlayerRecord> = Array<PlayerRecord>(4) { PlayerRecord() },
     val scoreCardRecId: Int = SCORE_CARD_REC_ID,    // score card record ID
     val observer: Boolean = false,
-    val readDatabase: Boolean = true,
+    val mReadDatabaseComplete: Boolean = false,
     val mNextScreen: Int = 0,
 )
 

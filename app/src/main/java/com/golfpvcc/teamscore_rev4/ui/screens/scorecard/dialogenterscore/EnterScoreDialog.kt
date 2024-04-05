@@ -79,6 +79,7 @@ fun EnterPlayersScores(
     val rowPlayerNames = scoreCardViewModel.state.playerHeading
     val state = scoreCardViewModel.state
     val currentHole: Int = state.mCurrentHole
+    val holeHandicap: Int = scoreCardViewModel.getHoleHandicap(currentHole)
 
 
     if (state.mDialogDisplayed) {
@@ -98,7 +99,7 @@ fun EnterPlayersScores(
                     Log.d("VIN", "EnterPlayersScores $currentHole")
 
                     Column(modifier = Modifier.weight(.75f)) {
-                        DisplayCurrentHoleHeading(currentHole)
+                        DisplayCurrentHoleHeading(currentHole, holeHandicap)
                         DisplayPlayerNameAndScoreHeading()
                         for (idx in rowPlayerNames.indices) {
                             Row(horizontalArrangement = Arrangement.Start) {
@@ -202,13 +203,13 @@ fun DisplayPlayerNameAndScoreHeading() {
 }
 
 @Composable
-fun DisplayCurrentHoleHeading(currentHole: Int) {
+fun DisplayCurrentHoleHeading(currentHole: Int, holeHandicap: Int) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "Current Hole ${currentHole + 1}",
+            text = "Current Hole ${currentHole + 1} Handicap $holeHandicap",
             textAlign = TextAlign.Center,
             modifier = Modifier
                 .width(300.dp)

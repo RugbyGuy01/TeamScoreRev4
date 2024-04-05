@@ -12,5 +12,5 @@ data class ScoreCardRecord(
     val mPar: IntArray,         // the current course Par
     val mHandicap: IntArray,       // current course handicap
     @PrimaryKey
-    val scoreCardRec_Id: Int?,    // score card record ID
+    val scoreCardRecId: Int?,    // score card record ID
 )

@@ -12,10 +12,17 @@ const val VIN_LIGHT_GRAY = 0xFFE0E0E0
 const val VIN_HOLE_PLAYED = 0xFF48EFF0
 const val GETS_1_STROKES = 0xFFFFF887
 const val GETS_2_STROKES = 0xFFFFE4C5
-const val FRONT_NINE_TOTAL_DISPLAYED = true
-const val BACK_NINE_TOTAL_DISPLAYED = false
-const val FRONT_NINE_IS_DISPLAYED = true
-const val BACK_NINE_IS_DISPLAY = false
+const val FRONT_NINE_TOTAL_DISPLAYED = 8    //zero base, user is one the 9 nine hole
+const val BACK_NINE_TOTAL_DISPLAYED = 17      //zero base, user is one the 18 nine hole
+const val FRONT_NINE_IS_DISPLAYED = true      //zero base, user is one the 18 nine hole
+
+const val TEAM_GROSS_SCORE = 0x10
+const val TEAM_NET_SCORE = 0x20
+const val DOUBLE_TEAM_SCORE = 0x40
+const val BIT_NOT_USED = 0x80
+const val TEAM_SCORE = 0x70
+const val JUST_RAW_SCORE = 0x0F
+
 object Constants {
     const val SCORE_CARD_REC_ID = 2024
     const val MAX_PLAYERS = 4
@@ -54,7 +61,7 @@ object Constants {
 }
 
 @Composable
-fun setScreenOrientation(orientation : Int) {
+fun SetScreenOrientation(orientation : Int) {
     val activity = LocalContext.current as Activity
     activity.requestedOrientation = orientation
 }
