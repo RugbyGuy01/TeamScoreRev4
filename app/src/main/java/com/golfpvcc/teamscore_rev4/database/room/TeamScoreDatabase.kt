@@ -17,7 +17,7 @@ import com.golfpvcc.teamscore_rev4.database.model.ScoreCardRecord
 
 @Database(
     entities = [CourseRecord::class, ScoreCardRecord::class, PlayerRecord::class],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class TeamScoreDatabase: RoomDatabase() {

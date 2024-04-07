@@ -55,7 +55,10 @@ class PlayerSetupViewModel(
 //        saveScoreCardRecord()       // make sure we have a record
         vinScoreCardRecordUpdate()
         val scoreCardRecord: ScoreCardRecord = scoreCardDao.getScoreCardRecord(SCORE_CARD_REC_ID)
-        updateScoreCard(scoreCardRecord)
+        if (scoreCardRecord != null)
+            updateScoreCard(scoreCardRecord)
+        else
+            Log.d("VIN", "scoreCardDao - record not found")
         val playerRecords: List<PlayerRecord> = playerDao.getAllPlayerRecords()
         updatePlayers(playerRecords)
         Log.d("VIN", "Get course id = $courseId")
@@ -118,7 +121,7 @@ class PlayerSetupViewModel(
         val scoreCardRecord: ScoreCardRecord = ScoreCardRecord(
             mCourseName = state.mCourseName,
             mTee = state.mTee,
-            mCurrentHole = state.mStartingHole.toInt(),
+            mCurrentHole = state.mStartingHole.toInt() - 1, // zero based
             mPar = state.mPar,
             mHandicap = state.mHandicap,
             scoreCardRecId = state.scoreCardRecId

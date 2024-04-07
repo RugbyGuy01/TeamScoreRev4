@@ -7,7 +7,7 @@ import java.util.Date
 open class DataConverter {
     @TypeConverter
     fun arrayToString(myArray: IntArray): String? {
-        if (myArray == null || myArray.isEmpty()) {
+        if (myArray.isEmpty()) {
             return ""
         }
         var str = myArray[0].toString()

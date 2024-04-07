@@ -43,6 +43,35 @@ fun FlipNineDisplay(scoreCardViewModel: ScoreCardViewModel) {
 }
 
 @Composable
+fun PreviousHole(scoreCardViewModel: ScoreCardViewModel) {
+    val buttonText: String = "Prev"
+
+    Button(
+        onClick = {
+            scoreCardViewModel.advanceToThePreviousHole()
+        },
+        modifier = Modifier
+            .height(40.dp),  //vpg
+    ) {
+        Text(text = buttonText)
+    }
+}
+
+@Composable
+fun NextHole(scoreCardViewModel: ScoreCardViewModel) {
+    val buttonText: String = "Next"
+    Button(
+        onClick = {
+            scoreCardViewModel.advanceToTheNextHole()
+        },
+        modifier = Modifier
+            .height(40.dp),  //vpg
+    ) {
+        Text(text = buttonText)
+    }
+}
+
+@Composable
 fun DisplayMainScoreCard(
     scoreCardViewModel: ScoreCardViewModel
 ) {

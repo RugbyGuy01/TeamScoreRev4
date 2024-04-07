@@ -81,4 +81,8 @@ fun DisplayControlButtons(scoreCardViewModel: ScoreCardViewModel) {
     FlipNineDisplay(scoreCardViewModel)
     Spacer(modifier = Modifier.size(12.dp))
     ButtonEnterScore(scoreCardViewModel, scoreCardViewModel::dialogAction)
+    Spacer(modifier = Modifier.size(12.dp))
+    PreviousHole(scoreCardViewModel)
+    Spacer(modifier = Modifier.size(12.dp))
+    NextHole(scoreCardViewModel)
 }

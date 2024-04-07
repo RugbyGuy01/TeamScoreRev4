@@ -13,6 +13,7 @@ import com.golfpvcc.teamscore_rev4.database.model.ScoreCardRecord
 import com.golfpvcc.teamscore_rev4.database.model.ScoreCardWithPlayers
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.dialogenterscore.DialogAction
 import com.golfpvcc.teamscore_rev4.utils.BACK_NINE_DISPLAY
+import com.golfpvcc.teamscore_rev4.utils.BACK_NINE_TOTAL_DISPLAYED
 
 import com.golfpvcc.teamscore_rev4.utils.Constants.SCORE_CARD_REC_ID
 import com.golfpvcc.teamscore_rev4.utils.FRONT_NINE_DISPLAY
@@ -92,7 +93,8 @@ class ScoreCardViewModel(
         } else
             return (IntArray(18) { 0 })
     }
-    fun getHoleHandicap(hole:Int): Int {
+
+    fun getHoleHandicap(hole: Int): Int {
         val hdcpCell: HdcpParHoleHeading? =
             state.hdcpParHoleHeading.find { it.vinTag == HDCP_HEADER }
         if (hdcpCell != null) {
@@ -147,6 +149,25 @@ class ScoreCardViewModel(
         state = state.copy(mWhatNineIsBeingDisplayed = !state.mWhatNineIsBeingDisplayed)
     }
 
+    fun advanceToTheNextHole() {
+        state = if ((state.mCurrentHole + 1) < TOTAL_18_HOLE) {
+            state.copy(mCurrentHole = (state.mCurrentHole + 1))
+        } else {
+            state.copy(mCurrentHole = 0)
+        }
+        displayFrontOrBackOfScoreCard()
+    }
+
+    fun advanceToThePreviousHole() {
+        Log.d("Vin", "current hole ${state.mCurrentHole}")
+        state = if (0 <= (state.mCurrentHole - 1)) {
+            state.copy(mCurrentHole = (state.mCurrentHole - 1))
+        } else {
+            state.copy(mCurrentHole = BACK_NINE_TOTAL_DISPLAYED)
+        }
+        displayFrontOrBackOfScoreCard()
+    }
+
     fun setHighLightCurrentHole(holeIdx: Int, displayHoleColor: Color): Color {
         if (displayHoleColor == Color(VIN_HOLE_PLAYED)) { // the only row to high light on the score card
             return if (holeIdx == state.mCurrentHole) Color(VIN_HOLE_PLAYED) else Color(
@@ -162,6 +183,13 @@ class ScoreCardViewModel(
         state.playerHeading[playerIdx].mScore[idx] = score
         Log.d("VIN", "SetHoleScore ${state.playerHeading[playerIdx].mScore[idx]}")
         repaintScreen()
+    }
+
+    private fun displayFrontOrBackOfScoreCard() {
+        if (state.mCurrentHole < FRONT_NINE_DISPLAY) {
+            state = state.copy(mWhatNineIsBeingDisplayed = FRONT_NINE_IS_DISPLAYED)
+        } else
+            state = state.copy(mWhatNineIsBeingDisplayed = !FRONT_NINE_IS_DISPLAYED)
     }
 
     // *******************************************************
@@ -180,10 +208,7 @@ class ScoreCardViewModel(
     fun ButtonEnterScore() {
         Log.d("VIN", "ButtonEnterScore")
         state = state.copy(mDialogDisplayed = true)
-        if (state.mCurrentHole < FRONT_NINE_DISPLAY) {
-            state = state.copy(mWhatNineIsBeingDisplayed = FRONT_NINE_IS_DISPLAYED)
-        } else
-            state = state.copy(mWhatNineIsBeingDisplayed = !FRONT_NINE_IS_DISPLAYED)
+        displayFrontOrBackOfScoreCard()
     }
 
     fun setGrossScore(playerIdx: Int) {
@@ -197,12 +222,9 @@ class ScoreCardViewModel(
     fun finishedScoringDialog() {
         Log.d("HOLE", "finishedScoringDialog current hole ${state.mCurrentHole}")
         state = state.copy(mDialogDisplayed = false)
-        state = if ((state.mCurrentHole + 1) < TOTAL_18_HOLE) {
-            state.copy(mCurrentHole = (state.mCurrentHole + 1))
-        } else {
-            state.copy(mCurrentHole = 0)
-        }
+        advanceToTheNextHole()
     }
+
 
     private fun clearOneScore() {
         scoreEnter(0)
