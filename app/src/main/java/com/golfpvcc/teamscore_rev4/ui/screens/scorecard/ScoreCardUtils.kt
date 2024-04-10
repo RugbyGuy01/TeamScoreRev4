@@ -170,12 +170,11 @@ fun DisplayScoreCardNames(
             }
             Column {
                 val holeHdcps = scoreCardViewModel.getHoleHdcps()
-                for (idx in playerHeading.indices) {
+                for (idx in playerHeading.indices) {        // here's the score card player's loop of scores
                     DisplayPlayerScoreCardCell(
                         Modifier,
                         playerHeading[idx],
                         holeHdcps,      // the course handicap for the holes
-                        Color.Transparent,
                         scoreCardViewModel
                     )
                 }
@@ -267,17 +266,29 @@ fun DisplayPlayerScoreCardCell(
     modifier: Modifier,
     playerHeading: PlayerHeading,
     holeHdcps: IntArray,
-    color: Color,
     scoreCardViewModel: ScoreCardViewModel
 ) {
     Row()
     {
         val startingCell: Int = scoreCardViewModel.getStartingHole()
         val endingCell: Int = scoreCardViewModel.getEndingHole()
-        for (idx in startingCell until endingCell) {
+        val hdcpParHoleHeading = scoreCardViewModel.state.hdcpParHoleHeading
+        var parForTheHoles: IntArray = IntArray(18) { 4 }
+
+        for (idx in hdcpParHoleHeading.indices) {
+            if (hdcpParHoleHeading[idx].vinTag == PAR_HEADER) { // the score card par row
+                parForTheHoles = hdcpParHoleHeading[idx].mHole
+            }
+        }
+
+        for (idx in startingCell until endingCell) {    // player score card loop
             val playerStokeHoleColor = scoreCardViewModel.getStokeOnHolePlayerColor(
                 playerHeading.mHdcp,
                 holeHdcps[idx]
+            )
+            val playerScoreColor = scoreCardViewModel.getPlayerScoreColorForHole(
+                playerHeading.mScore[idx],
+                parForTheHoles[idx]
             )
             Surface(
                 modifier = modifier.width(45.dp),
@@ -285,16 +296,13 @@ fun DisplayPlayerScoreCardCell(
                 color = playerStokeHoleColor,
                 contentColor = contentColorFor(Color.Transparent),
             ) {
-                Log.d(
-                    "VIN",
-                    "DisplayPlayerScoreCardCell playerHeading mHdc ${playerHeading.mHdcp} hdcp ${holeHdcps[idx]}"
-                )
-
+                val playerStringScore = scoreCardViewModel.getPlayerHoleScore(playerHeading.vinTag, idx) // do not display '0'++ on the score card
                 Text(
-                    text = if (playerHeading.mScore[idx] == 0) "" else playerHeading.mScore[idx].toString(), // do not display '0'++ on the score card
+                    text = playerStringScore,
                     fontSize = SCORE_CARD_TEXT.sp,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(4.dp),
+                    color = playerScoreColor,
                     maxLines = 1,
                 )  // start at zero - get the first column of the data
             }

@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import com.golfpvcc.teamscore_rev4.ui.theme.shape
 import com.golfpvcc.teamscore_rev4.utils.TeamObjects
@@ -77,6 +78,7 @@ fun DropDownSelectHolePar(
                     Divider(color = Color.Green, thickness = 1.dp)
                     Text(
                         text = "      ${it.Par}     ",
+                        fontSize = 20.sp,
                         textAlign = TextAlign.Center,
                         color = if (currentHolePar == it.Par) Color.White else Color.Unspecified,
                         style = if (currentHolePar == it.Par) TextStyle(background = Color.Black) else TextStyle(
@@ -145,6 +147,7 @@ fun DropDownSelectHoleHandicap(
                             Divider(color = Color.Green, thickness = 1.dp)
                             Text(
                                 text = "  ${courseHdcp[inx].holeHandicap}  ",
+                                fontSize = 20.sp,
                                 textAlign = TextAlign.Center,
                                 color = if (currentHoleHdcp == courseHdcp[inx].holeHandicap) Color.White else Color.Unspecified,
                                 style = if (currentHoleHdcp == courseHdcp[inx].holeHandicap) TextStyle(

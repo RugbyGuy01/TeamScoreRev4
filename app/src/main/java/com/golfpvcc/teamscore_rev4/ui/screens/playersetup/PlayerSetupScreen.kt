@@ -46,15 +46,15 @@ fun PlayerSetupScreen(
     val modifier: Modifier = Modifier
 
     SetScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
-//    LaunchedEffect(true) {
-//        if (courseId != -1) {
-//            scope.launch(Dispatchers.IO) {
-//                viewModel.getCourseById(courseId)
-//            }
-//        } else {
-//            Log.d("VIN", "Record ID not passed to Player setup screen!!")
-//        }
-//    }
+    LaunchedEffect(true) {
+        if (courseId != -1) {
+            scope.launch(Dispatchers.IO) {
+                viewModel.getCourseById(courseId)
+            }
+        } else {
+            Log.d("VIN", "Record ID not passed to Player setup screen!!")
+        }
+    }
 
 
     Scaffold {

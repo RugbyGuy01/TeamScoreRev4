@@ -14,8 +14,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -50,8 +48,7 @@ const val BUTTON_ENTER_SCORE_TEXT = "Enter Scores"
 
 @Composable
 fun ButtonEnterScore(
-    scoreCardViewModel: ScoreCardViewModel,
-    onAction: (DialogAction) -> Unit
+    scoreCardViewModel: ScoreCardViewModel, onAction: (DialogAction) -> Unit
 ) {
 
     if (scoreCardViewModel.state.mDialogDisplayed) {
@@ -83,10 +80,8 @@ fun EnterPlayersScores(
 
 
     if (state.mDialogDisplayed) {
-        Dialog(
-            properties = DialogProperties(usePlatformDefaultWidth = false),
-            onDismissRequest = { onAction(DialogAction.Finished) }
-        ) {
+        Dialog(properties = DialogProperties(usePlatformDefaultWidth = false),
+            onDismissRequest = { onAction(DialogAction.Finished) }) {
             Card(
                 modifier = Modifier
                     .fillMaxSize()
@@ -103,28 +98,15 @@ fun EnterPlayersScores(
                         DisplayPlayerNameAndScoreHeading()
                         for (idx in rowPlayerNames.indices) {
                             Row(horizontalArrangement = Arrangement.Start) {
-                                Text(
-                                    text = rowPlayerNames[idx].mName,
-                                    modifier = Modifier
-                                        .padding(5.dp)
-                                        .width(PLAYER_NAME_WIDTH.dp),
-                                    fontSize = PLAYER_TEXT_SIZE.sp
-                                )
-                                val currentActivePlayerScore: Color =
+
+                                val playerName = rowPlayerNames[idx].mName
+                                val backgroundColorForStokes: Color =
                                     scoreCardViewModel.getHighLiteActivePlayerColor(idx)
-                                Text(
-                                    text = scoreCardViewModel.getPlayerHoleScore(
-                                        idx,
-                                        currentHole
-                                    ),
-                                    modifier = Modifier
-                                        .padding(5.dp)
-                                        .width(PLAYER_SCORE_WIDTH.dp)
-                                        .clickable { scoreCardViewModel.setDialogCurrentPlayer(idx) },
-                                    style = TextStyle(background = currentActivePlayerScore),
-                                    fontSize = PLAYER_TEXT_SIZE.sp
-                                )
-                                DisplayTeamGrossNetButton(idx, onAction)
+                                val playerHoleScore =
+                                    scoreCardViewModel.getPlayerHoleScore(idx, currentHole)
+
+                                DisplayPlayerNames(playerName, backgroundColorForStokes, playerHoleScore,idx,onAction )
+                                DisplayTeamGrossNetButton(scoreCardViewModel, idx, onAction)
                             }
                         }
                     }
@@ -148,31 +130,33 @@ fun EnterPlayersScores(
 }
 
 @Composable
-fun DisplayTeamGrossNetButton(idx: Int, onAction: (DialogAction) -> Unit) {
-    DialogCard(
-        symbol = "Net",
+fun DisplayTeamGrossNetButton(
+    scoreCardViewModel: ScoreCardViewModel, idx: Int, onAction: (DialogAction) -> Unit
+) {
+
+    DialogCard(symbol = "Net",
         modifier = Modifier.padding(start = 2.dp, top = 2.dp, bottom = 2.dp, end = 2.dp),
         myFontSize = BUTTON_NET_GROSS_FONT,
-        backGround = Color.LightGray,
+        backGround = scoreCardViewModel.state.netButtonColor[idx],
         textColor = Color.Black,
-        onClick = { onAction(DialogAction.Net(idx)) }
-    )
+        onClick = { onAction(DialogAction.Net(idx)) },
+        onLongClick = { onAction(DialogAction.NetLongClick(idx)) })
     Spacer(modifier = Modifier.width(10.dp))
     DialogCard(
         symbol = "Gross",
         modifier = Modifier.padding(2.dp),
         myFontSize = BUTTON_NET_GROSS_FONT,
-        backGround = Color.LightGray,
+        backGround = scoreCardViewModel.state.grossButtonColor[idx],
         textColor = Color.Black,
-        onClick = { onAction(DialogAction.Gross(idx)) }
+        onClick = { onAction(DialogAction.Gross(idx)) },
+        onLongClick = { onAction(DialogAction.GrossLongClick(idx)) },
     )
 }
 
 @Composable
 fun DisplayPlayerNameAndScoreHeading() {
     Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.Start
+        modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start
     ) {
         Text(
             text = "Player Name",
@@ -205,8 +189,7 @@ fun DisplayPlayerNameAndScoreHeading() {
 @Composable
 fun DisplayCurrentHoleHeading(currentHole: Int, holeHandicap: Int) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.Center
+        modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center
     ) {
         Text(
             text = "Current Hole ${currentHole + 1} Handicap $holeHandicap",
@@ -222,8 +205,7 @@ fun DisplayCurrentHoleHeading(currentHole: Int, holeHandicap: Int) {
 @Composable
 fun DisplayEnterScoreHeading() {
     Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.Center
+        modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center
     ) {
         Text(
             text = "Enter Score",
@@ -238,8 +220,7 @@ fun DisplayEnterScoreHeading() {
 
 @Composable
 fun DisplayActionButtons(
-    onAction: (DialogAction) -> Unit,
-    modifier: Modifier
+    onAction: (DialogAction) -> Unit, modifier: Modifier
 ) {
 
     Row(
@@ -248,30 +229,27 @@ fun DisplayActionButtons(
             .width(CARD_ROW_WIDTH.dp),
         horizontalArrangement = Arrangement.Start,
     ) {
-        DialogCard(
-            symbol = "Clear",
-            modifier = modifier.padding(start = 10.dp, top = 2.dp, bottom = 2.dp, end = 10.dp),
+        DialogCard(symbol = "Clear",
+            modifier = Modifier.padding(start = 10.dp, top = 2.dp, bottom = 2.dp, end = 10.dp),
             myFontSize = BUTTON_ACTION_FONT,
             backGround = Color.DarkGray,
             textColor = Color.White,
-            onClick = { onAction(DialogAction.Clear) }
-        )
+            onClick = { onAction(DialogAction.Clear) },
+            onLongClick = {})
         Spacer(modifier = Modifier.width(30.dp))
-        DialogCard(
-            symbol = "Done",
-            modifier = modifier.width(80.dp),
+        DialogCard(symbol = "Done",
+            modifier = Modifier.width(80.dp),
             myFontSize = BUTTON_ACTION_FONT,
             backGround = Color.DarkGray,
             textColor = Color.White,
-            onClick = { onAction(DialogAction.Finished) }  //onAction(DialogAction.Finished)
-        )
+            onClick = { onAction(DialogAction.Finished) },
+            onLongClick = {})
     }
 }
 
 @Composable
 fun DisplayKeyPad(
-    onAction: (DialogAction) -> Unit,
-    modifier: Modifier
+    onAction: (DialogAction) -> Unit, modifier: Modifier
 ) {
     Row(
         modifier = Modifier
@@ -280,12 +258,10 @@ fun DisplayKeyPad(
         horizontalArrangement = Arrangement.spacedBy(ROW_BOTTOM_PAD.dp),
     ) {
         for (idx in 1..3) {
-            DialogButton(
-                symbol = idx.toString(),
+            DialogButton(symbol = idx.toString(),
                 modifier = modifier,
                 myFontSize = BUTTON_NUMBER_FONT,
-                onClick = { onAction(DialogAction.Number(idx)) }
-            )
+                onClick = { onAction(DialogAction.Number(idx)) })
         }
     }
     Row(
@@ -295,12 +271,10 @@ fun DisplayKeyPad(
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         for (idx in 4..6) {
-            DialogButton(
-                symbol = idx.toString(),
+            DialogButton(symbol = idx.toString(),
                 modifier = modifier,
                 myFontSize = BUTTON_NUMBER_FONT,
-                onClick = { onAction(DialogAction.Number(idx)) }
-            )
+                onClick = { onAction(DialogAction.Number(idx)) })
         }
     }
     Row(
@@ -310,12 +284,10 @@ fun DisplayKeyPad(
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         for (idx in 7..9) {
-            DialogButton(
-                symbol = idx.toString(),
+            DialogButton(symbol = idx.toString(),
                 modifier = modifier,
                 myFontSize = BUTTON_NUMBER_FONT,
-                onClick = { onAction(DialogAction.Number(idx)) }
-            )
+                onClick = { onAction(DialogAction.Number(idx)) })
         }
     }
 }

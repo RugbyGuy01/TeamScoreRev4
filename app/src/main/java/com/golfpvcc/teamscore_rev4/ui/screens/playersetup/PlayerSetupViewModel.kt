@@ -40,25 +40,19 @@ class PlayerSetupViewModel(
     }
 
     init {
-        viewModelScope.launch(Dispatchers.IO) {
-            if (courseId != -1) {
-                getCourseById(courseId)
-            } else {
-                Log.d("VIN", "Record ID not passed to Player setup screen!!")
-            }
-        }
     }
 
     suspend fun getCourseById(courseId: Int?) {
         val courseRecord: CourseRecord = courseDao.getCourseRecord(courseId)
         updateCourseRecord(courseRecord)
-//        saveScoreCardRecord()       // make sure we have a record
-        vinScoreCardRecordUpdate()
         val scoreCardRecord: ScoreCardRecord = scoreCardDao.getScoreCardRecord(SCORE_CARD_REC_ID)
-        if (scoreCardRecord != null)
+        if (scoreCardRecord != null) {
+            Log.d("VIN", "scoreCardDao - record found")
             updateScoreCard(scoreCardRecord)
-        else
+        } else {
             Log.d("VIN", "scoreCardDao - record not found")
+            vinScoreCardRecordUpdate()
+        }
         val playerRecords: List<PlayerRecord> = playerDao.getAllPlayerRecords()
         updatePlayers(playerRecords)
         Log.d("VIN", "Get course id = $courseId")

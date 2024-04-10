@@ -5,22 +5,34 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import com.golfpvcc.teamscore_rev4.database.model.CourseRecord
 
+const val VIN_LIGHT_GRAY = 0xFFE0E0E0
+const val VIN_HOLE_PLAYED = 0xFF48EFF0
+const val YELLOW_GETS_1_STROKES = 0xFFFFFBBB
+const val ORANGE_GETS_2_STROKES = 0xFFFFE4C5
+const val RED_ONE_UNDER_PAR = 0xFFF53526
+const val PURPLE_TWO_UNDER_PAR = 0xFF732BF5
+
+const val TEAM_SINGLE_NET_SCORE = 0xFFFFC683
+const val TEAM_SINGLE_GROSS_SCORE = 0xFFED4E2F
+const val TEAM_DOUBLE_NET_SCORE = 0xFF1BD914
+const val TEAM_DOUBLE_GROSS_SCORE = 0xFFB56C00
+
+
 const val FRONT_NINE_DISPLAY = 9
 const val BACK_NINE_DISPLAY = 18
 const val TOTAL_18_HOLE = 18
-const val VIN_LIGHT_GRAY = 0xFFE0E0E0
-const val VIN_HOLE_PLAYED = 0xFF48EFF0
-const val GETS_1_STROKES = 0xFFFFF887
-const val GETS_2_STROKES = 0xFFFFE4C5
+
+
 const val FRONT_NINE_TOTAL_DISPLAYED = 8    //zero base, user is one the 9 nine hole
 const val BACK_NINE_TOTAL_DISPLAYED = 17      //zero base, user is one the 18 nine hole
 const val FRONT_NINE_IS_DISPLAYED = true      //zero base, user is one the 18 nine hole
 
+const val TEAM_CLEAR_SCORE = 0x0F
 const val TEAM_GROSS_SCORE = 0x10
 const val TEAM_NET_SCORE = 0x20
 const val DOUBLE_TEAM_SCORE = 0x40
 const val BIT_NOT_USED = 0x80
-const val TEAM_SCORE = 0x70
+const val TEAM_SCORE_MASK = 0x70
 const val JUST_RAW_SCORE = 0x0F
 
 object Constants {

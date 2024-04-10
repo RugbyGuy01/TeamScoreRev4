@@ -1,9 +1,9 @@
 package com.golfpvcc.teamscore_rev4.ui.screens.scorecard
 
 import android.util.Log
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
@@ -12,16 +12,26 @@ import com.golfpvcc.teamscore_rev4.TeamScoreCardApp
 import com.golfpvcc.teamscore_rev4.database.model.ScoreCardRecord
 import com.golfpvcc.teamscore_rev4.database.model.ScoreCardWithPlayers
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.dialogenterscore.DialogAction
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.dialogenterscore.getTeamButtonColor
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.dialogenterscore.teamScoreTypeNet
 import com.golfpvcc.teamscore_rev4.utils.BACK_NINE_DISPLAY
 import com.golfpvcc.teamscore_rev4.utils.BACK_NINE_TOTAL_DISPLAYED
 
 import com.golfpvcc.teamscore_rev4.utils.Constants.SCORE_CARD_REC_ID
+import com.golfpvcc.teamscore_rev4.utils.DOUBLE_TEAM_SCORE
 import com.golfpvcc.teamscore_rev4.utils.FRONT_NINE_DISPLAY
 import com.golfpvcc.teamscore_rev4.utils.FRONT_NINE_IS_DISPLAYED
-
-import com.golfpvcc.teamscore_rev4.utils.GETS_1_STROKES
-import com.golfpvcc.teamscore_rev4.utils.GETS_2_STROKES
 import com.golfpvcc.teamscore_rev4.utils.JUST_RAW_SCORE
+
+import com.golfpvcc.teamscore_rev4.utils.YELLOW_GETS_1_STROKES
+import com.golfpvcc.teamscore_rev4.utils.ORANGE_GETS_2_STROKES
+import com.golfpvcc.teamscore_rev4.utils.PURPLE_TWO_UNDER_PAR
+import com.golfpvcc.teamscore_rev4.utils.RED_ONE_UNDER_PAR
+import com.golfpvcc.teamscore_rev4.utils.TEAM_CLEAR_SCORE
+import com.golfpvcc.teamscore_rev4.utils.TEAM_DOUBLE_GROSS_SCORE
+import com.golfpvcc.teamscore_rev4.utils.TEAM_GROSS_SCORE
+import com.golfpvcc.teamscore_rev4.utils.TEAM_NET_SCORE
+import com.golfpvcc.teamscore_rev4.utils.TEAM_SCORE_MASK
 import com.golfpvcc.teamscore_rev4.utils.TOTAL_18_HOLE
 import com.golfpvcc.teamscore_rev4.utils.VIN_LIGHT_GRAY
 import com.golfpvcc.teamscore_rev4.utils.VIN_HOLE_PLAYED
@@ -42,9 +52,6 @@ class ScoreCardViewModel(
     fun getScoreCardAndPlayerRecord() {
         val scoreCardWithPlayers: List<ScoreCardWithPlayers> =
             scoreCardDao.getScoreRecordWithPlayers(SCORE_CARD_REC_ID)
-
-        Log.d("VIN", "scoreCardWithPlayers size ${scoreCardWithPlayers.size}  ")
-        Log.d("VIN", "playerRecords size ${scoreCardWithPlayers[0].playerRecords.size}  ")
 
         if (0 < scoreCardWithPlayers.size)      // found score record with players
             updateScoreCardState(scoreCardWithPlayers[0])
@@ -67,7 +74,7 @@ class ScoreCardViewModel(
         }
         for (idx in scoreCardWithPlayers.playerRecords.indices) { // player name and handicap
             state.playerHeading += PlayerHeading(
-                PLAYER_1_NAME + idx,
+                idx,
                 mName = scoreCardWithPlayers.playerRecords[idx].mName,
                 mHdcp = scoreCardWithPlayers.playerRecords[idx].mHandicap,
                 mScore = scoreCardWithPlayers.playerRecords[idx].mScore
@@ -76,8 +83,8 @@ class ScoreCardViewModel(
     }
 
     fun getPlayerHoleScore(playerIdx: Int, idx: Int): String {
-        var playerHoleScore: Int = state.playerHeading[playerIdx].mScore[idx]
-        var displayPlayerHoleScore: String = "_"
+        val playerHoleScore: Int = (state.playerHeading[playerIdx].mScore[idx] and JUST_RAW_SCORE)
+        var displayPlayerHoleScore: String = "  "
 
         if (playerHoleScore != 0)
             displayPlayerHoleScore = playerHoleScore.toString()
@@ -116,12 +123,22 @@ class ScoreCardViewModel(
         var playerIntHdcp = playerHdcp.toInt()
 
         if (holeHdcp <= playerIntHdcp) {
-            backGroundColor = Color(GETS_1_STROKES)
+            backGroundColor = Color(YELLOW_GETS_1_STROKES)
             playerIntHdcp -= 18
             if (holeHdcp <= playerIntHdcp)
-                backGroundColor = Color(GETS_2_STROKES)
+                backGroundColor = Color(ORANGE_GETS_2_STROKES)
         }
         return (backGroundColor)
+    }
+
+    fun getPlayerScoreColorForHole(playerScore: Int, holePar: Int): Color {
+        val score: Int = (playerScore and JUST_RAW_SCORE) - holePar
+        var backGroundColor: Color = Color.Black
+        when (score) {
+            -1 -> backGroundColor = Color(RED_ONE_UNDER_PAR)
+            -2 -> backGroundColor = Color(PURPLE_TWO_UNDER_PAR)
+        }
+        return backGroundColor
     }
 
     fun getTotalForNineCell(Holes: IntArray): String {
@@ -130,14 +147,13 @@ class ScoreCardViewModel(
         val endingCell: Int = getEndingHole()
 
         for (idx in startingCell until endingCell) {
-            total += Holes[idx]
+            total += (Holes[idx] and JUST_RAW_SCORE)
         }
         Log.d("VIN", "getTotalForNineCell sum $total")
         return if (total == 0) " " else total.toString()
     }
 
     fun getCurrentHole(): Int {
-        repaintScreen()
         return (state.mCurrentHole)
     }
 
@@ -182,7 +198,6 @@ class ScoreCardViewModel(
         Log.d("VIN", "SetHoleScore $idx  Score $score")
         state.playerHeading[playerIdx].mScore[idx] = score
         Log.d("VIN", "SetHoleScore ${state.playerHeading[playerIdx].mScore[idx]}")
-        repaintScreen()
     }
 
     private fun displayFrontOrBackOfScoreCard() {
@@ -200,8 +215,11 @@ class ScoreCardViewModel(
             DialogAction.Clear -> clearOneScore()
             DialogAction.ButtonEnterScore -> ButtonEnterScore()
             is DialogAction.Gross -> setGrossScore(action.playerIdx)
+            is DialogAction.GrossLongClick -> setGrossLongClickScore(action.playerIdx)
             is DialogAction.Net -> setNetScore(action.playerIdx)
+            is DialogAction.NetLongClick -> setNetLongClickScore(action.playerIdx)
             is DialogAction.Number -> scoreEnter(action.score)
+            is DialogAction.SetDialogCurrentPlayer -> setDialogCurrentPlayer(action.currentPlayerIdx)
         }
     }
 
@@ -209,22 +227,80 @@ class ScoreCardViewModel(
         Log.d("VIN", "ButtonEnterScore")
         state = state.copy(mDialogDisplayed = true)
         displayFrontOrBackOfScoreCard()
+        configureDialogGrossAndNetButtonColors()
+    }
+
+    fun configureDialogGrossAndNetButtonColors() {
+        val holeIdx = getCurrentHole()
+        var playerScore: Int
+
+        for (playerHeadRecord in state.playerHeading) {
+            playerScore = playerHeadRecord.mScore[holeIdx]
+            getGrossButtonColor(playerHeadRecord.vinTag, playerScore)
+        }
     }
 
     fun setGrossScore(playerIdx: Int) {
-        Log.d("VIN", "setGrossScore $playerIdx")
+        setTeamScoreButtonColor(playerIdx, TEAM_GROSS_SCORE)
+    }
+
+    fun setGrossLongClickScore(playerIdx: Int) {
+        setTeamScoreButtonColor(playerIdx, (TEAM_GROSS_SCORE + DOUBLE_TEAM_SCORE))
     }
 
     fun setNetScore(playerIdx: Int) {
-        Log.d("VIN", "setNetScore")
+        setTeamScoreButtonColor(playerIdx, TEAM_NET_SCORE)
     }
+
+    fun setNetLongClickScore(playerIdx: Int) {
+        setTeamScoreButtonColor(playerIdx, TEAM_NET_SCORE + DOUBLE_TEAM_SCORE)
+    }
+
+    fun setTeamScoreButtonColor(playerIdx: Int, teamScore: Int) {
+        val holeIdx = getCurrentHole()
+        val teamHoleMask: Int
+        val playerHeadRecord = state.playerHeading[playerIdx]
+
+        var playerScore = playerHeadRecord.mScore[holeIdx]
+        teamHoleMask = playerScore and TEAM_SCORE_MASK
+        playerScore = playerScore and TEAM_CLEAR_SCORE
+
+        if ((teamHoleMask and teamScore) != teamScore) {  // if the team score already set, then clear the score
+            playerScore = playerScore or teamScore
+        }
+        playerHeadRecord.mScore[holeIdx] = playerScore
+        Log.d("VIN", "setGrossScore playerScore $playerScore")
+        getGrossButtonColor(playerHeadRecord.vinTag, playerScore)
+    }
+
+    fun getGrossButtonColor(playerIdx: Int, playerScore: Int) {
+
+        if (teamScoreTypeNet(playerScore)) {
+            state.grossButtonColor[playerIdx] = Color.LightGray
+            state.netButtonColor[playerIdx] = getTeamButtonColor(playerScore)
+        } else {
+            state.grossButtonColor[playerIdx] = getTeamButtonColor(playerScore)
+            state.netButtonColor[playerIdx] = Color.LightGray
+        }
+        repaintScreen()
+    }
+
+    fun clearGrossAndNetButtons() {
+        for (idx in state.grossButtonColor.indices) {
+            state.grossButtonColor[idx] = Color.LightGray
+        }
+        for (idx in state.netButtonColor.indices) {
+            state.netButtonColor[idx] = Color.LightGray
+        }
+    }
+
 
     fun finishedScoringDialog() {
         Log.d("HOLE", "finishedScoringDialog current hole ${state.mCurrentHole}")
         state = state.copy(mDialogDisplayed = false)
+        clearGrossAndNetButtons()   // clear the color button array
         advanceToTheNextHole()
     }
-
 
     private fun clearOneScore() {
         scoreEnter(0)
@@ -232,16 +308,14 @@ class ScoreCardViewModel(
     }
 
     fun scoreEnter(score: Int) {
-        Log.d("HOLE", "scoreEnter current hole ${state.mCurrentHole}")
-
         var dialogCurrentPlayer: Int = getDialogCurrentPlayer()
 
         setHoleScore(dialogCurrentPlayer, getCurrentHole(), score)
         dialogCurrentPlayer += 1
         if (dialogCurrentPlayer < state.playerHeading.size)
             setDialogCurrentPlayer(dialogCurrentPlayer) // on to the next player
-
-        Log.d("VIN", "Score enter is $score")
+        else
+            repaintScreen()
     }
 
     fun setDialogCurrentPlayer(idx: Int) {
@@ -264,7 +338,10 @@ class ScoreCardViewModel(
 }
 
 data class ScoreCard(
+    val grossButtonColor: Array<Color> = Array(4) { Color.LightGray },
+    val netButtonColor: Array<Color> = Array(4) { Color.LightGray },
     val mRepaintScreen: Boolean = false,
+
     val mCourseName: String = "",    // current course name from the course list database
     val mDialogDisplayed: Boolean = false,
     var mDialogCurrentPlayer: Int = 0,
@@ -279,8 +356,8 @@ data class ScoreCard(
     var playerHeading: List<PlayerHeading> = emptyList(),
 
     val teamUsedHeading: List<TeamUsedHeading> = listOf(
-        TeamUsedHeading(TEAM_HEADER, "Team"),
-        TeamUsedHeading(USED_HEADER, "Used"),
+        TeamUsedHeading(TEAM_HEADER, "Team"),   // total hole score for selected player
+        TeamUsedHeading(USED_HEADER, "Used"),   // total players selected for this hole
     ),
 )
 
