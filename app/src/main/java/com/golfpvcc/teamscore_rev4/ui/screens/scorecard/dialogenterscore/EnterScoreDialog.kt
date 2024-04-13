@@ -2,7 +2,6 @@ package com.golfpvcc.teamscore_rev4.ui.screens.scorecard.dialogenterscore
 
 import android.util.Log
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -19,13 +18,9 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -57,7 +52,7 @@ fun ButtonEnterScore(
 
     Button(
         onClick = {
-            scoreCardViewModel.ButtonEnterScore()
+            scoreCardViewModel.buttonEnterScore()
             scoreCardViewModel.setDialogCurrentPlayer(0)
         },
         contentPadding = PaddingValues(10.dp),
@@ -220,7 +215,8 @@ fun DisplayEnterScoreHeading() {
 
 @Composable
 fun DisplayActionButtons(
-    onAction: (DialogAction) -> Unit, modifier: Modifier
+    onAction: (DialogAction) -> Unit,
+    modifier: Modifier
 ) {
 
     Row(

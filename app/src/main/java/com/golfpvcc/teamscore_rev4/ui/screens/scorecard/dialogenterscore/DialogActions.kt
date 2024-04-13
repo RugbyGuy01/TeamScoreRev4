@@ -10,8 +10,8 @@ sealed class DialogAction {
     data class Gross(val playerIdx: Int):DialogAction()
     data class GrossLongClick(val playerIdx: Int):DialogAction()
     data class SetDialogCurrentPlayer(val currentPlayerIdx:Int):DialogAction()
-    object Clear:DialogAction()
-    object Finished:DialogAction()
-    object ButtonEnterScore:DialogAction()
+    data object Clear:DialogAction()
+    data object Finished:DialogAction()
+    data object ButtonEnterScore:DialogAction()
 
 }

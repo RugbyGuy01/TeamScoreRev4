@@ -20,6 +20,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.dialogenterscore.ButtonEnterScore
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DisplayMainScoreCard
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DisplayPrevNextHoleButton
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.FlipNineDisplay
 import com.golfpvcc.teamscore_rev4.utils.SetScreenOrientation
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -82,7 +85,6 @@ fun DisplayControlButtons(scoreCardViewModel: ScoreCardViewModel) {
     Spacer(modifier = Modifier.size(12.dp))
     ButtonEnterScore(scoreCardViewModel, scoreCardViewModel::dialogAction)
     Spacer(modifier = Modifier.size(25.dp))
-    PreviousHole(scoreCardViewModel)
-    Spacer(modifier = Modifier.size(15.dp))
-    NextHole(scoreCardViewModel)
+
+    DisplayPrevNextHoleButton( scoreCardViewModel::scoreCardActions)
 }

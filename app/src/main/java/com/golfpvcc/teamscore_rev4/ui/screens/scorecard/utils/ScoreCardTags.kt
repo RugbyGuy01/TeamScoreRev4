@@ -1,4 +1,4 @@
-package com.golfpvcc.teamscore_rev4.ui.screens.scorecard
+package com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils
 
 
 const val HDCP_HEADER: Int = 100

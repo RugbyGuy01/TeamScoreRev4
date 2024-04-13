@@ -1,7 +1,8 @@
-package com.golfpvcc.teamscore_rev4.ui.screens.scorecard
+package com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils
 
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -21,6 +23,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.PlayerHeading
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.ScoreCardActions
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.ScoreCardViewModel
 import com.golfpvcc.teamscore_rev4.utils.Constants.COLUMN_TOTAL_WIDTH
 import com.golfpvcc.teamscore_rev4.utils.Constants.SCORE_CARD_COURSE_NAME_TEXT
 import com.golfpvcc.teamscore_rev4.utils.Constants.SCORE_CARD_TEXT
@@ -43,35 +48,6 @@ fun FlipNineDisplay(scoreCardViewModel: ScoreCardViewModel) {
 }
 
 @Composable
-fun PreviousHole(scoreCardViewModel: ScoreCardViewModel) {
-    val buttonText: String = "Prev"
-
-    Button(
-        onClick = {
-            scoreCardViewModel.advanceToThePreviousHole()
-        },
-        modifier = Modifier
-            .height(40.dp),  //vpg
-    ) {
-        Text(text = buttonText)
-    }
-}
-
-@Composable
-fun NextHole(scoreCardViewModel: ScoreCardViewModel) {
-    val buttonText: String = "Next"
-    Button(
-        onClick = {
-            scoreCardViewModel.advanceToTheNextHole()
-        },
-        modifier = Modifier
-            .height(40.dp),  //vpg
-    ) {
-        Text(text = buttonText)
-    }
-}
-
-@Composable
 fun DisplayMainScoreCard(
     scoreCardViewModel: ScoreCardViewModel
 ) {
@@ -82,7 +58,6 @@ fun DisplayMainScoreCard(
         DisplayScoreCardTeams(scoreCardViewModel)
     }
 }
-
 @Composable
 fun DisplayCourseName(scoreCardViewModel: ScoreCardViewModel) {
     Row {
@@ -101,7 +76,6 @@ fun DisplayCourseName(scoreCardViewModel: ScoreCardViewModel) {
         )
     }
 }
-
 @Composable
 fun DisplayScoreCardHeader(
     scoreCardViewModel: ScoreCardViewModel
@@ -253,7 +227,9 @@ fun DisplayScoreCardCell(
                     text = if (cellData[idx] == 0) "" else cellData[idx].toString(), // do not display '0'++ on the score card
                     fontSize = SCORE_CARD_TEXT.sp,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(4.dp),
+                    modifier = Modifier
+                        .padding(4.dp),
+//                        .border(2.dp, Color.Red, shape = RoundedCornerShape(0.dp)),
                     maxLines = 1,
                 )  // start at zero - get the first column of the data
             }
@@ -331,5 +307,25 @@ fun DisplayRowHeading(
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )  // start at zero - get the first column of the data
+    }
+}
+
+@Composable
+fun DisplayPrevNextHoleButton(onAction: (ScoreCardActions) -> Unit) {
+
+    PrevNextHoleButton("Prev", onClick = { onAction(ScoreCardActions.Prev) })
+    Spacer(modifier = Modifier.size(15.dp))
+    PrevNextHoleButton("Next", onClick = { onAction(ScoreCardActions.Next) })
+}
+@Composable
+fun PrevNextHoleButton(buttonText:String, onClick: () -> Unit,) {
+    Button(
+        onClick = {
+            onClick()
+        },
+        modifier = Modifier
+            .height(40.dp),  //vpg
+    ) {
+        Text(text = buttonText)
     }
 }
