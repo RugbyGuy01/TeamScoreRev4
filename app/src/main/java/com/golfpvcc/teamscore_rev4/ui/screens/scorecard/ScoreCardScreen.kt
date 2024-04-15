@@ -20,8 +20,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.dialogenterscore.ButtonEnterScore
-import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DisplayMainScoreCard
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DisplayCourseName
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DisplayPrevNextHoleButton
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DisplayScoreCardHeader
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DisplayScoreCardNames
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DisplayScoreCardTeams
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.FlipNineDisplay
 import com.golfpvcc.teamscore_rev4.utils.SetScreenOrientation
 import kotlinx.coroutines.Dispatchers
@@ -79,6 +82,17 @@ fun GetScoreCardRecord(
     }
 }
 
+@Composable
+fun DisplayMainScoreCard(
+    scoreCardViewModel: ScoreCardViewModel
+) {
+    Column {
+        DisplayCourseName(scoreCardViewModel)
+        DisplayScoreCardHeader(scoreCardViewModel)
+        DisplayScoreCardNames(scoreCardViewModel)
+        DisplayScoreCardTeams(scoreCardViewModel)
+    }
+}
 @Composable
 fun DisplayControlButtons(scoreCardViewModel: ScoreCardViewModel) {
     FlipNineDisplay(scoreCardViewModel)

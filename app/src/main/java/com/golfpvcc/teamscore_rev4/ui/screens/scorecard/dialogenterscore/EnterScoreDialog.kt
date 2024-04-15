@@ -76,7 +76,7 @@ fun EnterPlayersScores(
 
     if (state.mDialogDisplayed) {
         Dialog(properties = DialogProperties(usePlatformDefaultWidth = false),
-            onDismissRequest = { onAction(DialogAction.Finished) }) {
+            onDismissRequest = { onAction(DialogAction.Done) }) {
             Card(
                 modifier = Modifier
                     .fillMaxSize()
@@ -238,7 +238,7 @@ fun DisplayActionButtons(
             myFontSize = BUTTON_ACTION_FONT,
             backGround = Color.DarkGray,
             textColor = Color.White,
-            onClick = { onAction(DialogAction.Finished) },
+            onClick = { onAction(DialogAction.Done) },
             onLongClick = {})
     }
 }
