@@ -1,6 +1,5 @@
 package com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils
 
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
@@ -29,7 +28,7 @@ import com.golfpvcc.teamscore_rev4.utils.Constants.COLUMN_TOTAL_WIDTH
 import com.golfpvcc.teamscore_rev4.utils.Constants.SCORE_CARD_COURSE_NAME_TEXT
 import com.golfpvcc.teamscore_rev4.utils.Constants.SCORE_CARD_TEXT
 import com.golfpvcc.teamscore_rev4.utils.VIN_LIGHT_GRAY
-import com.golfpvcc.teamscore_rev4.utils.VIN_HOLE_PLAYED
+import com.golfpvcc.teamscore_rev4.utils.DISPLAY_HOLE_NUMBER
 
 @Composable
 fun FlipNineDisplay(scoreCardViewModel: ScoreCardViewModel) {
@@ -85,10 +84,10 @@ fun DisplayScoreCardHeader(
                     )
                 }
             }
-            Column {
+            Column {    // the DISPLAY_HOLE_NUMBER is flag to high lite the current hole being scored
                 for (idx in hdcpParHoleHeading.indices) { // here's how the current hole played is high lighted
                     val holeNumberColor: Long = // Vin hole played is a flag to high light the hole being played
-                        if (hdcpParHoleHeading[idx].vinTag == HOLE_HEADER) VIN_HOLE_PLAYED else VIN_LIGHT_GRAY
+                        if (hdcpParHoleHeading[idx].vinTag == HOLE_HEADER) DISPLAY_HOLE_NUMBER else VIN_LIGHT_GRAY
 
                     DisplayScoreCardCell(
                         Modifier,
@@ -101,14 +100,14 @@ fun DisplayScoreCardHeader(
             Column {
                 modifier = Modifier.width(COLUMN_TOTAL_WIDTH.dp)
                 for (idx in hdcpParHoleHeading.indices) {
-                    if (hdcpParHoleHeading[idx].vinTag == PAR_HEADER) { // the score card par row
+                    if (hdcpParHoleHeading[idx].vinTag == PAR_HEADER) { // the score card par row - show the total for par
                         hdcpParHoleHeading[idx].mTotal =
                             scoreCardViewModel.getTotalForNineCell(hdcpParHoleHeading[idx].mHole)
                     }
                     DisplayRowHeading(
                         hdcpParHoleHeading[idx].mTotal,
                         modifier,
-                        Color(VIN_LIGHT_GRAY)
+                        hdcpParHoleHeading[idx].mColor
                     )
                 }
             }

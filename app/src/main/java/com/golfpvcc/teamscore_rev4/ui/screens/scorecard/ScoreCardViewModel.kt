@@ -19,17 +19,20 @@ import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.ScoreCardActions
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.TEAM_HEADER
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.USED_HEADER
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.getPlayerStrokesForHole
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.highLiteTotalColumn
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.setBoardColorForPlayerTeamScore
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.totalScore
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.updateNetAndGrossScoreCells
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.updateScoreCardState
 import com.golfpvcc.teamscore_rev4.utils.BACK_NINE_DISPLAY
+import com.golfpvcc.teamscore_rev4.utils.BACK_NINE_IS_DISPLAYED
 import com.golfpvcc.teamscore_rev4.utils.BACK_NINE_TOTAL_DISPLAYED
 
 import com.golfpvcc.teamscore_rev4.utils.Constants.SCORE_CARD_REC_ID
 import com.golfpvcc.teamscore_rev4.utils.DOUBLE_TEAM_SCORE
 import com.golfpvcc.teamscore_rev4.utils.FRONT_NINE_DISPLAY
 import com.golfpvcc.teamscore_rev4.utils.FRONT_NINE_IS_DISPLAYED
+import com.golfpvcc.teamscore_rev4.utils.FRONT_NINE_TOTAL_DISPLAYED
 import com.golfpvcc.teamscore_rev4.utils.JUST_RAW_SCORE
 
 import com.golfpvcc.teamscore_rev4.utils.YELLOW_GETS_1_STROKES
@@ -42,7 +45,7 @@ import com.golfpvcc.teamscore_rev4.utils.TEAM_NET_SCORE
 import com.golfpvcc.teamscore_rev4.utils.TEAM_SCORE_MASK
 import com.golfpvcc.teamscore_rev4.utils.TOTAL_18_HOLE
 import com.golfpvcc.teamscore_rev4.utils.VIN_LIGHT_GRAY
-import com.golfpvcc.teamscore_rev4.utils.VIN_HOLE_PLAYED
+import com.golfpvcc.teamscore_rev4.utils.DISPLAY_HOLE_NUMBER
 
 open class ScoreCardViewModel() : ViewModel() {
     var state by mutableStateOf(ScoreCard())
@@ -100,7 +103,7 @@ open class ScoreCardViewModel() : ViewModel() {
             return (0)
     }
 
-    fun getStartingHole(): Int {
+    fun getStartingHole(): Int {    // true for front nine being displayed
         return if (state.mWhatNineIsBeingDisplayed) 0 else FRONT_NINE_DISPLAY
     }
 
@@ -111,227 +114,249 @@ open class ScoreCardViewModel() : ViewModel() {
     fun getStokeOnHolePlayerColor(playerHdcp: String, currentHole: Int): Color {
         var backGroundColor: Color = Color.Transparent
         val holeHdcp = state.hdcpParHoleHeading.find { it.vinTag == HDCP_HEADER }
-        if(holeHdcp != null){
+        if (holeHdcp != null) {
             val strokeForHole = getPlayerStrokesForHole(holeHdcp, playerHdcp, currentHole)
 
-            when(strokeForHole){
-                1 -> {backGroundColor = Color(YELLOW_GETS_1_STROKES)}
-                2 -> {backGroundColor = Color(ORANGE_GETS_2_STROKES)}
+            when (strokeForHole) {
+                1 -> {
+                    backGroundColor = Color(YELLOW_GETS_1_STROKES)
+                }
+
+                2 -> {
+                    backGroundColor = Color(ORANGE_GETS_2_STROKES)
+                }
             }
         }
 
         return (backGroundColor)
     }
 
-fun getPlayerScoreColorForHole(playerScore: Int, holePar: Int): Color {
-    val score: Int = (playerScore and JUST_RAW_SCORE) - holePar
-    var backGroundColor: Color = Color.Black
-    when (score) {
-        -1 -> backGroundColor = Color(RED_ONE_UNDER_PAR)
-        -2 -> backGroundColor = Color(PURPLE_TWO_UNDER_PAR)
+    fun getPlayerScoreColorForHole(playerScore: Int, holePar: Int): Color {
+        val score: Int = (playerScore and JUST_RAW_SCORE) - holePar
+        var backGroundColor: Color = Color.Black
+        when (score) {
+            -1 -> backGroundColor = Color(RED_ONE_UNDER_PAR)
+            -2 -> backGroundColor = Color(PURPLE_TWO_UNDER_PAR)
+        }
+        return backGroundColor
     }
-    return backGroundColor
-}
 
-fun getTeamColorForHole(playerScore: Int): Color {
-    return setBoardColorForPlayerTeamScore(playerScore)
-}
-
-fun getTotalForNineCell(holes: IntArray): String {
-    val startingCell: Int = getStartingHole()
-    val endingCell: Int = getEndingHole()
-    val totalScoreStr = totalScore(holes, startingCell, endingCell)    // helper functions file
-
-    return (totalScoreStr)
-}
-
-fun getCurrentHole(): Int {
-    return (state.mCurrentHole)
-}
-
-private fun repaintScreen() {
-    state = state.copy(mRepaintScreen = !state.mRepaintScreen)
-}
-
-fun flipFrontNineBackNine() {
-    state = state.copy(mWhatNineIsBeingDisplayed = !state.mWhatNineIsBeingDisplayed)
-}
-
-fun advanceToTheNextHole() {
-    state = if ((state.mCurrentHole + 1) < TOTAL_18_HOLE) {
-        state.copy(mCurrentHole = (state.mCurrentHole + 1))
-    } else {
-        state.copy(mCurrentHole = 0)
+    fun getTeamColorForHole(playerScore: Int): Color {
+        return setBoardColorForPlayerTeamScore(playerScore)
     }
-    displayFrontOrBackOfScoreCard()
-}
 
-fun advanceToThePreviousHole() {
-    Log.d("Vin", "current hole ${state.mCurrentHole}")
-    state = if (0 <= (state.mCurrentHole - 1)) {
-        state.copy(mCurrentHole = (state.mCurrentHole - 1))
-    } else {
-        state.copy(mCurrentHole = BACK_NINE_TOTAL_DISPLAYED)
+    fun getTotalForNineCell(holes: IntArray): String {
+        val startingCell: Int = getStartingHole()
+        val endingCell: Int = getEndingHole()
+        val totalScoreStr = totalScore(holes, startingCell, endingCell)    // helper functions file
+
+        return (totalScoreStr)
     }
-    displayFrontOrBackOfScoreCard()
-}
 
-fun setHighLightCurrentHole(holeIdx: Int, displayHoleColor: Color): Color {
-    if (displayHoleColor == Color(VIN_HOLE_PLAYED)) { // the only row to high light on the score card
-        return if (holeIdx == state.mCurrentHole) Color(VIN_HOLE_PLAYED) else Color(
-            VIN_LIGHT_GRAY
-        )
-    } else {
-        return displayHoleColor
+    fun getCurrentHole(): Int {
+        return (state.mCurrentHole)
     }
-}
 
-private fun setHoleScore(playerIdx: Int, idx: Int, score: Int) {
-    state.playerHeading[playerIdx].mScore[idx] = score
-}
+    private fun repaintScreen() {
+        state = state.copy(mRepaintScreen = !state.mRepaintScreen)
+    }
 
-private fun displayFrontOrBackOfScoreCard() {
-    if (state.mCurrentHole < FRONT_NINE_DISPLAY) {
-        state = state.copy(mWhatNineIsBeingDisplayed = FRONT_NINE_IS_DISPLAYED)
-    } else
-        state = state.copy(mWhatNineIsBeingDisplayed = !FRONT_NINE_IS_DISPLAYED)
-}
+    fun flipFrontNineBackNine() {
+        state = state.copy(mWhatNineIsBeingDisplayed = !state.mWhatNineIsBeingDisplayed)
+    }
 
-// *******************************************************
+    fun advanceToTheNextHole() { // zero base, user is one the 9 nine hole
+        state = if ((state.mCurrentHole + 1) < TOTAL_18_HOLE) {
+            state.copy(mCurrentHole = (state.mCurrentHole + 1))
+        } else {
+            state.copy(mCurrentHole = 0)
+        }
+        displayFrontOrBackOfScoreCard()
+    }
+
+
+    fun advanceToThePreviousHole() {
+        Log.d("Vin", "current hole ${state.mCurrentHole}")
+        state = if (0 <= (state.mCurrentHole - 1)) {
+            state.copy(mCurrentHole = (state.mCurrentHole - 1))
+        } else {
+            state.copy(mCurrentHole = BACK_NINE_TOTAL_DISPLAYED)
+        }
+        displayFrontOrBackOfScoreCard()
+    }
+
+    fun setHighLightCurrentHole(holeIdx: Int, displayHoleColor: Color): Color {
+        if (displayHoleColor == Color(DISPLAY_HOLE_NUMBER)) { // the only row to high light on the score card
+            return if (holeIdx == state.mCurrentHole) Color(DISPLAY_HOLE_NUMBER) else Color(
+                VIN_LIGHT_GRAY
+            )
+        } else {
+            return displayHoleColor
+        }
+    }
+
+    private fun setHoleScore(playerIdx: Int, idx: Int, score: Int) {
+        state.playerHeading[playerIdx].mScore[idx] = score
+    }
+
+    private fun displayFrontOrBackOfScoreCard() {
+        if (state.mCurrentHole < FRONT_NINE_DISPLAY) {
+            state = state.copy(mWhatNineIsBeingDisplayed = FRONT_NINE_IS_DISPLAYED)
+        } else
+            state = state.copy(mWhatNineIsBeingDisplayed = BACK_NINE_IS_DISPLAYED)
+    }
+
+    // *******************************************************
 //  Dialog Enter player scores function are below
-fun dialogAction(action: DialogAction) {
-    when (action) {
-        DialogAction.Done -> doneScoringDialog()
-        DialogAction.Clear -> clearOneScore()
-        DialogAction.ButtonEnterScore -> buttonEnterScore()
-        is DialogAction.Gross -> setGrossScore(action.playerIdx)
-        is DialogAction.GrossLongClick -> setGrossLongClickScore(action.playerIdx)
-        is DialogAction.Net -> setNetScore(action.playerIdx)
-        is DialogAction.NetLongClick -> setNetLongClickScore(action.playerIdx)
-        is DialogAction.Number -> scoreEnter(action.score)
-        is DialogAction.SetDialogCurrentPlayer -> setDialogCurrentPlayer(action.currentPlayerIdx)
+    fun dialogAction(action: DialogAction) {
+        when (action) {
+            DialogAction.Done -> doneScoringDialog()
+            DialogAction.Clear -> clearOneScore()
+            DialogAction.ButtonEnterScore -> buttonEnterScore()
+            is DialogAction.Gross -> setGrossScore(action.playerIdx)
+            is DialogAction.GrossLongClick -> setGrossLongClickScore(action.playerIdx)
+            is DialogAction.Net -> setNetScore(action.playerIdx)
+            is DialogAction.NetLongClick -> setNetLongClickScore(action.playerIdx)
+            is DialogAction.Number -> scoreEnter(action.score)
+            is DialogAction.SetDialogCurrentPlayer -> setDialogCurrentPlayer(action.currentPlayerIdx)
+        }
     }
-}
 
-fun buttonEnterScore() {
-    Log.d("VIN", "ButtonEnterScore")
-    state = state.copy(mDialogDisplayed = true)
-    displayFrontOrBackOfScoreCard()
-    configureDialogGrossAndNetButtonColors()
-}
+    fun buttonEnterScore() {
+        Log.d("VIN", "ButtonEnterScore")
+        state = state.copy(mDialogDisplayed = true)
+        if (state.mShowTotals) {
+            advanceToTheNextHole()  //user looking at the total scores
+            state = state.copy(mShowTotals = false)
+            highLiteTotalColumn(VIN_LIGHT_GRAY)
+        }
+        displayFrontOrBackOfScoreCard()
+        configureDialogGrossAndNetButtonColors()
+    }
 
-private fun configureDialogGrossAndNetButtonColors() {
-    val holeIdx = getCurrentHole()
-    var playerScore: Int
+    private fun doneScoringDialog() {
+        Log.d("HOLE", "doneScoringDialog current hole ${state.mCurrentHole}")
+        state = state.copy(mDialogDisplayed = false)
+        updateNetAndGrossScoreCells(
+            state.hdcpParHoleHeading,
+            state.mCurrentHole,
+            state.teamUsedHeading,
+            state.playerHeading
+        )
+        clearGrossAndNetButtons()   // clear the color button array
+        if (FRONT_NINE_TOTAL_DISPLAYED == state.mCurrentHole || BACK_NINE_TOTAL_DISPLAYED == state.mCurrentHole) {     // let the user see the totals scores
+            state = state.copy(mShowTotals = true)
+            highLiteTotalColumn(DISPLAY_HOLE_NUMBER)
+        } else {
+            advanceToTheNextHole()
+        }
+    }
 
-    for (playerHeadRecord in state.playerHeading) {
-        playerScore = playerHeadRecord.mScore[holeIdx]
+    private fun configureDialogGrossAndNetButtonColors() {
+        val holeIdx = getCurrentHole()
+        var playerScore: Int
+
+        for (playerHeadRecord in state.playerHeading) {
+            playerScore = playerHeadRecord.mScore[holeIdx]
+            getGrossButtonColor(playerHeadRecord.vinTag, playerScore)
+        }
+    }
+
+    private fun setGrossScore(playerIdx: Int) {
+        setTeamScoreButtonColor(playerIdx, TEAM_GROSS_SCORE)
+    }
+
+    private fun setGrossLongClickScore(playerIdx: Int) {
+        setTeamScoreButtonColor(playerIdx, (TEAM_GROSS_SCORE + DOUBLE_TEAM_SCORE))
+    }
+
+    private fun setNetScore(playerIdx: Int) {
+        setTeamScoreButtonColor(playerIdx, TEAM_NET_SCORE)
+    }
+
+    private fun setNetLongClickScore(playerIdx: Int) {
+        setTeamScoreButtonColor(playerIdx, TEAM_NET_SCORE + DOUBLE_TEAM_SCORE)
+    }
+
+    private fun setTeamScoreButtonColor(playerIdx: Int, teamScore: Int) {
+        val holeIdx = getCurrentHole()
+        val teamHoleMask: Int
+        val playerHeadRecord = state.playerHeading[playerIdx]
+
+        var playerScore = playerHeadRecord.mScore[holeIdx]
+        teamHoleMask = playerScore and TEAM_SCORE_MASK
+        playerScore = playerScore and TEAM_CLEAR_SCORE
+
+        if ((teamHoleMask and teamScore) != teamScore) {  // if the team score already set, then clear the score
+            playerScore = playerScore or teamScore
+        }
+        playerHeadRecord.mScore[holeIdx] = playerScore
+        Log.d("VIN", "setGrossScore playerScore $playerScore")
         getGrossButtonColor(playerHeadRecord.vinTag, playerScore)
     }
-}
 
-private fun setGrossScore(playerIdx: Int) {
-    setTeamScoreButtonColor(playerIdx, TEAM_GROSS_SCORE)
-}
+    private fun getGrossButtonColor(playerIdx: Int, playerScore: Int) {
 
-private fun setGrossLongClickScore(playerIdx: Int) {
-    setTeamScoreButtonColor(playerIdx, (TEAM_GROSS_SCORE + DOUBLE_TEAM_SCORE))
-}
-
-private fun setNetScore(playerIdx: Int) {
-    setTeamScoreButtonColor(playerIdx, TEAM_NET_SCORE)
-}
-
-private fun setNetLongClickScore(playerIdx: Int) {
-    setTeamScoreButtonColor(playerIdx, TEAM_NET_SCORE + DOUBLE_TEAM_SCORE)
-}
-
-private fun setTeamScoreButtonColor(playerIdx: Int, teamScore: Int) {
-    val holeIdx = getCurrentHole()
-    val teamHoleMask: Int
-    val playerHeadRecord = state.playerHeading[playerIdx]
-
-    var playerScore = playerHeadRecord.mScore[holeIdx]
-    teamHoleMask = playerScore and TEAM_SCORE_MASK
-    playerScore = playerScore and TEAM_CLEAR_SCORE
-
-    if ((teamHoleMask and teamScore) != teamScore) {  // if the team score already set, then clear the score
-        playerScore = playerScore or teamScore
-    }
-    playerHeadRecord.mScore[holeIdx] = playerScore
-    Log.d("VIN", "setGrossScore playerScore $playerScore")
-    getGrossButtonColor(playerHeadRecord.vinTag, playerScore)
-}
-
-private fun getGrossButtonColor(playerIdx: Int, playerScore: Int) {
-
-    if (teamScoreTypeNet(playerScore)) {
-        state.grossButtonColor[playerIdx] = Color.LightGray
-        state.netButtonColor[playerIdx] = getTeamButtonColor(playerScore)
-    } else {
-        state.grossButtonColor[playerIdx] = getTeamButtonColor(playerScore)
-        state.netButtonColor[playerIdx] = Color.LightGray
-    }
-    repaintScreen()
-}
-
-private fun clearGrossAndNetButtons() {
-    for (idx in state.grossButtonColor.indices) {
-        state.grossButtonColor[idx] = Color.LightGray
-    }
-    for (idx in state.netButtonColor.indices) {
-        state.netButtonColor[idx] = Color.LightGray
-    }
-}
-
-private fun doneScoringDialog() {
-    Log.d("HOLE", "doneScoringDialog current hole ${state.mCurrentHole}")
-    state = state.copy(mDialogDisplayed = false)
-    updateNetAndGrossScoreCells(state.hdcpParHoleHeading, state.mCurrentHole, state.teamUsedHeading, state.playerHeading)
-    clearGrossAndNetButtons()   // clear the color button array
-    advanceToTheNextHole()
-}
-
-private fun clearOneScore() {
-    scoreEnter(0)
-    Log.d("VIN", "clearOneScore")
-}
-
-fun scoreEnter(score: Int) {
-    var dialogCurrentPlayer: Int = getDialogCurrentPlayer()
-
-    setHoleScore(dialogCurrentPlayer, getCurrentHole(), score)
-    dialogCurrentPlayer += 1
-    if (dialogCurrentPlayer < state.playerHeading.size)
-        setDialogCurrentPlayer(dialogCurrentPlayer) // on to the next player
-    else
+        if (teamScoreTypeNet(playerScore)) {
+            state.grossButtonColor[playerIdx] = Color.LightGray
+            state.netButtonColor[playerIdx] = getTeamButtonColor(playerScore)
+        } else {
+            state.grossButtonColor[playerIdx] = getTeamButtonColor(playerScore)
+            state.netButtonColor[playerIdx] = Color.LightGray
+        }
         repaintScreen()
-}
-
-fun setDialogCurrentPlayer(idx: Int) {
-    state.mDialogCurrentPlayer = idx
-    Log.d("VIN", "setDialogCurrentPlayer is $idx")
-    repaintScreen()
-}
-
-private fun getDialogCurrentPlayer(): Int {
-    return (state.mDialogCurrentPlayer)
-}
-
-fun getHighLiteActivePlayerColor(idx: Int): Color {
-    return if (idx == state.mDialogCurrentPlayer) {
-        Color.Yellow
-    } else {
-        Color.Transparent
     }
-}
+
+    private fun clearGrossAndNetButtons() {
+        for (idx in state.grossButtonColor.indices) {
+            state.grossButtonColor[idx] = Color.LightGray
+        }
+        for (idx in state.netButtonColor.indices) {
+            state.netButtonColor[idx] = Color.LightGray
+        }
+    }
+
+
+    private fun clearOneScore() {
+        scoreEnter(0)
+        Log.d("VIN", "clearOneScore")
+    }
+
+    fun scoreEnter(score: Int) {
+        var dialogCurrentPlayer: Int = getDialogCurrentPlayer()
+
+        setHoleScore(dialogCurrentPlayer, getCurrentHole(), score)
+        dialogCurrentPlayer += 1
+        if (dialogCurrentPlayer < state.playerHeading.size)
+            setDialogCurrentPlayer(dialogCurrentPlayer) // on to the next player
+        else
+            repaintScreen()
+    }
+
+    fun setDialogCurrentPlayer(idx: Int) {
+        state.mDialogCurrentPlayer = idx
+        Log.d("VIN", "setDialogCurrentPlayer is $idx")
+        repaintScreen()
+    }
+
+    private fun getDialogCurrentPlayer(): Int {
+        return (state.mDialogCurrentPlayer)
+    }
+
+    fun getHighLiteActivePlayerColor(idx: Int): Color {
+        return if (idx == state.mDialogCurrentPlayer) {
+            Color.Yellow
+        } else {
+            Color.Transparent
+        }
+    }
 }
 
 data class ScoreCard(
     val grossButtonColor: Array<Color> = Array(4) { Color.LightGray },
     val netButtonColor: Array<Color> = Array(4) { Color.LightGray },
     val mRepaintScreen: Boolean = false,
-
+    val mShowTotals: Boolean = false,
     val mCourseName: String = "",    // current course name from the course list database
     val mDialogDisplayed: Boolean = false,
     var mDialogCurrentPlayer: Int = 0,
@@ -356,6 +381,7 @@ data class HdcpParHoleHeading(
     var mName: String = "",
     var mHole: IntArray = IntArray(18) { i -> i + 1 },
     var mTotal: String = "",
+    var mColor: Color = Color(VIN_LIGHT_GRAY)
 )
 
 data class PlayerHeading(

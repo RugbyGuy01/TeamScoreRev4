@@ -18,6 +18,13 @@ import com.golfpvcc.teamscore_rev4.utils.TEAM_SCORE_MASK
 import com.golfpvcc.teamscore_rev4.utils.TEAM_SINGLE_GROSS_SCORE
 import com.golfpvcc.teamscore_rev4.utils.TEAM_SINGLE_NET_SCORE
 
+fun ScoreCardViewModel.highLiteTotalColumn(displayColor: Long){
+    val holeHeading: HdcpParHoleHeading? = state.hdcpParHoleHeading.find { it.vinTag == HOLE_HEADER }
+    if (holeHeading != null) {
+        holeHeading.mColor = Color(displayColor)
+    }
+}
+
 fun updateNetAndGrossScoreCells(
     hdcpParHoleHeading: List<HdcpParHoleHeading>,
     currentHole: Int,
