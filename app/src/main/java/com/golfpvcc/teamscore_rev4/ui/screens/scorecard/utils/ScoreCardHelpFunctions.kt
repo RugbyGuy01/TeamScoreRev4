@@ -27,9 +27,11 @@ fun updateNetAndGrossScoreCells(
     var teamPlayerScore: TeamUsedHeading? =
         teamUsedHeading.find { it.vinTag == TEAM_HEADER }  // total hole score for selected player
     val holeHdcp = hdcpParHoleHeading.find { it.vinTag == HDCP_HEADER }
+    var teamUsedHeading: TeamUsedHeading? = teamUsedHeading.find { it.vinTag == USED_HEADER }  // total hole score for selected player
 
-    if (teamPlayerScore != null && holeHdcp != null) {
-        teamPlayerScore.mHole[currentHole] = 0
+    if (teamPlayerScore != null && holeHdcp != null && teamUsedHeading != null) {
+        teamPlayerScore.mHole[currentHole] = 0      // keeps track of the scores that are used by players
+        teamUsedHeading.mHole[currentHole] = 0      // keeps track of the player scores are used
 
         for (player in playerHeading) {
             val teamScore = player.mScore[currentHole] and TEAM_SCORE_MASK
@@ -37,18 +39,22 @@ fun updateNetAndGrossScoreCells(
             when (teamScore) {
                 TEAM_GROSS_SCORE -> {
                     teamPlayerScore.mHole[currentHole] += player.mScore[currentHole] and JUST_RAW_SCORE
+                    teamUsedHeading.mHole[currentHole] += 1
                 }
 
                 TEAM_NET_SCORE -> { // using the player's net score, need to subtract stroke for this hole
                     teamPlayerScore.mHole[currentHole] += (player.mScore[currentHole] and JUST_RAW_SCORE) - strokeForHole
+                    teamUsedHeading.mHole[currentHole] += 1
                 }
 
                 TEAM_GROSS_SCORE + DOUBLE_TEAM_SCORE -> {
                     teamPlayerScore.mHole[currentHole] += (player.mScore[currentHole] and JUST_RAW_SCORE) * 2
+                    teamUsedHeading.mHole[currentHole] += 1
                 }
 
                 TEAM_NET_SCORE + DOUBLE_TEAM_SCORE -> { // using the player's net score, need to subtract stroke for this hole X 2
                     teamPlayerScore.mHole[currentHole] += ((player.mScore[currentHole] and JUST_RAW_SCORE) - strokeForHole) * 2
+                    teamUsedHeading.mHole[currentHole] += 1
                 }
             }
         }

@@ -285,7 +285,7 @@ private fun clearGrossAndNetButtons() {
 }
 
 private fun doneScoringDialog() {
-    Log.d("HOLE", "finishedScoringDialog current hole ${state.mCurrentHole}")
+    Log.d("HOLE", "doneScoringDialog current hole ${state.mCurrentHole}")
     state = state.copy(mDialogDisplayed = false)
     updateNetAndGrossScoreCells(state.hdcpParHoleHeading, state.mCurrentHole, state.teamUsedHeading, state.playerHeading)
     clearGrossAndNetButtons()   // clear the color button array
