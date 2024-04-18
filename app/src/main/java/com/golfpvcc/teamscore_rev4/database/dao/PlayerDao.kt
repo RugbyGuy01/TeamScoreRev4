@@ -17,7 +17,7 @@ interface PlayerDao {
     @Upsert
     suspend fun addUpdatePlayerRecord(playerRecord: PlayerRecord)
 
-    @Query("SELECT * FROM PlayerRecord WHERE scoreCardRecFk = :scoreCardRec_Id AND mId = :playerID")
+    @Query("SELECT * FROM PlayerRecord WHERE mScoreCardRecFk = :scoreCardRec_Id AND mId = :playerID")
     fun getPlayerRecord(playerID: Int, scoreCardRec_Id: Int):PlayerRecord
 
     @Query("UPDATE PlayerRecord SET mName = :name, mHandicap = :handicap WHERE mId =:index")

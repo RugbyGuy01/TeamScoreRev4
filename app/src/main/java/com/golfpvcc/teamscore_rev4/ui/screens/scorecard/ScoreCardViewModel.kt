@@ -7,7 +7,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import com.golfpvcc.teamscore_rev4.TeamScoreCardApp
+import com.golfpvcc.teamscore_rev4.database.model.PlayerRecord
+import com.golfpvcc.teamscore_rev4.database.model.ScoreCardRecord
 import com.golfpvcc.teamscore_rev4.database.model.ScoreCardWithPlayers
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.dialogenterscore.DialogAction
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.dialogenterscore.getTeamButtonColor
@@ -46,10 +49,13 @@ import com.golfpvcc.teamscore_rev4.utils.TEAM_SCORE_MASK
 import com.golfpvcc.teamscore_rev4.utils.TOTAL_18_HOLE
 import com.golfpvcc.teamscore_rev4.utils.VIN_LIGHT_GRAY
 import com.golfpvcc.teamscore_rev4.utils.DISPLAY_HOLE_NUMBER
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 open class ScoreCardViewModel() : ViewModel() {
     var state by mutableStateOf(ScoreCard())
     private val scoreCardDao = TeamScoreCardApp.getScoreCardDao()
+    private val playerRecordDoa = TeamScoreCardApp.getPlayerDao()
 
     class ScoreCardViewModelFactor() : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -67,12 +73,42 @@ open class ScoreCardViewModel() : ViewModel() {
             Log.d("VIN1", "getScoreCardAndPlayerRecord is empty")
     }
 
+    private fun savePlayersScoresRecord() {
+        viewModelScope.launch(Dispatchers.IO) {
+            saveScoreCardRecord()
+            for (playerHeadRecord in state.playerHeading) {
+                val playerRecord = PlayerRecord(
+                    mName = playerHeadRecord.mName,
+                    mHandicap = playerHeadRecord.mHdcp,
+                    mScore = playerHeadRecord.mScore,
+                    mScoreCardRecFk = SCORE_CARD_REC_ID,
+                    mId = playerHeadRecord.vinTag
+                )
+                playerRecordDoa.addUpdatePlayerRecord(playerRecord)
+            }
+        }
+    }
+     private suspend fun saveScoreCardRecord(){
+        val coursePar = state.hdcpParHoleHeading.find { it.vinTag == PAR_HEADER }
+        val handicap = state.hdcpParHoleHeading.find { it.vinTag == HDCP_HEADER }
+        if(coursePar != null && handicap != null){
+            val scoreCardRecord : ScoreCardRecord = ScoreCardRecord(mCourseName = state.mCourseName,
+                mTee = state.mTee,
+                mCurrentHole = state.mCurrentHole,
+                mPar = coursePar.mHole,
+                mHandicap = handicap.mHole,
+                mScoreCardRecId = SCORE_CARD_REC_ID
+            )
+            scoreCardDao.addUpdateScoreCardRecord(scoreCardRecord)
+        }
+
+    }
+
     fun scoreCardActions(action: ScoreCardActions) {
         when (action) {
             ScoreCardActions.Next -> advanceToTheNextHole()
             ScoreCardActions.Prev -> advanceToThePreviousHole()
         }
-
     }
 
     fun getPlayerHoleScore(playerIdx: Int, idx: Int): String {
@@ -187,7 +223,9 @@ open class ScoreCardViewModel() : ViewModel() {
 
     fun setHighLightCurrentHole(holeIdx: Int, displayHoleColor: Color): Color {
         if (displayHoleColor == Color(DISPLAY_HOLE_NUMBER)) { // the only row to high light on the score card
-            return if (holeIdx == state.mCurrentHole) Color(DISPLAY_HOLE_NUMBER) else Color(
+            return if (holeIdx == state.mCurrentHole && !state.mShowTotals) Color(
+                DISPLAY_HOLE_NUMBER
+            ) else Color(
                 VIN_LIGHT_GRAY
             )
         } else {
@@ -244,6 +282,7 @@ open class ScoreCardViewModel() : ViewModel() {
             state.playerHeading
         )
         clearGrossAndNetButtons()   // clear the color button array
+        savePlayersScoresRecord()
         if (FRONT_NINE_TOTAL_DISPLAYED == state.mCurrentHole || BACK_NINE_TOTAL_DISPLAYED == state.mCurrentHole) {     // let the user see the totals scores
             state = state.copy(mShowTotals = true)
             highLiteTotalColumn(DISPLAY_HOLE_NUMBER)
@@ -358,6 +397,7 @@ data class ScoreCard(
     val mRepaintScreen: Boolean = false,
     val mShowTotals: Boolean = false,
     val mCourseName: String = "",    // current course name from the course list database
+    val mTee: String = "",                   // the tee's played or the course yardage
     val mDialogDisplayed: Boolean = false,
     var mDialogCurrentPlayer: Int = 0,
     val mCurrentHole: Int = 0,      // the current hole being played in the game

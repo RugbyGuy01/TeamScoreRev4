@@ -83,16 +83,15 @@ fun ScoreCardViewModel.updateScoreCardState(scoreCardWithPlayers: ScoreCardWithP
 
     state = state.copy(mCourseName = scoreCardRecord.mCourseName)
     state = state.copy(mCurrentHole = (scoreCardRecord.mCurrentHole))   // zero based
+    state = state.copy(mTee = scoreCardRecord.mTee)
 
     val parCell: HdcpParHoleHeading? = state.hdcpParHoleHeading.find { it.vinTag == PAR_HEADER }
-    if (parCell != null) {
+    val hdcpCell: HdcpParHoleHeading? = state.hdcpParHoleHeading.find { it.vinTag == HDCP_HEADER }
+    if (parCell != null && hdcpCell != null) {
         parCell.mHole = scoreCardRecord.mPar
-    }
-    val hdcpCell: HdcpParHoleHeading? =
-        state.hdcpParHoleHeading.find { it.vinTag == HDCP_HEADER }
-    if (hdcpCell != null) {
         hdcpCell.mHole = scoreCardRecord.mHandicap
     }
+
     for (idx in scoreCardWithPlayers.playerRecords.indices) { // player name and handicap
         state.playerHeading += PlayerHeading(
             idx,

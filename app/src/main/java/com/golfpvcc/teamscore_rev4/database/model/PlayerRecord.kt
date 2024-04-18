@@ -10,7 +10,7 @@ data class PlayerRecord(
     val mName: String = "",   // this is the database key for this course in the CourseListRecord class
     var mHandicap: String = "",
     val mScore: IntArray = IntArray(18),
-    val scoreCardRecFk: Int = SCORE_CARD_REC_ID,    // score card record ID
+    val mScoreCardRecFk: Int = SCORE_CARD_REC_ID,    // score card record ID
     @PrimaryKey(autoGenerate = false)    // default is false
     val mId: Int = 0
 )

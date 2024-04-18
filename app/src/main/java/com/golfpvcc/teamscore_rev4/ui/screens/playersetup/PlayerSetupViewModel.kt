@@ -45,17 +45,21 @@ class PlayerSetupViewModel(
     suspend fun getCourseById(courseId: Int?) {
         val courseRecord: CourseRecord = courseDao.getCourseRecord(courseId)
         updateCourseRecord(courseRecord)
-        val scoreCardRecord: ScoreCardRecord = scoreCardDao.getScoreCardRecord(SCORE_CARD_REC_ID)
-        if (scoreCardRecord != null) {
-            Log.d("VIN", "scoreCardDao - record found")
-            updateScoreCard(scoreCardRecord)
+        val scoreCardRecord: ScoreCardRecord
+
+        val checkScoreCardRecord = scoreCardDao.isRowIsExist(SCORE_CARD_REC_ID)
+        if (checkScoreCardRecord) {
+            scoreCardRecord = scoreCardDao.getScoreCardRecord(SCORE_CARD_REC_ID)
+            state = state.copy(mTee = scoreCardRecord.mTee)
+//            state =  state.copy(mStartingHole = (scoreCardRecord.mCurrentHole + 1).toString())  // starting hole is zero based)
+            state =  state.copy(mStartingHole = "1")  // User can change this hole number
         } else {
             Log.d("VIN", "scoreCardDao - record not found")
             vinScoreCardRecordUpdate()
         }
+        Log.d("VIN", "read record  Tee ${state.mTee}  scoreCardRecord.mTee ")
         val playerRecords: List<PlayerRecord> = playerDao.getAllPlayerRecords()
         updatePlayers(playerRecords)
-        Log.d("VIN", "Get course id = $courseId")
     }
 
     private fun updateCourseRecord(courseRec: CourseRecord) {
@@ -64,26 +68,27 @@ class PlayerSetupViewModel(
         state = state.copy(mHandicap = courseRec.mHandicap)
     }
 
-    private fun updateScoreCard(scoreCard: ScoreCardRecord) {
-        state = state.copy(mTee = scoreCard.mTee)
-        if (scoreCard.mCurrentHole < 0) {
-            state = state.copy(mCurrentHole = 0)  // make it zero bases
+    suspend fun vinScoreCardRecordUpdate() {
+        if (state.mStartingHole.isEmpty())
             state = state.copy(mStartingHole = "1")
-        } else {
-            state =
-                state.copy(mStartingHole = (scoreCard.mCurrentHole + 1).toString()) // mCurrentHole is zero based; mStartingHole is 1 bases
-        }
-        Log.d(
-            "VIN",
-            "updateScoreCard  starting Hole ${state.mStartingHole} "
+
+        val scoreCardRecord: ScoreCardRecord = ScoreCardRecord(
+            mCourseName = state.mCourseName,
+            mTee = state.mTee,
+            mCurrentHole = state.mStartingHole.toInt() - 1, // zero based
+            mPar = state.mPar,
+            mHandicap = state.mHandicap,
+            mScoreCardRecId = state.scoreCardRecId
         )
-        saveScoreCardRecord()
+        scoreCardDao.addUpdateScoreCardRecord(scoreCardRecord)
     }
 
     fun updatePlayers(playerRecords: List<PlayerRecord>) {
 
         for ((idx, playerRecord) in playerRecords.withIndex()) {
+            Log.d("VIN", "playerRecord $idx score ${playerRecord.mScore}")
             state.mPlayerRecords[idx] = playerRecord
+            Log.d("VIN", "updatePlayers $idx score ${state.mPlayerRecords[idx].mScore}")
         }
     }
 
@@ -108,20 +113,6 @@ class PlayerSetupViewModel(
         )
     }
 
-    suspend fun vinScoreCardRecordUpdate() {
-        if (state.mStartingHole.isEmpty())
-            state = state.copy(mStartingHole = "1")
-
-        val scoreCardRecord: ScoreCardRecord = ScoreCardRecord(
-            mCourseName = state.mCourseName,
-            mTee = state.mTee,
-            mCurrentHole = state.mStartingHole.toInt() - 1, // zero based
-            mPar = state.mPar,
-            mHandicap = state.mHandicap,
-            scoreCardRecId = state.scoreCardRecId
-        )
-        scoreCardDao.addUpdateScoreCardRecord(scoreCardRecord)
-    }
 
     fun saveScoreCardRecord() {
         if (state.mStartingHole.isEmpty())
@@ -133,7 +124,7 @@ class PlayerSetupViewModel(
             mCurrentHole = state.mStartingHole.toInt() - 1,  // the value is 1 make it zero base
             mPar = state.mPar,
             mHandicap = state.mHandicap,
-            scoreCardRecId = state.scoreCardRecId
+            mScoreCardRecId = state.scoreCardRecId
         )
         viewModelScope.launch {
             scoreCardDao.addUpdateScoreCardRecord(scoreCardRecord)
@@ -177,6 +168,11 @@ class PlayerSetupViewModel(
 
     private fun deleteAllPlayerRecords() {
         playerDao.deleteAllPlayersRecord()
+        val zeroArray: IntArray = IntArray(18) { 0 }
+
+        for (player in state.mPlayerRecords) {
+            zeroArray.copyInto(player.mScore)
+        }
     }
 
     suspend fun savePlayersRecord() {
@@ -191,7 +187,7 @@ class PlayerSetupViewModel(
                 val playerRecord: PlayerRecord = PlayerRecord(
                     player.mName,
                     player.mHandicap,
-                    IntArray(18) { 0 },
+                    player.mScore,
                     Constants.SCORE_CARD_REC_ID,
                     mId = count
                 )
