@@ -6,8 +6,14 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -25,7 +31,9 @@ import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DisplayPrevNextHol
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DisplayScoreCardHeader
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DisplayScoreCardNames
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DisplayScoreCardTeams
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DisplayScreenModeButton
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.FlipNineDisplay
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.screenModeText
 import com.golfpvcc.teamscore_rev4.utils.SetScreenOrientation
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -62,7 +70,7 @@ fun ScoreCardScreen(
                         .fillMaxHeight(),
                     horizontalAlignment = Alignment.End
                 ) {
-                    DisplayControlButtons(scoreCardViewModel)
+                    DisplayControlButtons(scoreCardViewModel)       // buttons on the side of the score card
                 }
             }
         } // end of Scaffold
@@ -93,12 +101,18 @@ fun DisplayMainScoreCard(
         DisplayScoreCardTeams(scoreCardViewModel)
     }
 }
+
 @Composable
 fun DisplayControlButtons(scoreCardViewModel: ScoreCardViewModel) {
     FlipNineDisplay(scoreCardViewModel)
     Spacer(modifier = Modifier.size(12.dp))
-    ButtonEnterScore(scoreCardViewModel, scoreCardViewModel::dialogAction)
+    ButtonEnterScore(scoreCardViewModel, scoreCardViewModel::dialogAction, scoreCardViewModel::scoreCardActions )
     Spacer(modifier = Modifier.size(25.dp))
+    DisplayPrevNextHoleButton(scoreCardViewModel::scoreCardActions)
+    Spacer(modifier = Modifier.size(25.dp))
+    DisplayScreenModeButton(
+        scoreCardViewModel.state.mButtonScreenNextText, // what will be display next on the screen
+        scoreCardViewModel::scoreCardActions
+    )
 
-    DisplayPrevNextHoleButton( scoreCardViewModel::scoreCardActions)
 }

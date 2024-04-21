@@ -18,8 +18,34 @@ import com.golfpvcc.teamscore_rev4.utils.TEAM_SCORE_MASK
 import com.golfpvcc.teamscore_rev4.utils.TEAM_SINGLE_GROSS_SCORE
 import com.golfpvcc.teamscore_rev4.utils.TEAM_SINGLE_NET_SCORE
 
-fun ScoreCardViewModel.highLiteTotalColumn(displayColor: Long){
-    val holeHeading: HdcpParHoleHeading? = state.hdcpParHoleHeading.find { it.vinTag == HOLE_HEADER }
+fun changeDisplayScreenMode(currentScreenMode: Int): Int {
+    var newScreenMode: Int = DISPLAY_MODE_GROSS
+
+    when (currentScreenMode) {
+        DISPLAY_MODE_GROSS -> {newScreenMode = DISPLAY_MODE_NET}
+        DISPLAY_MODE_NET -> {newScreenMode = DISPLAY_MODE_POINT_QUOTA}
+        DISPLAY_MODE_POINT_QUOTA -> {newScreenMode = DISPLAY_MODE_STABLEFORD}
+        DISPLAY_MODE_9_GAME -> {newScreenMode = DISPLAY_MODE_GROSS}
+        DISPLAY_MODE_STABLEFORD -> {newScreenMode = DISPLAY_MODE_GROSS}
+    }
+
+    return (newScreenMode)
+}
+fun screenModeText(currentScreenMode: Int):String{
+    var newScreenMode: String = "Gross"
+    when (currentScreenMode) {
+        DISPLAY_MODE_GROSS -> {newScreenMode = "Net"}
+        DISPLAY_MODE_NET -> {newScreenMode = "Pt Quote"}
+        DISPLAY_MODE_POINT_QUOTA -> {newScreenMode = "Stableford"}
+        DISPLAY_MODE_9_GAME -> {newScreenMode = "Gross"}
+        DISPLAY_MODE_STABLEFORD -> {newScreenMode = "Gross"}
+    }
+    return (newScreenMode)
+}
+
+fun ScoreCardViewModel.highLiteTotalColumn(displayColor: Long) {
+    val holeHeading: HdcpParHoleHeading? =
+        state.hdcpParHoleHeading.find { it.vinTag == HOLE_HEADER }
     if (holeHeading != null) {
         holeHeading.mColor = Color(displayColor)
     }
@@ -34,10 +60,12 @@ fun updateNetAndGrossScoreCells(
     var teamPlayerScore: TeamUsedHeading? =
         teamUsedHeading.find { it.vinTag == TEAM_HEADER }  // total hole score for selected player
     val holeHdcp = hdcpParHoleHeading.find { it.vinTag == HDCP_HEADER }
-    var teamUsedHeading: TeamUsedHeading? = teamUsedHeading.find { it.vinTag == USED_HEADER }  // total hole score for selected player
+    var teamUsedHeading: TeamUsedHeading? =
+        teamUsedHeading.find { it.vinTag == USED_HEADER }  // total hole score for selected player
 
     if (teamPlayerScore != null && holeHdcp != null && teamUsedHeading != null) {
-        teamPlayerScore.mHole[currentHole] = 0      // keeps track of the scores that are used by players
+        teamPlayerScore.mHole[currentHole] =
+            0      // keeps track of the scores that are used by players
         teamUsedHeading.mHole[currentHole] = 0      // keeps track of the player scores are used
 
         for (player in playerHeading) {
@@ -100,6 +128,18 @@ fun ScoreCardViewModel.updateScoreCardState(scoreCardWithPlayers: ScoreCardWithP
             mScore = scoreCardWithPlayers.playerRecords[idx].mScore
         ) // add the player's name to the score card
     }
+    if (parCell != null) {
+        for (currentHole in parCell.mHole.indices) {
+            updateNetAndGrossScoreCells(        // fill in the team used and score fields
+                state.hdcpParHoleHeading,
+                currentHole,
+                state.teamUsedHeading,
+                state.playerHeading
+            )
+        }
+    }
+
+
 }
 
 fun getPlayerStrokesForHole(

@@ -27,33 +27,38 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.ScoreCardViewModel
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.ScoreCardActions
 
 const val TEXT_WIDTH = 65
 const val ROW_WIDTH = 500
 const val CARD_ROW_WIDTH = 650
 const val ROW_BOTTOM_PAD = 8
-const val PLAYER_TEXT_SIZE = 30
-const val PLAYER_NAME_WIDTH = 200
+const val PLAYER_TEXT_SIZE = 25
+const val PLAYER_NAME_WIDTH = 145
 const val PLAYER_SCORE_WIDTH = 55
 const val TEAM_SCORE_WIDTH = 70
 const val BUTTON_NUMBER_FONT = 45
 const val BUTTON_ACTION_FONT = 25
 const val BUTTON_NET_GROSS_FONT = 15
+const val BUTTON_JUNK_FONT = 15
 const val BUTTON_ENTER_SCORE_TEXT = "Enter Scores"
 
 @Composable
 fun ButtonEnterScore(
-    scoreCardViewModel: ScoreCardViewModel, onAction: (DialogAction) -> Unit
+    scoreCardViewModel: ScoreCardViewModel,
+    onAction: (DialogAction) -> Unit,
+    onScoreCardAction: (ScoreCardActions) -> Unit
 ) {
 
     if (scoreCardViewModel.state.mDialogDisplayed) {
         EnterPlayersScores(scoreCardViewModel, onAction)
     }
 
-    Button(
+    Button(     // onDismissRequest = { onAction(DialogAction.Done) }
         onClick = {
-            scoreCardViewModel.buttonEnterScore()
-            scoreCardViewModel.setDialogCurrentPlayer(0)
+            Log.d("VIN", "Click ButtonEnterScore")
+            onScoreCardAction(ScoreCardActions.ButtonEnterScore)
+            onScoreCardAction(ScoreCardActions.SetDialogCurrentPlayer)
         },
         contentPadding = PaddingValues(10.dp),
         shape = RectangleShape,
@@ -65,6 +70,7 @@ fun ButtonEnterScore(
 
 @Composable
 fun EnterPlayersScores(
+    // display the dialog window
     scoreCardViewModel: ScoreCardViewModel,
     onAction: (DialogAction) -> Unit,
 ) {
@@ -86,7 +92,6 @@ fun EnterPlayersScores(
                 DisplayEnterScoreHeading()
 
                 Row(horizontalArrangement = Arrangement.Start) { // put the header test here
-                    Log.d("VIN", "EnterPlayersScores $currentHole")
 
                     Column(modifier = Modifier.weight(.75f)) {
                         DisplayCurrentHoleHeading(currentHole, holeHandicap)
@@ -100,8 +105,15 @@ fun EnterPlayersScores(
                                 val playerHoleScore =
                                     scoreCardViewModel.getPlayerHoleScore(idx, currentHole)
 
-                                DisplayPlayerNames(playerName, backgroundColorForStokes, playerHoleScore,idx,onAction )
+                                DisplayPlayerNames(
+                                    playerName,
+                                    backgroundColorForStokes,
+                                    playerHoleScore,
+                                    idx,
+                                    onAction
+                                )
                                 DisplayTeamGrossNetButton(scoreCardViewModel, idx, onAction)
+                                DisplayJunkButton(scoreCardViewModel, idx, onAction)
                             }
                         }
                     }
@@ -125,12 +137,29 @@ fun EnterPlayersScores(
 }
 
 @Composable
+fun DisplayJunkButton(
+    scoreCardViewModel: ScoreCardViewModel,
+    idx: Int,
+    onAction: (DialogAction) -> Unit
+) {
+
+    DialogCard(
+        symbol = "Junk",
+        modifier = Modifier.padding(1.dp),
+        myFontSize = BUTTON_JUNK_FONT,
+        backGround = scoreCardViewModel.state.junkButtonColor[idx],
+        textColor = Color.Black,
+        onClick = { onAction(DialogAction.JunkClick(idx)) }) {
+    }
+}
+
+@Composable
 fun DisplayTeamGrossNetButton(
     scoreCardViewModel: ScoreCardViewModel, idx: Int, onAction: (DialogAction) -> Unit
 ) {
 
     DialogCard(symbol = "Net",
-        modifier = Modifier.padding(start = 2.dp, top = 2.dp, bottom = 2.dp, end = 2.dp),
+        modifier = Modifier.padding(1.dp),
         myFontSize = BUTTON_NET_GROSS_FONT,
         backGround = scoreCardViewModel.state.netButtonColor[idx],
         textColor = Color.Black,
@@ -139,7 +168,7 @@ fun DisplayTeamGrossNetButton(
     Spacer(modifier = Modifier.width(10.dp))
     DialogCard(
         symbol = "Gross",
-        modifier = Modifier.padding(2.dp),
+        modifier = Modifier.padding(1.dp),
         myFontSize = BUTTON_NET_GROSS_FONT,
         backGround = scoreCardViewModel.state.grossButtonColor[idx],
         textColor = Color.Black,

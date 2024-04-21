@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.contentColorFor
@@ -24,6 +25,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.PlayerHeading
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.ScoreCardViewModel
+import com.golfpvcc.teamscore_rev4.utils.COLOR_NEXT_HOLE
+import com.golfpvcc.teamscore_rev4.utils.COLOR_PREV_HOLE
+import com.golfpvcc.teamscore_rev4.utils.COLOR_SCREEN_MODE
 import com.golfpvcc.teamscore_rev4.utils.Constants.COLUMN_TOTAL_WIDTH
 import com.golfpvcc.teamscore_rev4.utils.Constants.SCORE_CARD_COURSE_NAME_TEXT
 import com.golfpvcc.teamscore_rev4.utils.Constants.SCORE_CARD_TEXT
@@ -56,7 +60,7 @@ fun DisplayCourseName(scoreCardViewModel: ScoreCardViewModel) {
         )
         Spacer(modifier = Modifier.size(10.dp))
         Text(
-            text = "Display: Gross Score",
+            text = "Display: ${scoreCardViewModel.state.mDisplayScreenModeText}",
             fontSize = SCORE_CARD_COURSE_NAME_TEXT.sp,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(4.dp),
@@ -86,7 +90,8 @@ fun DisplayScoreCardHeader(
             }
             Column {    // the DISPLAY_HOLE_NUMBER is flag to high lite the current hole being scored
                 for (idx in hdcpParHoleHeading.indices) { // here's how the current hole played is high lighted
-                    val holeNumberColor: Long = // Vin hole played is a flag to high light the hole being played
+                    val holeNumberColor: Long =
+                        // Vin hole played is a flag to high light the hole being played
                         if (hdcpParHoleHeading[idx].vinTag == HOLE_HEADER) DISPLAY_HOLE_NUMBER else VIN_LIGHT_GRAY
 
                     DisplayScoreCardCell(
@@ -245,7 +250,8 @@ fun DisplayPlayerScoreCardCell(
         for (idx in startingCell until endingCell) {    // player score card loop
             val playerStokeHoleColor =
                 scoreCardViewModel.getStokeOnHolePlayerColor( //determine the stokes a player gets on hole by the color
-                    playerHeading.mHdcp, idx)
+                    playerHeading.mHdcp, idx
+                )
 
             val playerScoreColor =
                 scoreCardViewModel.getPlayerScoreColorForHole(   //check for a birdie and turn the score red.
@@ -306,19 +312,35 @@ fun DisplayRowHeading(
 @Composable
 fun DisplayPrevNextHoleButton(onAction: (ScoreCardActions) -> Unit) {
 
-    PrevNextHoleButton("Prev", onClick = { onAction(ScoreCardActions.Prev) })
+    PrevNextHoleButton(
+        "Prev",
+        Color(COLOR_PREV_HOLE),
+        onClick = { onAction(ScoreCardActions.Prev) })
     Spacer(modifier = Modifier.size(15.dp))
-    PrevNextHoleButton("Next", onClick = { onAction(ScoreCardActions.Next) })
+    PrevNextHoleButton(
+        "Next",
+        Color(COLOR_NEXT_HOLE),
+        onClick = { onAction(ScoreCardActions.Next) })
 }
 
 @Composable
-fun PrevNextHoleButton(buttonText: String, onClick: () -> Unit) {
+fun DisplayScreenModeButton(DisplayScreenMode: String, onAction: (ScoreCardActions) -> Unit) {
+    PrevNextHoleButton(
+        DisplayScreenMode,
+        Color(COLOR_SCREEN_MODE),
+        onClick = { onAction(ScoreCardActions.ScreenMode) })
+}
+
+@Composable
+fun PrevNextHoleButton(buttonText: String, butColor: Color, onClick: () -> Unit) {
     Button(
         onClick = {
             onClick()
         },
+        colors = ButtonDefaults.buttonColors(containerColor = butColor),
         modifier = Modifier
-            .height(40.dp),  //vpg
+            .height(40.dp)
+            .width(120.dp),  //vpg
     ) {
         Text(text = buttonText)
     }
@@ -327,4 +349,8 @@ fun PrevNextHoleButton(buttonText: String, onClick: () -> Unit) {
 sealed class ScoreCardActions {
     data object Prev : ScoreCardActions()
     data object Next : ScoreCardActions()
+    data object ScreenMode : ScoreCardActions()
+    data object ButtonEnterScore : ScoreCardActions()
+    data object SetDialogCurrentPlayer : ScoreCardActions()
+
 }

@@ -7,6 +7,7 @@ sealed class DialogAction {
     data class NetLongClick(val playerIdx: Int):DialogAction()
     data class Gross(val playerIdx: Int):DialogAction()
     data class GrossLongClick(val playerIdx: Int):DialogAction()
+    data class JunkClick(val playerIdx: Int):DialogAction()
     data class SetDialogCurrentPlayer(val currentPlayerIdx:Int):DialogAction()
     data object Clear:DialogAction()
     data object Done:DialogAction()

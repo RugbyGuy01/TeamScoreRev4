@@ -15,14 +15,17 @@ import com.golfpvcc.teamscore_rev4.database.model.ScoreCardWithPlayers
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.dialogenterscore.DialogAction
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.dialogenterscore.getTeamButtonColor
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.dialogenterscore.teamScoreTypeNet
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DISPLAY_MODE_GROSS
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.HDCP_HEADER
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.HOLE_HEADER
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.PAR_HEADER
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.ScoreCardActions
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.TEAM_HEADER
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.USED_HEADER
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.changeDisplayScreenMode
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.getPlayerStrokesForHole
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.highLiteTotalColumn
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.screenModeText
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.setBoardColorForPlayerTeamScore
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.totalScore
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.updateNetAndGrossScoreCells
@@ -88,11 +91,13 @@ open class ScoreCardViewModel() : ViewModel() {
             }
         }
     }
-     private suspend fun saveScoreCardRecord(){
+
+    private suspend fun saveScoreCardRecord() {
         val coursePar = state.hdcpParHoleHeading.find { it.vinTag == PAR_HEADER }
         val handicap = state.hdcpParHoleHeading.find { it.vinTag == HDCP_HEADER }
-        if(coursePar != null && handicap != null){
-            val scoreCardRecord : ScoreCardRecord = ScoreCardRecord(mCourseName = state.mCourseName,
+        if (coursePar != null && handicap != null) {
+            val scoreCardRecord: ScoreCardRecord = ScoreCardRecord(
+                mCourseName = state.mCourseName,
                 mTee = state.mTee,
                 mCurrentHole = state.mCurrentHole,
                 mPar = coursePar.mHole,
@@ -108,9 +113,18 @@ open class ScoreCardViewModel() : ViewModel() {
         when (action) {
             ScoreCardActions.Next -> advanceToTheNextHole()
             ScoreCardActions.Prev -> advanceToThePreviousHole()
+            ScoreCardActions.ScreenMode -> changeScreenMode()
+            ScoreCardActions.ButtonEnterScore -> buttonEnterScore()
+            ScoreCardActions.SetDialogCurrentPlayer -> setDialogCurrentPlayer(0)
         }
     }
+    fun changeScreenMode(){
+        state = state.copy(mDisplayScreenModeText = screenModeText(state.mDisplayScreenMode))
+        Log.d("VIN", "before mDisplayScreenModeText  ${state.mDisplayScreenModeText}")
 
+        state.mDisplayScreenMode = changeDisplayScreenMode(state.mDisplayScreenMode)
+        state = state.copy(mButtonScreenNextText = screenModeText(state.mDisplayScreenMode))  // change the button text now
+    }
     fun getPlayerHoleScore(playerIdx: Int, idx: Int): String {
         val playerHoleScore: Int = (state.playerHeading[playerIdx].mScore[idx] and JUST_RAW_SCORE)
         var displayPlayerHoleScore: String = "  "
@@ -257,7 +271,12 @@ open class ScoreCardViewModel() : ViewModel() {
             is DialogAction.NetLongClick -> setNetLongClickScore(action.playerIdx)
             is DialogAction.Number -> scoreEnter(action.score)
             is DialogAction.SetDialogCurrentPlayer -> setDialogCurrentPlayer(action.currentPlayerIdx)
+            is DialogAction.JunkClick -> displayJunkDialog()
         }
+    }
+
+    fun displayJunkDialog() {
+
     }
 
     fun buttonEnterScore() {
@@ -394,6 +413,10 @@ open class ScoreCardViewModel() : ViewModel() {
 data class ScoreCard(
     val grossButtonColor: Array<Color> = Array(4) { Color.LightGray },
     val netButtonColor: Array<Color> = Array(4) { Color.LightGray },
+    val junkButtonColor: Array<Color> = Array(4) { Color.LightGray },
+    var mDisplayScreenMode: Int = DISPLAY_MODE_GROSS,
+    val mDisplayScreenModeText:String = "Gross",        // what is being display now
+    val mButtonScreenNextText:String="Net",             // what will be display next
     val mRepaintScreen: Boolean = false,
     val mShowTotals: Boolean = false,
     val mCourseName: String = "",    // current course name from the course list database
