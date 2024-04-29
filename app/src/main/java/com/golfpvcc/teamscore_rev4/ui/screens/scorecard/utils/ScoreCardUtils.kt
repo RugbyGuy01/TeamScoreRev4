@@ -23,6 +23,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import com.golfpvcc.teamscore_rev4.ui.navigation.TeamScoreScreen
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.PlayerHeading
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.ScoreCardViewModel
 import com.golfpvcc.teamscore_rev4.utils.COLOR_NEXT_HOLE
@@ -310,29 +312,48 @@ fun DisplayRowHeading(
 }
 
 @Composable
+fun FlipFrontAndBackNine(FlipText: Boolean, onAction: (ScoreCardActions) -> Unit) {
+    val displayFlipFrontBackText: String = if (FlipText) "Back Nine" else "Front Nine"
+
+    RightSidePanelButton(
+        displayFlipFrontBackText,
+        Color(COLOR_PREV_HOLE),
+        onClick = { onAction(ScoreCardActions.FlipFrontBackNine) })
+}
+
+@Composable
 fun DisplayPrevNextHoleButton(onAction: (ScoreCardActions) -> Unit) {
 
-    PrevNextHoleButton(
+    RightSidePanelButton(
         "Prev",
         Color(COLOR_PREV_HOLE),
         onClick = { onAction(ScoreCardActions.Prev) })
     Spacer(modifier = Modifier.size(15.dp))
-    PrevNextHoleButton(
+    RightSidePanelButton(
         "Next",
         Color(COLOR_NEXT_HOLE),
         onClick = { onAction(ScoreCardActions.Next) })
 }
 
 @Composable
-fun DisplayScreenModeButton(DisplayScreenMode: String, onAction: (ScoreCardActions) -> Unit) {
-    PrevNextHoleButton(
-        DisplayScreenMode,
+fun DisplayScreenModeButton(displayScreenMode: String, onAction: (ScoreCardActions) -> Unit) {
+    RightSidePanelButton(
+        displayScreenMode,
         Color(COLOR_SCREEN_MODE),
         onClick = { onAction(ScoreCardActions.ScreenMode) })
 }
 
 @Composable
-fun PrevNextHoleButton(buttonText: String, butColor: Color, onClick: () -> Unit) {
+fun DisplayGameOverButton(navController: NavController,) {
+    RightSidePanelButton(
+        "Summary",
+        Color(COLOR_SCREEN_MODE),
+        onClick = { navController.navigate(route = TeamScoreScreen.ScreenSummary.route)}
+    )
+}
+
+@Composable
+fun RightSidePanelButton(buttonText: String, butColor: Color, onClick: () -> Unit) {
     Button(
         onClick = {
             onClick()
@@ -347,10 +368,10 @@ fun PrevNextHoleButton(buttonText: String, butColor: Color, onClick: () -> Unit)
 }
 
 sealed class ScoreCardActions {
+    data object ButtonEnterScore : ScoreCardActions()
     data object Prev : ScoreCardActions()
     data object Next : ScoreCardActions()
     data object ScreenMode : ScoreCardActions()
-    data object ButtonEnterScore : ScoreCardActions()
     data object SetDialogCurrentPlayer : ScoreCardActions()
-
+    data object FlipFrontBackNine : ScoreCardActions()
 }

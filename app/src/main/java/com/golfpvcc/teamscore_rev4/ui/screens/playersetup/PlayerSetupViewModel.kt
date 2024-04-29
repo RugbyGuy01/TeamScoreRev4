@@ -16,6 +16,7 @@ import com.golfpvcc.teamscore_rev4.utils.Constants
 import com.golfpvcc.teamscore_rev4.utils.Constants.DISPLAY_SCORE_CARD_SCREEN
 import com.golfpvcc.teamscore_rev4.utils.Constants.MINIMUM_LEN_OF_PLAYER_NAME
 import com.golfpvcc.teamscore_rev4.utils.Constants.SCORE_CARD_REC_ID
+import com.golfpvcc.teamscore_rev4.utils.Constants.USER_CANCEL
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -44,6 +45,7 @@ class PlayerSetupViewModel(
 
     suspend fun getCourseById(courseId: Int?) {
         val courseRecord: CourseRecord = courseDao.getCourseRecord(courseId)
+
         updateCourseRecord(courseRecord)
         val scoreCardRecord: ScoreCardRecord
 
@@ -51,8 +53,7 @@ class PlayerSetupViewModel(
         if (checkScoreCardRecord) {
             scoreCardRecord = scoreCardDao.getScoreCardRecord(SCORE_CARD_REC_ID)
             state = state.copy(mTee = scoreCardRecord.mTee)
-//            state =  state.copy(mStartingHole = (scoreCardRecord.mCurrentHole + 1).toString())  // starting hole is zero based)
-            state =  state.copy(mStartingHole = "1")  // User can change this hole number
+            state = state.copy(mStartingHole = "1")  // User can change this hole number
         } else {
             Log.d("VIN", "scoreCardDao - record not found")
             vinScoreCardRecordUpdate()
@@ -60,12 +61,18 @@ class PlayerSetupViewModel(
         Log.d("VIN", "read record  Tee ${state.mTee}  scoreCardRecord.mTee ")
         val playerRecords: List<PlayerRecord> = playerDao.getAllPlayerRecords()
         updatePlayers(playerRecords)
+
     }
 
     private fun updateCourseRecord(courseRec: CourseRecord) {
-        state = state.copy(mCourseName = courseRec.mCoursename)
-        state = state.copy(mPar = courseRec.mPar)
-        state = state.copy(mHandicap = courseRec.mHandicap)
+        if (courseRec != null) {
+            state = state.copy(mCourseName = courseRec.mCoursename)
+            state = state.copy(mPar = courseRec.mPar)
+            state = state.copy(mHandicap = courseRec.mHandicap)
+            state = state.copy(mCourseId = courseRec.mId)
+        } else {
+            state = state.copy(mCourseName = "No course record")
+        }
     }
 
     suspend fun vinScoreCardRecordUpdate() {
@@ -75,6 +82,7 @@ class PlayerSetupViewModel(
         val scoreCardRecord: ScoreCardRecord = ScoreCardRecord(
             mCourseName = state.mCourseName,
             mTee = state.mTee,
+            mCourseId = state.mCourseId,
             mCurrentHole = state.mStartingHole.toInt() - 1, // zero based
             mPar = state.mPar,
             mHandicap = state.mHandicap,
@@ -121,6 +129,7 @@ class PlayerSetupViewModel(
         val scoreCardRecord: ScoreCardRecord = ScoreCardRecord(
             mCourseName = state.mCourseName,
             mTee = state.mTee,
+            mCourseId = state.mCourseId,
             mCurrentHole = state.mStartingHole.toInt() - 1,  // the value is 1 make it zero base
             mPar = state.mPar,
             mHandicap = state.mHandicap,
@@ -153,8 +162,8 @@ class PlayerSetupViewModel(
         return 0
     }
 
-    fun onButtonCancel(): Int {
-        return Constants.USER_CANCEL
+    fun onButtonCancel() {
+        state = state.copy(mNextScreen = USER_CANCEL)
     }
 
     fun onButtonUpdate(): Int {
@@ -205,6 +214,7 @@ data class ScoreCardState(
     val nextScreen: Int = 0,
     val mCourseName: String = "",    // current course name from the course list database
     val mTee: String = "",                   // the tee's played or the course yardage
+    val mCourseId: Int = 0,      // the current course we are using for the score card
     val mCurrentHole: Int = 0,      // the current hole being played in the game
     val mStartingHole: String = "1",
     val mPar: IntArray = IntArray(18),        // the current course Par,         // the current course Par

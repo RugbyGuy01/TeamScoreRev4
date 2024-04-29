@@ -137,7 +137,7 @@ fun GetTeeInformation(
     updatedData: (String) -> Unit,
     keyboardType: KeyboardType,
     imeAction: ImeAction,
-    modifier : Modifier,
+    modifier: Modifier,
 ) {
     val focusManager = LocalFocusManager.current
     val mContext = LocalContext.current
@@ -179,9 +179,8 @@ fun GetTeeInformation(
 
 @Composable
 fun DisplayPlayerSetupButtons(
-    onButtonSelection: () -> Int,
+    onButtonSelection: () -> Unit,
     buttonText: String,
-    navHostController: NavHostController,
 ) {
     var nextScreen: Int
 
@@ -190,10 +189,7 @@ fun DisplayPlayerSetupButtons(
             .padding(top = 5.dp, start = 5.dp)
             .height(40.dp),
         onClick = {
-            nextScreen = onButtonSelection()
-            if (nextScreen == Constants.USER_CANCEL) {
-                navHostController.popBackStack() // display courses screen
-            }
+            onButtonSelection()
         },
         shape = shape.large
     ) {
@@ -207,12 +203,25 @@ fun moveToNextScreen(
     scoreCardId: Int
 ) {
 
-    if (viewModel.state.mNextScreen == Constants.DISPLAY_SCORE_CARD_SCREEN) {
-        Log.d("VIN", "On to game on")
-        navController.navigate(ROUTE_GAME_ON) {
-            popUpTo(ROOT_GRAPH_ROUTE) {
-                inclusive = true
+    when (viewModel.state.mNextScreen) {
+        Constants.DISPLAY_SCORE_CARD_SCREEN -> {
+            Log.d("VIN", "On to game on")
+            navController.navigate(route = TeamScoreScreen.ScreenScoreCard.route) {
+                popUpTo(ROOT_GRAPH_ROUTE) {
+                    inclusive = true
+                }
             }
         }
+        Constants.USER_CANCEL -> {
+            navController.navigate(ROUTE_CONFIGURATION) {
+                popUpTo(ROOT_GRAPH_ROUTE) {
+                    inclusive = true
+                }
+            }
+        }
+        else -> {
+            // display user setup screen
+        }
     }
+
 }

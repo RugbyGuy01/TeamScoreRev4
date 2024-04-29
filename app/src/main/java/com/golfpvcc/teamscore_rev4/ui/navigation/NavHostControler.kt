@@ -15,10 +15,8 @@ fun SetupNavGraph(
 ) {
     NavHost(
         navController = navController,
-        startDestination = ROUTE_CONFIGURATION,
- //            startDestination = ROUTE_GAME_ON,
-
-        route = ROOT_GRAPH_ROUTE
+        startDestination = ROUTE_GAME_ON,
+         route = ROOT_GRAPH_ROUTE
     ) {
         teamConfiguration(navController)
         teamGameOn(navController)

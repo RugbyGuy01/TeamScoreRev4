@@ -116,15 +116,19 @@ open class ScoreCardViewModel() : ViewModel() {
             ScoreCardActions.ScreenMode -> changeScreenMode()
             ScoreCardActions.ButtonEnterScore -> buttonEnterScore()
             ScoreCardActions.SetDialogCurrentPlayer -> setDialogCurrentPlayer(0)
+            ScoreCardActions.FlipFrontBackNine -> flipFrontNineBackNine()
         }
     }
-    fun changeScreenMode(){
+
+    fun changeScreenMode() {
         state = state.copy(mDisplayScreenModeText = screenModeText(state.mDisplayScreenMode))
         Log.d("VIN", "before mDisplayScreenModeText  ${state.mDisplayScreenModeText}")
 
         state.mDisplayScreenMode = changeDisplayScreenMode(state.mDisplayScreenMode)
-        state = state.copy(mButtonScreenNextText = screenModeText(state.mDisplayScreenMode))  // change the button text now
+        state =
+            state.copy(mButtonScreenNextText = screenModeText(state.mDisplayScreenMode))  // change the button text now
     }
+
     fun getPlayerHoleScore(playerIdx: Int, idx: Int): String {
         val playerHoleScore: Int = (state.playerHeading[playerIdx].mScore[idx] and JUST_RAW_SCORE)
         var displayPlayerHoleScore: String = "  "
@@ -415,8 +419,8 @@ data class ScoreCard(
     val netButtonColor: Array<Color> = Array(4) { Color.LightGray },
     val junkButtonColor: Array<Color> = Array(4) { Color.LightGray },
     var mDisplayScreenMode: Int = DISPLAY_MODE_GROSS,
-    val mDisplayScreenModeText:String = "Gross",        // what is being display now
-    val mButtonScreenNextText:String="Net",             // what will be display next
+    val mDisplayScreenModeText: String = "Gross",        // what is being display now
+    val mButtonScreenNextText: String = "Net",             // what will be display next
     val mRepaintScreen: Boolean = false,
     val mShowTotals: Boolean = false,
     val mCourseName: String = "",    // current course name from the course list database

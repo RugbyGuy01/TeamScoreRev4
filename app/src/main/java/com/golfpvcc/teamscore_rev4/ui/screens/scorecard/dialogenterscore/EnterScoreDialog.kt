@@ -54,7 +54,8 @@ fun ButtonEnterScore(
         EnterPlayersScores(scoreCardViewModel, onAction)
     }
 
-    Button(     // onDismissRequest = { onAction(DialogAction.Done) }
+    Button(
+        // onDismissRequest = { onAction(DialogAction.Done) }
         onClick = {
             Log.d("VIN", "Click ButtonEnterScore")
             onScoreCardAction(ScoreCardActions.ButtonEnterScore)
@@ -98,8 +99,9 @@ fun EnterPlayersScores(
                         DisplayPlayerNameAndScoreHeading()
                         for (idx in rowPlayerNames.indices) {
                             Row(horizontalArrangement = Arrangement.Start) {
-
-                                val playerName = rowPlayerNames[idx].mName
+                                Log.d("VIN", "DisplayPlayerNameAndScoreHeading Idx $idx")
+                                val playerName =
+                                    rowPlayerNames[idx].mHdcp + " - " + rowPlayerNames[idx].mName
                                 val backgroundColorForStokes: Color =
                                     scoreCardViewModel.getHighLiteActivePlayerColor(idx)
                                 val playerHoleScore =

@@ -130,8 +130,8 @@ fun DisplayBottomButtons(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly,
     ) {
-        DisplayPlayerSetupButtons(viewModel::onButtonNewGame, "New Game", navController)
-        DisplayPlayerSetupButtons(viewModel::onButtonCancel, "Cancel", navController)
-        DisplayPlayerSetupButtons(viewModel::onButtonUpdate, "Update", navController)
+        DisplayPlayerSetupButtons(viewModel::onButtonNewGame, "New Game")
+        DisplayPlayerSetupButtons(viewModel::onButtonCancel, "Cancel")
+        DisplayPlayerSetupButtons(viewModel::onButtonUpdate, "Update")
     }
 }

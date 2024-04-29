@@ -53,10 +53,11 @@ object Constants {
 //    const val DISPLAY_COURSES_SCREEN = 7
     const val MINIMUM_LEN_OF_PLAYER_NAME = 2
 
+    // text size for forms
     const val DATABASE_NAME = "TeamDatabase"
     const val SCORE_CARD_TEXT = 18
     const val SCORE_CARD_COURSE_NAME_TEXT = 15
-
+    const val SUMMARY_BUTTON_TEXT = 20
     const val COLUMN_TOTAL_WIDTH = 65
 
 

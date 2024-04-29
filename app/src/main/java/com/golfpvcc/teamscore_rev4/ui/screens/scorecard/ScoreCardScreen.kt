@@ -24,14 +24,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.dialogenterscore.ButtonEnterScore
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DisplayCourseName
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DisplayGameOverButton
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DisplayPrevNextHoleButton
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DisplayScoreCardHeader
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DisplayScoreCardNames
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DisplayScoreCardTeams
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DisplayScreenModeButton
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.FlipFrontAndBackNine
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.FlipNineDisplay
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.screenModeText
 import com.golfpvcc.teamscore_rev4.utils.SetScreenOrientation
@@ -70,7 +73,7 @@ fun ScoreCardScreen(
                         .fillMaxHeight(),
                     horizontalAlignment = Alignment.End
                 ) {
-                    DisplayControlButtons(scoreCardViewModel)       // buttons on the side of the score card
+                    DisplayControlButtons(scoreCardViewModel, navController)       // buttons on the side of the score card
                 }
             }
         } // end of Scaffold
@@ -103,16 +106,19 @@ fun DisplayMainScoreCard(
 }
 
 @Composable
-fun DisplayControlButtons(scoreCardViewModel: ScoreCardViewModel) {
-    FlipNineDisplay(scoreCardViewModel)
+fun DisplayControlButtons(scoreCardViewModel: ScoreCardViewModel, navController: NavController,) {
+
+    FlipFrontAndBackNine( scoreCardViewModel.state.mWhatNineIsBeingDisplayed, scoreCardViewModel::scoreCardActions)
     Spacer(modifier = Modifier.size(12.dp))
     ButtonEnterScore(scoreCardViewModel, scoreCardViewModel::dialogAction, scoreCardViewModel::scoreCardActions )
-    Spacer(modifier = Modifier.size(25.dp))
+    Spacer(modifier = Modifier.size(20.dp))
     DisplayPrevNextHoleButton(scoreCardViewModel::scoreCardActions)
     Spacer(modifier = Modifier.size(25.dp))
     DisplayScreenModeButton(
-        scoreCardViewModel.state.mButtonScreenNextText, // what will be display next on the screen
+        scoreCardViewModel.state.mButtonScreenNextText, // what will be display gross, net point quote, stableford screens
         scoreCardViewModel::scoreCardActions
     )
+    Spacer(modifier = Modifier.size(15.dp))
+    DisplayGameOverButton(navController)
 
 }

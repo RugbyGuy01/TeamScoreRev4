@@ -11,5 +11,5 @@ data class ScoreCardWithPlayers(
         parentColumn = "mScoreCardRecId",   // ties the score card record
         entityColumn = "mScoreCardRecFk"    //Link to score card
     )
-    val playerRecords: List<PlayerRecord>
+    val playerRecords: List<PlayerRecord>   // returns
 )
