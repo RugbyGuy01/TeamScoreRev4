@@ -9,12 +9,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -53,7 +52,6 @@ fun DropDownSelectHolePar(
         alignment = Alignment.CenterEnd,
         onDismissRequest = {
             recDetail.setPopupSelectHolePar(-1)
-            expanded
         }
     ) {     // Composable content to be shown in the Popup
         Surface(
@@ -73,9 +71,9 @@ fun DropDownSelectHolePar(
                     modifier = Modifier.padding(15.dp),
                     text = "Hole ${holeIdx + 1}"
                 )
-                Divider(color = Color.Blue, thickness = 1.dp)
+                HorizontalDivider(thickness = 1.dp, color = Color.Blue)
                 TeamObjects.holeParList.forEach {
-                    Divider(color = Color.Green, thickness = 1.dp)
+                    HorizontalDivider(color = Color.Green, thickness = 1.dp)
                     Text(
                         text = "      ${it.Par}     ",
                         fontSize = 20.sp,
@@ -96,15 +94,16 @@ fun DropDownSelectHolePar(
         }
     }
 }
+
 @Composable     // holeIdx is zero base index
 fun DropDownSelectHoleHandicap(
-    recDetail: CourseDetailViewModel,
+    courseDetailViewModel: CourseDetailViewModel,
     holeIdx: Int
 ) {
-    var expanded = if (recDetail.getPopupSelectHoleHandicap() < 0) false else true
-    val currentHoleHdcp = recDetail.getHoleHandicap(holeIdx)
-    val courseHdcp = recDetail.state.availableHandicap
-    val FlipHdcps = recDetail.getFlipHdcps()
+    var expanded = if (courseDetailViewModel.getPopupSelectHoleHandicap() < 0) false else true
+    val currentHoleHdcp = courseDetailViewModel.getHoleHandicap(holeIdx)
+    val courseHdcp = courseDetailViewModel.state.availableHandicap
+    val FlipHdcps = courseDetailViewModel.getFlipHdcps()
     val displayFrontNineHdcp: Int
 
     if (FlipHdcps) {
@@ -118,8 +117,8 @@ fun DropDownSelectHoleHandicap(
     Popup(
         alignment = Alignment.CenterEnd,
         onDismissRequest = {
-            recDetail.setPopupSelectHoleHdcp(-1)
-           // expanded
+            courseDetailViewModel.setPopupSelectHoleHdcp(-1)
+            // expanded
         }
     ) {     // Composable content to be shown in the Popup
         Surface(
@@ -139,12 +138,12 @@ fun DropDownSelectHoleHandicap(
                     modifier = Modifier.padding(15.dp),
                     text = "Hole ${holeIdx + 1}"
                 )
-                Divider(color = Color.Blue, thickness = 1.dp)
+                HorizontalDivider(color = Color.Blue, thickness = 1.dp)
 
                 courseHdcp.forEachIndexed { inx, holeHdcp ->
                     if ((inx % 2) == displayFrontNineHdcp) {
                         if (courseHdcp[inx].available || currentHoleHdcp == courseHdcp[inx].holeHandicap) {
-                            Divider(color = Color.Green, thickness = 1.dp)
+                            HorizontalDivider(color = Color.Green, thickness = 1.dp)
                             Text(
                                 text = "  ${courseHdcp[inx].holeHandicap}  ",
                                 fontSize = 20.sp,
@@ -163,25 +162,17 @@ fun DropDownSelectHoleHandicap(
                                                 courseHdcp.find { it.holeHandicap == currentHoleHdcp }
                                             if (returnHdcpToPool != null) {
                                                 returnHdcpToPool.available = true
-                                                Log.d(
-                                                    "VIN",
-                                                    "returnHdcpToPool ${returnHdcpToPool.holeHandicap}"
-                                                )
                                             }
                                         }
 
-                                        recDetail.onHandicapChange(
+                                        courseDetailViewModel.onHandicapChange(
                                             holeIdx,
                                             courseHdcp[inx].holeHandicap
                                         )
-                                        courseHdcp[inx].available =
-                                            false        // this handicap has been selected
-                                        Log.d(
-                                            "VIN",
-                                            "clickable Card Hole $holeIdx set to Hdcp ${courseHdcp[inx].holeHandicap} "
-                                        )
-                                        recDetail.setPopupSelectHoleHdcp(-1)
-                                    }
+                                        courseHdcp[inx].available = false        // this handicap has been selected
+                                        courseDetailViewModel.checkForAvailableHandicaps()  // will set the course save button
+                                        courseDetailViewModel.setPopupSelectHoleHdcp(-1)
+                                    } // rnd of clickable
                             )
                         }
                     }
@@ -190,15 +181,17 @@ fun DropDownSelectHoleHandicap(
         }
     }
 }
+
 fun currentHandicapConfiguration(cardHandicap: IntArray, availableHandicap: Array<HoleHandicap>) {
 
-    for (idx in 0 until availableHandicap.size) {
+    for (idx in availableHandicap.indices) {
         availableHandicap[idx].holeHandicap = idx + 1   // display handicap number in drop down menu
         availableHandicap[idx].available = true
     }
     cardHandicap.forEachIndexed { inx, holeHdcp ->
         if (holeHdcp != 0) {
-            var removeHdcpFromPool: HoleHandicap? = availableHandicap.find { it.holeHandicap == holeHdcp }
+            val removeHdcpFromPool: HoleHandicap? =
+                availableHandicap.find { it.holeHandicap == holeHdcp }
             if (removeHdcpFromPool != null) {
                 removeHdcpFromPool.available = false
             }

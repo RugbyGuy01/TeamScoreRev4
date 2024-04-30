@@ -66,6 +66,15 @@ class CourseDetailViewModel (){
     fun setHandicapAvailable() {
         currentHandicapConfiguration(state.mHandicap, state.availableHandicap)
     }
+    fun checkForAvailableHandicaps(){
+        val allHandicapsUsed: HoleHandicap? = state.availableHandicap.find { it.available == true }
+
+        state = if (allHandicapsUsed == null){
+            state.copy(mEnableSaveButton = true)
+        } else {
+            state.copy(mEnableSaveButton = false)
+        }
+    }
     // end of Configure course Handicap
 }
 data class CourseDetailState(
@@ -80,6 +89,7 @@ data class CourseDetailState(
     val isPopupSelectHolePar: Int = -1,
     val isPopupSelectHoleHdcp: Int = -1,
     val isDropDownDismissed: Boolean = false,
+    val mEnableSaveButton:Boolean = false,
     val parList: HoleParList = HoleParList(),
     var availableHandicap: Array<HoleHandicap> = Array(18) { HoleHandicap(0, false) }
 )
