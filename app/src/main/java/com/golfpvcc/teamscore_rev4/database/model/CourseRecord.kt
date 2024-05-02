@@ -10,6 +10,7 @@ data class CourseRecord(
     val mUsstate: String? = "NC",
     val mPar: IntArray,
     val mHandicap: IntArray,
+    val mNotes:Array<String>,
     @PrimaryKey(autoGenerate = true)    // default is false
     val mId: Int = 0
 )

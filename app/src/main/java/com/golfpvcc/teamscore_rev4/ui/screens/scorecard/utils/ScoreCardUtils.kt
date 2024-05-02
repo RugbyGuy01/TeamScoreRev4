@@ -2,7 +2,9 @@ package com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -18,15 +20,18 @@ import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.golfpvcc.teamscore_rev4.ui.navigation.ROOT_GRAPH_ROUTE
 import com.golfpvcc.teamscore_rev4.ui.navigation.TeamScoreScreen
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.PlayerHeading
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.ScoreCardViewModel
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.dialogenterscore.DialogAction
 import com.golfpvcc.teamscore_rev4.utils.COLOR_NEXT_HOLE
 import com.golfpvcc.teamscore_rev4.utils.COLOR_PREV_HOLE
 import com.golfpvcc.teamscore_rev4.utils.COLOR_SCREEN_MODE
@@ -81,10 +86,10 @@ fun DisplayScoreCardHeader(
         Row(
             modifier = Modifier.padding(top = 4.dp)
         ) {
-            Column {
+            Column {    // display the handicap row
                 for (rowHeading in hdcpParHoleHeading) {
                     DisplayRowHeading(
-                        rowHeading = rowHeading.mName,
+                        rowHeading = rowHeading.mName,  // display hdcp, par, and hole in first column
                         modifier,
                         Color(VIN_LIGHT_GRAY)
                     )
@@ -96,7 +101,7 @@ fun DisplayScoreCardHeader(
                         // Vin hole played is a flag to high light the hole being played
                         if (hdcpParHoleHeading[idx].vinTag == HOLE_HEADER) DISPLAY_HOLE_NUMBER else VIN_LIGHT_GRAY
 
-                    DisplayScoreCardCell(
+                    DisplayScoreCardCell(   // the cell function will display the 9 cell data - ie hdcp, par, and hole number
                         Modifier,
                         hdcpParHoleHeading[idx].mHole,
                         Color(holeNumberColor),
@@ -104,17 +109,19 @@ fun DisplayScoreCardHeader(
                     )
                 }
             }
-            Column {
+            Column {    // display the total column notes par total and "Total"
                 modifier = Modifier.width(COLUMN_TOTAL_WIDTH.dp)
-                for (idx in hdcpParHoleHeading.indices) {
+                for (idx in hdcpParHoleHeading.indices) {       // indices = 3
                     if (hdcpParHoleHeading[idx].vinTag == PAR_HEADER) { // the score card par row - show the total for par
                         hdcpParHoleHeading[idx].mTotal =
                             scoreCardViewModel.getTotalForNineCell(hdcpParHoleHeading[idx].mHole)
                     }
-                    DisplayRowHeading(
+
+                    DisplayRowHeadingOnClick(
                         hdcpParHoleHeading[idx].mTotal,
                         modifier,
-                        hdcpParHoleHeading[idx].mColor
+                        hdcpParHoleHeading[idx].mColor,
+                        scoreCardViewModel::dialogAction
                     )
                 }
             }
@@ -310,7 +317,31 @@ fun DisplayRowHeading(
         )  // start at zero - get the first column of the data
     }
 }
+@Composable
+fun DisplayRowHeadingOnClick(
+    rowHeading: String,
+    modifier: Modifier,
+    color: Color,
+    onAction: (DialogAction) -> Unit,
+) {
 
+    Surface(
+        modifier = modifier
+            .clickable {onAction(DialogAction.DisplayHoleNote)}, // modifier.width(100.dp),
+        border = BorderStroke(Dp.Hairline, color = Color.Blue),
+        color = color,
+        contentColor = contentColorFor(Color.Transparent),
+    ) {
+        Text(
+            text = rowHeading,
+            fontSize = SCORE_CARD_TEXT.sp,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(4.dp),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )  // start at zero - get the first column of the data
+    }
+}
 @Composable
 fun FlipFrontAndBackNine(FlipText: Boolean, onAction: (ScoreCardActions) -> Unit) {
     val displayFlipFrontBackText: String = if (FlipText) "Back Nine" else "Front Nine"
@@ -344,11 +375,15 @@ fun DisplayScreenModeButton(displayScreenMode: String, onAction: (ScoreCardActio
 }
 
 @Composable
-fun DisplayGameOverButton(navController: NavController,) {
+fun DisplaySummaryButton(navController: NavController,) {
     RightSidePanelButton(
         "Summary",
         Color(COLOR_SCREEN_MODE),
-        onClick = { navController.navigate(route = TeamScoreScreen.ScreenSummary.route)}
+        onClick = {
+            navController.navigate(route = TeamScoreScreen.ScreenSummary.route){
+            popUpTo(ROOT_GRAPH_ROUTE)
+            }
+        }
     )
 }
 
@@ -359,9 +394,11 @@ fun RightSidePanelButton(buttonText: String, butColor: Color, onClick: () -> Uni
             onClick()
         },
         colors = ButtonDefaults.buttonColors(containerColor = butColor),
+        contentPadding = PaddingValues(10.dp),
+        //shape = RectangleShape,
         modifier = Modifier
             .height(40.dp)
-            .width(120.dp),  //vpg
+            .width(110.dp),  //vpg 100 did not work
     ) {
         Text(text = buttonText)
     }

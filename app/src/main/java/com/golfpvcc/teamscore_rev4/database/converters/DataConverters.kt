@@ -35,4 +35,21 @@ open class DataConverter {
     fun fromDate(date: Date?): Long? {
         return date?.time
     }
+    @TypeConverter      // used for the notes in the course file
+    fun stringArrayToString(myArray: Array<String>): String? {
+        if (myArray.isEmpty()) {
+            return ""
+        }
+        var str = myArray[0]
+        for (i in 1 until myArray.size) {
+            str = str + "," + myArray[i]
+        }
+        return str
+    }
+
+    @TypeConverter   // used for the notes in the course file
+    fun stringToStringArray(mNoteString: String): Array<String> {
+
+        return mNoteString.split(",").toTypedArray<String>()
+    }
 }

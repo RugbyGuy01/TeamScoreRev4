@@ -85,6 +85,7 @@ data class CourseDetailState(
     val mHoleNumber: IntArray = IntArray(18) { i -> i + 1 },
     val mPar: IntArray = IntArray(18) { 4 },
     val mHandicap: IntArray = IntArray(18) { 0 },
+    val mNotes:Array<String> = Array(18){""},
     val isUpdatingCourse: Boolean = false,
     val isPopupSelectHolePar: Int = -1,
     val isPopupSelectHoleHdcp: Int = -1,

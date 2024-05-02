@@ -1,19 +1,15 @@
 package com.golfpvcc.teamscore_rev4.ui.screens.scorecard
 
+import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Share
-import androidx.compose.material3.BottomAppBar
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -28,19 +24,18 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.dialogenterscore.ButtonEnterScore
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DisplayCourseName
-import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DisplayGameOverButton
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DisplaySummaryButton
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DisplayPrevNextHoleButton
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DisplayScoreCardHeader
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DisplayScoreCardNames
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DisplayScoreCardTeams
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DisplayScreenModeButton
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.FlipFrontAndBackNine
-import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.FlipNineDisplay
-import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.screenModeText
 import com.golfpvcc.teamscore_rev4.utils.SetScreenOrientation
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ScoreCardScreen(
     navController: NavHostController,
@@ -56,12 +51,12 @@ fun ScoreCardScreen(
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.primary) {
         Scaffold()
         {
-            Spacer(modifier = Modifier.padding(it))
+            Spacer(modifier = Modifier.padding(5.dp))
             Row() {
                 Column(
                     modifier = Modifier
                         .padding(5.dp)
-                        .weight(.85f)
+                       // .weight(.8f)   // size of score card with
                         .fillMaxHeight()
                 ) {
                     DisplayMainScoreCard(scoreCardViewModel)
@@ -71,9 +66,13 @@ fun ScoreCardScreen(
                     modifier = Modifier
                         .padding(5.dp)
                         .fillMaxHeight(),
+                       // .weight(.2f),  // size of score card with
                     horizontalAlignment = Alignment.End
                 ) {
-                    DisplayControlButtons(scoreCardViewModel, navController)       // buttons on the side of the score card
+                    DisplayControlButtons(
+                        scoreCardViewModel,
+                        navController
+                    )       // buttons on the side of the score card
                 }
             }
         } // end of Scaffold
@@ -106,11 +105,18 @@ fun DisplayMainScoreCard(
 }
 
 @Composable
-fun DisplayControlButtons(scoreCardViewModel: ScoreCardViewModel, navController: NavController,) {
+fun DisplayControlButtons(scoreCardViewModel: ScoreCardViewModel, navController: NavController) {
 
-    FlipFrontAndBackNine( scoreCardViewModel.state.mWhatNineIsBeingDisplayed, scoreCardViewModel::scoreCardActions)
+    FlipFrontAndBackNine(
+        scoreCardViewModel.state.mWhatNineIsBeingDisplayed,
+        scoreCardViewModel::scoreCardActions
+    )
     Spacer(modifier = Modifier.size(12.dp))
-    ButtonEnterScore(scoreCardViewModel, scoreCardViewModel::dialogAction, scoreCardViewModel::scoreCardActions )
+    ButtonEnterScore(
+        scoreCardViewModel,
+        scoreCardViewModel::dialogAction,
+        scoreCardViewModel::scoreCardActions
+    )
     Spacer(modifier = Modifier.size(20.dp))
     DisplayPrevNextHoleButton(scoreCardViewModel::scoreCardActions)
     Spacer(modifier = Modifier.size(25.dp))
@@ -119,6 +125,6 @@ fun DisplayControlButtons(scoreCardViewModel: ScoreCardViewModel, navController:
         scoreCardViewModel::scoreCardActions
     )
     Spacer(modifier = Modifier.size(15.dp))
-    DisplayGameOverButton(navController)
+    DisplaySummaryButton(navController)
 
 }

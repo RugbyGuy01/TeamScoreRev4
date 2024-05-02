@@ -98,26 +98,31 @@ fun EnterPlayersScores(
                         DisplayCurrentHoleHeading(currentHole, holeHandicap)
                         DisplayPlayerNameAndScoreHeading()
                         for (idx in rowPlayerNames.indices) {
-                            Row(horizontalArrangement = Arrangement.Start) {
-                                Log.d("VIN", "DisplayPlayerNameAndScoreHeading Idx $idx")
-                                val playerName =
-                                    rowPlayerNames[idx].mHdcp + " - " + rowPlayerNames[idx].mName
-                                val backgroundColorForStokes: Color =
-                                    scoreCardViewModel.getHighLiteActivePlayerColor(idx)
-                                val playerHoleScore =
-                                    scoreCardViewModel.getPlayerHoleScore(idx, currentHole)
+                            if (idx < 4) {
+                                Row(horizontalArrangement = Arrangement.Start) {
+                                    val playerName =
+                                        rowPlayerNames[idx].mHdcp + " - " + rowPlayerNames[idx].mName
+                                    val backgroundColorForStokes: Color =
+                                        scoreCardViewModel.getHighLiteActivePlayerColor(idx)
+                                    val playerHoleScore =
+                                        scoreCardViewModel.getPlayerHoleScore(idx, currentHole)
 
-                                DisplayPlayerNames(
-                                    playerName,
-                                    backgroundColorForStokes,
-                                    playerHoleScore,
-                                    idx,
-                                    onAction
-                                )
-                                DisplayTeamGrossNetButton(scoreCardViewModel, idx, onAction)
-                                DisplayJunkButton(scoreCardViewModel, idx, onAction)
+                                    DisplayPlayerNames(
+                                        playerName,
+                                        backgroundColorForStokes,
+                                        playerHoleScore,
+                                        idx,
+                                        onAction
+                                    )
+                                    DisplayTeamGrossNetButton(scoreCardViewModel, idx, onAction)
+                                    DisplayJunkButton(scoreCardViewModel, idx, onAction)
+                                }
+                            } else {
+                                Log.d("VIN", "DisplayPlayerNameAndScoreHeading ERROR ")
+                                Log.d("VIN", "DisplayPlayerNameAndScoreHeading ERROR ${rowPlayerNames[idx].mName}")
                             }
                         }
+
                     }
 
                     Column(

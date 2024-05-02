@@ -276,11 +276,16 @@ open class ScoreCardViewModel() : ViewModel() {
             is DialogAction.Number -> scoreEnter(action.score)
             is DialogAction.SetDialogCurrentPlayer -> setDialogCurrentPlayer(action.currentPlayerIdx)
             is DialogAction.JunkClick -> displayJunkDialog()
+            DialogAction.DisplayHoleNote -> displayHoleNote()
         }
     }
 
     fun displayJunkDialog() {
+        Log.d("VIN", "displayJunkDialog")
+    }
 
+    fun displayHoleNote() {
+        Log.d("VIN", "displayHoleNotee")
     }
 
     fun buttonEnterScore() {
@@ -430,7 +435,7 @@ data class ScoreCard(
     val mCurrentHole: Int = 0,      // the current hole being played in the game
     val mWhatNineIsBeingDisplayed: Boolean = FRONT_NINE_IS_DISPLAYED,
     val hdcpParHoleHeading: List<HdcpParHoleHeading> = listOf(
-        HdcpParHoleHeading(HDCP_HEADER, "HdCp"),
+        HdcpParHoleHeading(HDCP_HEADER, "HdCp", mTotal = "Notes"),
         HdcpParHoleHeading(PAR_HEADER, "Par"),
         HdcpParHoleHeading(HOLE_HEADER, mName = "Hole", mTotal = "Total"),
     ),

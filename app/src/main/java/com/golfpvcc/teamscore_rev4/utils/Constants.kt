@@ -67,11 +67,21 @@ object Constants {
     const val USER_TEXT_UPDATE = 103
 
         val courseDetailPlaceHolder = CourseRecord(
-        "No Course", "", IntArray(18){4}, IntArray(18)
-    )
+            "No Course",
+            "",
+            mPar = IntArray(18) { 4 },
+            mHandicap = IntArray(18),
+            mNotes = Array<String>(18) { "" }
+        )
     fun List<CourseRecord>?.orCourseRecHolderList(): List<CourseRecord> {
         fun courseRecHolderList(): List<CourseRecord> {
-            return listOf(CourseRecord("No Course", "", IntArray(18){4}, IntArray(18)))
+            return listOf(CourseRecord(
+                "No Course",
+                "",
+                mPar = IntArray(18) { 4 },
+                mHandicap = IntArray(18),
+                mNotes = Array<String>(18) { "" }
+            ))
         }
         return if (!this.isNullOrEmpty()){
             this
