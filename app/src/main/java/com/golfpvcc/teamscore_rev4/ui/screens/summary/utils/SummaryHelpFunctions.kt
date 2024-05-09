@@ -36,16 +36,16 @@ fun SummaryViewModel.updateScoreCardState(scoreCardWithPlayers: ScoreCardWithPla
             mScore = scoreCardWithPlayers.playerRecords[idx].mScore
         ) // add the player's name to the score card
     }
-    if (parCell != null) {
-        for (currentHole in parCell.mHole.indices) {
-            updateNetAndGrossScoreCells(        // fill in the team used and score fields
-                state.hdcpParHoleHeading,
-                currentHole,
-                state.teamUsedHeading,
-                state.playerHeading
-            )
-        }
-    }
+//    if (parCell != null) {
+//        for (currentHole in parCell.mHole.indices) {
+//            updateNetAndGrossScoreCells(        // fill in the team used and score fields
+//                currentHole,
+//                state.hdcpParHoleHeading,
+//                state.teamUsedHeading,
+//                state.playerHeading
+//            )
+//        }
+//    }
 
 
 }

@@ -67,17 +67,13 @@ open class ScoreCardViewModel() : ViewModel() {
     }
 
     fun getScoreCardAndPlayerRecord() {
-        Log.d("VIN1", "getScoreCardAndPlayerRecord read records")
-        if (!state.mHasDatabaseBeenRead) {
-            state.mHasDatabaseBeenRead = true   // only read the database once
-            val scoreCardWithPlayers: List<ScoreCardWithPlayers> =
-                scoreCardDao.getScoreRecordWithPlayers(SCORE_CARD_REC_ID)
+        val scoreCardWithPlayers: List<ScoreCardWithPlayers> =
+            scoreCardDao.getScoreRecordWithPlayers(SCORE_CARD_REC_ID)
 
-            if (scoreCardWithPlayers.isNotEmpty()) {     // found score record with players
-                updateScoreCardState(scoreCardWithPlayers[0])       // located in helper function file
-            } else
-                Log.d("VIN1", "getScoreCardAndPlayerRecord is empty")
-        }
+        if (scoreCardWithPlayers.isNotEmpty()) {     // found score record with players
+            updateScoreCardState(scoreCardWithPlayers[0])       // located in helper function file
+        } else
+            Log.d("VIN1", "getScoreCardAndPlayerRecord is empty")
     }
 
     private fun savePlayersScoresRecord() {
@@ -424,7 +420,6 @@ open class ScoreCardViewModel() : ViewModel() {
 }
 
 data class ScoreCard(
-    var mHasDatabaseBeenRead: Boolean = false,
     val grossButtonColor: Array<Color> = Array(4) { Color.LightGray },
     val netButtonColor: Array<Color> = Array(4) { Color.LightGray },
     val junkButtonColor: Array<Color> = Array(4) { Color.LightGray },

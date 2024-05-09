@@ -2,7 +2,6 @@ package com.golfpvcc.teamscore_rev4.ui.screens.scorecard
 
 import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -49,9 +48,6 @@ fun ScoreCardScreen(
     )
     GetScoreCardRecord(scoreCardViewModel)
 
-      
-
-
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.primary) {
         Scaffold()
         {
@@ -88,12 +84,9 @@ fun GetScoreCardRecord(
     scoreCardViewModel: ScoreCardViewModel
 ) {
     val scope = rememberCoroutineScope()
-    Log.d("VIN1", "GetScoreCardRecord screen calling function")
 
     LaunchedEffect(true) {
-        Log.d("VIN1", "LaunchedEffect screen calling function")
         scope.launch(Dispatchers.IO) {
-            Log.d("VIN1", "GetScoreCardRecord called scope.launch")
             scoreCardViewModel.getScoreCardAndPlayerRecord()
         }
     }

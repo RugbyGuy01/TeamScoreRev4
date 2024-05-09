@@ -51,6 +51,7 @@ fun ScoreCardViewModel.highLiteTotalColumn(displayColor: Long) {
     }
 }
 
+
 fun updateNetAndGrossScoreCells(
     hdcpParHoleHeading: List<HdcpParHoleHeading>,
     currentHole: Int,
@@ -128,7 +129,6 @@ fun ScoreCardViewModel.updateScoreCardState(scoreCardWithPlayers: ScoreCardWithP
             mScore = scoreCardWithPlayers.playerRecords[idx].mScore
         ) // add the player's name to the score card
     }
-    Log.d("VIN1", "updateScoreCardState player record count ${state.playerHeading.size}")
     if (parCell != null) {
         for (currentHole in parCell.mHole.indices) {
             updateNetAndGrossScoreCells(        // fill in the team used and score fields
@@ -139,6 +139,8 @@ fun ScoreCardViewModel.updateScoreCardState(scoreCardWithPlayers: ScoreCardWithP
             )
         }
     }
+
+
 }
 
 fun getPlayerStrokesForHole(
@@ -182,3 +184,4 @@ fun setBoardColorForPlayerTeamScore(playerScore: Int): Color {
     }
     return (bordColor)
 }
+
