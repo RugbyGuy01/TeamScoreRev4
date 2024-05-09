@@ -1,5 +1,5 @@
 package com.golfpvcc.teamscore_rev4.ui.screens.scorecard
-
+// new commit with luach fix
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
