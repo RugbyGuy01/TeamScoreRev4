@@ -22,6 +22,7 @@ const val TEAM_SINGLE_GROSS_SCORE = 0xFF12B8D9
 const val TEAM_DOUBLE_NET_SCORE = 0xFF12910D
 const val TEAM_DOUBLE_GROSS_SCORE = 0xFF0D869E
 
+const val HOLE_ARRAY_SIZE = 18
 
 const val FRONT_NINE_DISPLAY = 9
 const val BACK_NINE_DISPLAY = 18
@@ -40,6 +41,12 @@ const val DOUBLE_TEAM_SCORE = 0x40
 // const val BIT_NOT_USED = 0x80
 const val TEAM_SCORE_MASK = 0x70
 const val JUST_RAW_SCORE = 0x0F
+// handicap masks
+const val PLAYER_HDCP = 0x00f00
+const val PLAYER_STROKES_0 = 0x00000
+const val PLAYER_STROKES_1 = 0x00100
+const val PLAYER_STROKES_2 = 0x00200
+const val PLAYER_STROKES_3 = 0x00300
 
 object Constants {
     const val SCORE_CARD_REC_ID = 2024

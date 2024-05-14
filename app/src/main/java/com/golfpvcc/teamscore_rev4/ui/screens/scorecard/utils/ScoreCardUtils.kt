@@ -1,5 +1,6 @@
 package com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -41,6 +42,14 @@ import com.golfpvcc.teamscore_rev4.utils.Constants.SCORE_CARD_TEXT
 import com.golfpvcc.teamscore_rev4.utils.VIN_LIGHT_GRAY
 import com.golfpvcc.teamscore_rev4.utils.DISPLAY_HOLE_NUMBER
 
+sealed class ScoreCardActions {
+    data object ButtonEnterScore : ScoreCardActions()
+    data object Prev : ScoreCardActions()
+    data object Next : ScoreCardActions()
+    data object ScreenMode : ScoreCardActions()
+    data object SetDialogCurrentPlayer : ScoreCardActions()
+    data object FlipFrontBackNine : ScoreCardActions()
+}
 @Composable
 fun FlipNineDisplay(scoreCardViewModel: ScoreCardViewModel) {
     val buttonText: String =
@@ -158,7 +167,7 @@ fun DisplayScoreCardNames(
                 modifier = Modifier.width(COLUMN_TOTAL_WIDTH.dp)
                 for (idx in playerHeading.indices) {
                     playerHeading[idx].mTotal =
-                        scoreCardViewModel.getTotalForNineCell(playerHeading[idx].mScore)
+                        scoreCardViewModel.getTotalForNineCell(playerHeading[idx].mDisplayScore)
                     DisplayRowHeading(playerHeading[idx].mTotal, modifier, Color(VIN_LIGHT_GRAY))
                 }
             }
@@ -197,6 +206,7 @@ fun DisplayScoreCardTeams(
                 for (idx in teamUsedHeading.indices) {
                     teamUsedHeading[idx].mTotal =       // Calculate "Team" and "Used" score totals
                         scoreCardViewModel.getTotalForNineCell(teamUsedHeading[idx].mHole)
+                    Log.d("VIN", "Calculate Team and Used score totals Idx $idx - ${teamUsedHeading[idx].mTotal}")
                     DisplayRowHeading(teamUsedHeading[idx].mTotal, modifier, Color(VIN_LIGHT_GRAY))
                 }
             }
@@ -221,11 +231,11 @@ fun DisplayScoreCardCell(
                 border = BorderStroke(Dp.Hairline, color = Color.Blue),
                 color = scoreCardViewModel.setHighLightCurrentHole(idx, color),
                 contentColor = contentColorFor(Color.Transparent),
-
                 ) {
 
                 Text(
-                    text = if (cellData[idx] == 0) "" else cellData[idx].toString(), // do not display '0'++ on the score card
+                    text = cellData[idx].toString(), //
+//                    text = if (cellData[idx] == 0) "" else cellData[idx].toString(), // do not display '0'++ on the score card
                     fontSize = SCORE_CARD_TEXT.sp,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(4.dp),
@@ -259,16 +269,16 @@ fun DisplayPlayerScoreCardCell(
         for (idx in startingCell until endingCell) {    // player score card loop
             val playerStokeHoleColor =
                 scoreCardViewModel.getStokeOnHolePlayerColor( //determine the stokes a player gets on hole by the color
-                    playerHeading.mHdcp, idx
+                    playerHeading.mDisplayScore[idx]
                 )
 
             val playerScoreColor =
                 scoreCardViewModel.getPlayerScoreColorForHole(   //check for a birdie and turn the score red.
-                    playerHeading.mScore[idx],
+                    playerHeading.mDisplayScore[idx],
                     parForTheHoles[idx]
                 )
             val teamScoreColor =
-                scoreCardViewModel.getTeamColorForHole(playerHeading.mScore[idx]) // did we use this score for the team game
+                scoreCardViewModel.getTeamColorForHole(playerHeading.mDisplayScore[idx]) // did we use this score for the team game
             Surface(
                 modifier = modifier.width(45.dp),
                 border = BorderStroke(Dp.Hairline, color = Color.Blue),
@@ -402,13 +412,4 @@ fun RightSidePanelButton(buttonText: String, butColor: Color, onClick: () -> Uni
     ) {
         Text(text = buttonText)
     }
-}
-
-sealed class ScoreCardActions {
-    data object ButtonEnterScore : ScoreCardActions()
-    data object Prev : ScoreCardActions()
-    data object Next : ScoreCardActions()
-    data object ScreenMode : ScoreCardActions()
-    data object SetDialogCurrentPlayer : ScoreCardActions()
-    data object FlipFrontBackNine : ScoreCardActions()
 }
