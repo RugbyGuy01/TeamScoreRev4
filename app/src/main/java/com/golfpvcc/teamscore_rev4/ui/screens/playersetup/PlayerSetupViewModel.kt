@@ -12,6 +12,7 @@ import com.golfpvcc.teamscore_rev4.database.model.CourseRecord
 
 import com.golfpvcc.teamscore_rev4.database.model.PlayerRecord
 import com.golfpvcc.teamscore_rev4.database.model.ScoreCardRecord
+import com.golfpvcc.teamscore_rev4.utils.BACK_NINE_TOTAL_DISPLAYED
 import com.golfpvcc.teamscore_rev4.utils.Constants
 import com.golfpvcc.teamscore_rev4.utils.Constants.DISPLAY_SCORE_CARD_SCREEN
 import com.golfpvcc.teamscore_rev4.utils.Constants.MINIMUM_LEN_OF_PLAYER_NAME
@@ -53,7 +54,10 @@ class PlayerSetupViewModel(
         if (checkScoreCardRecord) {
             scoreCardRecord = scoreCardDao.getScoreCardRecord(SCORE_CARD_REC_ID)
             state = state.copy(mTee = scoreCardRecord.mTee)
-            state = state.copy(mStartingHole = "1")  // User can change this hole number
+            state = if (scoreCardRecord.mCurrentHole == BACK_NINE_TOTAL_DISPLAYED)   // user finished round
+                state.copy(mStartingHole = "1")  // User can change this hole number
+            else
+                state.copy(mStartingHole = (scoreCardRecord.mCurrentHole + 1).toString())  // User can change this hole number
         } else {
             Log.d("VIN", "scoreCardDao - record not found")
             vinScoreCardRecordUpdate()

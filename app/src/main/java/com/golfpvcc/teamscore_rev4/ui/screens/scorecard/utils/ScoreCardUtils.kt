@@ -123,7 +123,7 @@ fun DisplayScoreCardHeader(
                 for (idx in hdcpParHoleHeading.indices) {       // indices = 3
                     if (hdcpParHoleHeading[idx].vinTag == PAR_HEADER) { // the score card par row - show the total for par
                         hdcpParHoleHeading[idx].mTotal =
-                            scoreCardViewModel.getTotalForNineCell(hdcpParHoleHeading[idx].mHole)
+                            scoreCardViewModel.getTotalForNineCell(hdcpParHoleHeading[idx].mHole, false)
                     }
 
                     DisplayRowHeadingOnClick(
@@ -167,7 +167,7 @@ fun DisplayScoreCardNames(
                 modifier = Modifier.width(COLUMN_TOTAL_WIDTH.dp)
                 for (idx in playerHeading.indices) {
                     playerHeading[idx].mTotal =
-                        scoreCardViewModel.getTotalForNineCell(playerHeading[idx].mDisplayScore)
+                        scoreCardViewModel.getTotalForNineCell(playerHeading[idx].mDisplayScore, true)
                     DisplayRowHeading(playerHeading[idx].mTotal, modifier, Color(VIN_LIGHT_GRAY))
                 }
             }
@@ -205,7 +205,7 @@ fun DisplayScoreCardTeams(
                 modifier = Modifier.width(COLUMN_TOTAL_WIDTH.dp)
                 for (idx in teamUsedHeading.indices) {
                     teamUsedHeading[idx].mTotal =       // Calculate "Team" and "Used" score totals
-                        scoreCardViewModel.getTotalForNineCell(teamUsedHeading[idx].mHole)
+                        scoreCardViewModel.getTotalForNineCell(teamUsedHeading[idx].mHole, false)
                     Log.d("VIN", "Calculate Team and Used score totals Idx $idx - ${teamUsedHeading[idx].mTotal}")
                     DisplayRowHeading(teamUsedHeading[idx].mTotal, modifier, Color(VIN_LIGHT_GRAY))
                 }

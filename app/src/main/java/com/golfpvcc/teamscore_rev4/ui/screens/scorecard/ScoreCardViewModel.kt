@@ -204,10 +204,10 @@ open class ScoreCardViewModel() : ViewModel() {
         return setBoardColorForPlayerTeamScore(playerScore)
     }
 
-    fun getTotalForNineCell(holes: IntArray): String {
+    fun getTotalForNineCell(holes: IntArray, useMask:Boolean): String {
         val startingCell: Int = getStartingHole()
         val endingCell: Int = getEndingHole()
-        val totalScoreStr = totalScore(holes, startingCell, endingCell)    // helper functions file
+        val totalScoreStr = totalScore(holes, startingCell, endingCell, useMask)    // helper functions file
 
         return (totalScoreStr)
     }

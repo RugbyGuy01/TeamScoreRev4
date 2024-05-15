@@ -59,11 +59,14 @@ fun updateNetAndGrossScoreCells(
 }
 
 
-fun totalScore(holes: IntArray, mStartingCell: Int, mEndingCell: Int): String {
+fun totalScore(holes: IntArray, mStartingCell: Int, mEndingCell: Int, useMask:Boolean): String {
     var mTotal: Int = 0
     for (idx in mStartingCell until mEndingCell) {
         Log.d("VIN", "totalScore hole value ${holes[idx]} ")
-        mTotal += (holes[idx] and JUST_RAW_SCORE)
+        if(useMask)
+            mTotal += (holes[idx] and JUST_RAW_SCORE)   // player's score cells also include strokes
+        else
+            mTotal += holes[idx]
     }
     Log.d("VIN", "getTotalForNineCell sum $mTotal")
 //    return if (mTotal == 0) " " else mTotal.toString()
