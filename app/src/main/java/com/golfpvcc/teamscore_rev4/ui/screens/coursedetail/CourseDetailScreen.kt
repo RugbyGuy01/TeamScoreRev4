@@ -23,7 +23,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -66,14 +66,14 @@ fun CourseDetailScreen(
         factory = CoursesViewModel.CoursesViewModelFactor()
     )
 
-    val recDetail = remember { CourseDetailViewModel() }
+    val courseDetailViewModel = remember { CourseDetailViewModel() }
     val saveButtonState = remember { mutableStateOf(USER_TEXT_SAVE) }
     val activity = LocalContext.current as Activity
     activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
     GetCourseRecord(
         courseViewModel,
-        recDetail,
+        courseDetailViewModel,
         courseID,
         saveButtonState,
     )
@@ -89,25 +89,25 @@ fun CourseDetailScreen(
             ) {
                 Row {
 
-                    GetCourseName(recDetail)
-                    DisplayFlipHdcpsButtons(recDetail)
+                    GetCourseName(courseDetailViewModel)
+                    DisplayFlipHdcpsButtons(courseDetailViewModel)
                 }
                 Spacer(modifier = Modifier.size(12.dp))
-                Divider(color = Color.Blue, thickness = 1.dp)
+                HorizontalDivider(thickness = 1.dp, color = Color.Blue)
                 Spacer(modifier = Modifier.size(12.dp))
                 ShowHoleDetailsList(
                     modifier = Modifier.weight(1f),
-                    recDetail,
+                    courseDetailViewModel,
                 )
                 Spacer(modifier = Modifier.size(12.dp))
-                Divider(color = Color.Blue, thickness = 1.dp)
+                HorizontalDivider(thickness = 1.dp, color = Color.Blue)
                 Spacer(modifier = Modifier.size(12.dp))
-                DisplaySaveCancelButtons(saveButtonState)
+                DisplaySaveCancelButtons(saveButtonState, courseDetailViewModel.state.mEnableSaveButton)
                 SaveCourseRecord(
                     navController,
                     saveButtonState,
                     courseViewModel,
-                    recDetail,
+                    courseDetailViewModel,
                 )
             }
         }
@@ -140,6 +140,7 @@ fun GetCourseRecord(
                 if (courseRec.value.mId == 0) USER_TEXT_SAVE else USER_TEXT_UPDATE
 
             recDetail.setHandicapAvailable()
+            recDetail.checkForAvailableHandicaps()  // enable/disable the course save button
         }
     }
 }
@@ -147,6 +148,7 @@ fun GetCourseRecord(
 @Composable
 fun DisplaySaveCancelButtons(
     saveButtonState: MutableState<Int>,
+    enableSaveButton:Boolean
 ) {
 
     Row(
@@ -162,10 +164,12 @@ fun DisplaySaveCancelButtons(
         ) {
             Text(text = "Cancel")
         }
+
         Button(
             onClick = {
                 saveButtonState.value = USER_SAVE
             },
+            enabled = enableSaveButton,
             modifier = Modifier
                 .height(40.dp),  //vpg
         ) {

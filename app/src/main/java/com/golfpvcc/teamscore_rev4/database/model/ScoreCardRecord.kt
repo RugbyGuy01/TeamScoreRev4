@@ -7,10 +7,11 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "ScoreCardRecord")
 data class ScoreCardRecord(
     val mCourseName: String,    // current course name from the course list dtabase
-    val mTee : String,                   // the tee's played or the course yardage
-    val mCurrentHole: Int = 0,      // the current hole being played in the game
+    val mTee : String,           // the tee's played or the course yardage
+    val mCurrentHole: Int = 0,   // the current hole being played in the game
+    val mCourseId:Int = 0,      // the current course we are using for the score card
     val mPar: IntArray,         // the current course Par
     val mHandicap: IntArray,       // current course handicap
     @PrimaryKey
-    val scoreCardRecId: Int?,    // score card record ID
+    val mScoreCardRecId: Int?,    // score card record ID
 )

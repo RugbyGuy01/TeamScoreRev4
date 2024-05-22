@@ -13,28 +13,26 @@ import com.golfpvcc.teamscore_rev4.ui.screens.playersetup.PlayerSetupScreen
 
 fun NavGraphBuilder.teamConfiguration(navController: NavHostController) {
     navigation(
-        startDestination = TeamScoreScreen.Courses.route,
+        startDestination = TeamScoreScreen.ScreenCourses.route,
         route = ROUTE_CONFIGURATION
     ) {
-        composable(route = TeamScoreScreen.Courses.route) {
-//                val viewModel = it.sharedViewModel<ScreensViewModel>(navHostController)
+        composable(route = TeamScoreScreen.ScreenCourses.route) {
             CoursesScreen(navController)
         }
 
-        composable(route = TeamScoreScreen.DetailCourse.route,
+        composable(route = TeamScoreScreen.ScreenDetailCourse.route,
             arguments = listOf(
                 navArgument(name = "id") {
                     type = NavType.IntType
                     defaultValue = -1
                 }
             )) { id ->
-            Log.d("VIN", "SetupNavGraph CourseDetail $id")
             CourseDetailScreen(
                 navController, id.arguments?.getInt("id")
             )
         }
 
-        composable(route = TeamScoreScreen.PlayerSetup.route,
+        composable(route = TeamScoreScreen.ScreenPlayerSetup.route,
             arguments = listOf(
                 navArgument(name = "id") {
                     type = NavType.IntType

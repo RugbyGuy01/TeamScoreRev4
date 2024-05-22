@@ -43,7 +43,8 @@ fun SaveCourseRecord(
                     mId = recDetail.state.mId,
                     mCoursename = recDetail.state.mCoursename,
                     mHandicap = recDetail.state.mHandicap,
-                    mPar = recDetail.state.mPar
+                    mPar = recDetail.state.mPar,
+                    mNotes = recDetail.state.mNotes
                 )
             )
         navController.popBackStack()

@@ -8,8 +8,8 @@ data class ScoreCardWithPlayers(
     val scoreCardRecord: ScoreCardRecord,
 
     @Relation(
-        parentColumn = "scoreCardRecId",   // ties the score card record
-        entityColumn = "scoreCardRecFk"    //Link to score card
+        parentColumn = "mScoreCardRecId",   // ties the score card record
+        entityColumn = "mScoreCardRecFk"    //Link to score card
     )
-    val playerRecords: List<PlayerRecord>
+    val playerRecords: List<PlayerRecord>   // returns
 )

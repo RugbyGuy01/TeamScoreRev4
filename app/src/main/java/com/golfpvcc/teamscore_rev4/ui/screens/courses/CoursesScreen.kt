@@ -169,7 +169,7 @@ fun CourseItem(
             .clickable {
                 if (0 < course.mId) {
                     Log.d("VIN:", "CourseItem onItemClick navigate to Player Setup")
-                    navController.navigate(route = TeamScoreScreen.PlayerSetup.passId(course.mId))
+                    navController.navigate(route = TeamScoreScreen.ScreenPlayerSetup.passId(course.mId))
                 }
             }
 
@@ -191,7 +191,7 @@ fun CourseItem(
                 onClick = {
                     Log.d("VIN", "CourseDetail?id={${course.mId}}")
                     if (course.mId != 0) {
-                        navController.navigate(route = TeamScoreScreen.DetailCourse.passId(course.mId))  // goto detail screen
+                        navController.navigate(route = TeamScoreScreen.ScreenDetailCourse.passId(course.mId))  // goto detail screen
                     }
                 }
             ) {
