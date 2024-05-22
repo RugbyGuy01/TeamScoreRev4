@@ -54,10 +54,11 @@ class PlayerSetupViewModel(
         if (checkScoreCardRecord) {
             scoreCardRecord = scoreCardDao.getScoreCardRecord(SCORE_CARD_REC_ID)
             state = state.copy(mTee = scoreCardRecord.mTee)
-            state = if (scoreCardRecord.mCurrentHole == BACK_NINE_TOTAL_DISPLAYED)   // user finished round
-                state.copy(mStartingHole = "1")  // User can change this hole number
-            else
-                state.copy(mStartingHole = (scoreCardRecord.mCurrentHole + 1).toString())  // User can change this hole number
+            state =
+                if (scoreCardRecord.mCurrentHole == BACK_NINE_TOTAL_DISPLAYED)   // user finished round
+                    state.copy(mStartingHole = "1")  // User can change this hole number
+                else
+                    state.copy(mStartingHole = (scoreCardRecord.mCurrentHole + 1).toString())  // User can change this hole number
         } else {
             Log.d("VIN", "scoreCardDao - record not found")
             vinScoreCardRecordUpdate()
@@ -182,9 +183,10 @@ class PlayerSetupViewModel(
     private fun deleteAllPlayerRecords() {
         playerDao.deleteAllPlayersRecord()
         val zeroArray: IntArray = IntArray(18) { 0 }
-
+        state = state.copy(mStartingHole = "1")
         for (player in state.mPlayerRecords) {
             zeroArray.copyInto(player.mScore)
+            zeroArray.copyInto(player.mTeamHole)
         }
     }
 
@@ -201,6 +203,7 @@ class PlayerSetupViewModel(
                     player.mName,
                     player.mHandicap,
                     player.mScore,
+                    player.mTeamHole,
                     Constants.SCORE_CARD_REC_ID,
                     mId = count
                 )

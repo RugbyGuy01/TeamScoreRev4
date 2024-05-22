@@ -1,9 +1,11 @@
 package com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils
 
+import com.golfpvcc.teamscore_rev4.utils.DOUBLE_TEAM_SCORE
 import com.golfpvcc.teamscore_rev4.utils.PLAYER_STROKES_0
 import com.golfpvcc.teamscore_rev4.utils.PLAYER_STROKES_1
 import com.golfpvcc.teamscore_rev4.utils.PLAYER_STROKES_2
 import com.golfpvcc.teamscore_rev4.utils.PLAYER_STROKES_3
+import com.golfpvcc.teamscore_rev4.utils.TEAM_NET_SCORE
 
 
 const val HDCP_HEADER: Int = 100
@@ -21,6 +23,9 @@ const val DISPLAY_MODE_POINT_QUOTA: Int = 129
 const val DISPLAY_MODE_9_GAME: Int = 130
 const val DISPLAY_MODE_STABLEFORD: Int = 131
 
+/*
+      This function will be used to classify the player's score for the hole. how did the user classify the player's score Gross or net
+       */
 
 fun changeDisplayScreenMode(currentScreenMode: Int): Int {
     var newScreenMode: Int = DISPLAY_MODE_GROSS

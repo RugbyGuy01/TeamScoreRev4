@@ -34,19 +34,16 @@ const val BACK_NINE_TOTAL_DISPLAYED = 17      //zero base, user is one the 18 ni
 const val FRONT_NINE_IS_DISPLAYED = true      //zero base, user is one the 18 nine hole
 const val BACK_NINE_IS_DISPLAYED = false      //zero base, user is one the 18 nine hole
 
-const val TEAM_CLEAR_SCORE = 0x0F
-const val TEAM_GROSS_SCORE = 0x10
-const val TEAM_NET_SCORE = 0x20
-const val DOUBLE_TEAM_SCORE = 0x40
+const val TEAM_CLEAR_SCORE = 0
+const val TEAM_GROSS_SCORE = 1
+const val TEAM_NET_SCORE = 2
+const val DOUBLE_TEAM_SCORE = 3
 // const val BIT_NOT_USED = 0x80
-const val TEAM_SCORE_MASK = 0x70
-const val JUST_RAW_SCORE = 0x0F
 // handicap masks
-const val PLAYER_HDCP = 0x00f00
-const val PLAYER_STROKES_0 = 0x00000
-const val PLAYER_STROKES_1 = 0x00100
-const val PLAYER_STROKES_2 = 0x00200
-const val PLAYER_STROKES_3 = 0x00300
+const val PLAYER_STROKES_0 = 0
+const val PLAYER_STROKES_1 = 1
+const val PLAYER_STROKES_2 = 2
+const val PLAYER_STROKES_3 = 3
 
 object Constants {
     const val SCORE_CARD_REC_ID = 2024

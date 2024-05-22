@@ -23,7 +23,6 @@ import com.golfpvcc.teamscore_rev4.utils.TEAM_DOUBLE_GROSS_SCORE
 import com.golfpvcc.teamscore_rev4.utils.TEAM_DOUBLE_NET_SCORE
 import com.golfpvcc.teamscore_rev4.utils.TEAM_GROSS_SCORE
 import com.golfpvcc.teamscore_rev4.utils.TEAM_NET_SCORE
-import com.golfpvcc.teamscore_rev4.utils.TEAM_SCORE_MASK
 import com.golfpvcc.teamscore_rev4.utils.TEAM_SINGLE_GROSS_SCORE
 import com.golfpvcc.teamscore_rev4.utils.TEAM_SINGLE_NET_SCORE
 
@@ -83,11 +82,9 @@ fun DialogCard(
     }
 }
 
-fun getTeamButtonColor(score: Int): Color {
+fun getTeamButtonColor(teamHoleMask: Int): Color {
     var resultColor: Color
-    var teamHoleMask: Int
 
-    teamHoleMask = score and TEAM_SCORE_MASK
     when (teamHoleMask) {
         TEAM_GROSS_SCORE -> {
             resultColor = Color(TEAM_SINGLE_GROSS_SCORE)
@@ -112,12 +109,10 @@ fun getTeamButtonColor(score: Int): Color {
     return resultColor
 }
 
-fun teamScoreTypeNet(score: Int): Boolean {        // return True if the score is a net score else false for a gross score
+fun teamScoreTypeNet(teamHoleMask: Int): Boolean {        // return True if the score is a net score else false for a gross score
 
-    var teamHoleMask: Int = score and TEAM_SCORE_MASK
-
-    val grossSingle: Boolean = (teamHoleMask and TEAM_GROSS_SCORE == 0)
-    val grossDouble: Boolean = (teamHoleMask and (TEAM_GROSS_SCORE + DOUBLE_TEAM_SCORE) == 0)
+    val grossSingle: Boolean = (teamHoleMask == TEAM_GROSS_SCORE)
+    val grossDouble: Boolean = (teamHoleMask == (TEAM_GROSS_SCORE + DOUBLE_TEAM_SCORE))
 
     return if (grossSingle or grossDouble) (true) else (false)
 }

@@ -123,7 +123,7 @@ fun DisplayScoreCardHeader(
                 for (idx in hdcpParHoleHeading.indices) {       // indices = 3
                     if (hdcpParHoleHeading[idx].vinTag == PAR_HEADER) { // the score card par row - show the total for par
                         hdcpParHoleHeading[idx].mTotal =
-                            scoreCardViewModel.getTotalForNineCell(hdcpParHoleHeading[idx].mHole, false)
+                            scoreCardViewModel.getTotalForNineCell(hdcpParHoleHeading[idx].mHole)
                     }
 
                     DisplayRowHeadingOnClick(
@@ -167,7 +167,7 @@ fun DisplayScoreCardNames(
                 modifier = Modifier.width(COLUMN_TOTAL_WIDTH.dp)
                 for (idx in playerHeading.indices) {
                     playerHeading[idx].mTotal =
-                        scoreCardViewModel.getTotalForNineCell(playerHeading[idx].mDisplayScore, true)
+                        scoreCardViewModel.getTotalForNineCell(playerHeading[idx].mScore)
                     DisplayRowHeading(playerHeading[idx].mTotal, modifier, Color(VIN_LIGHT_GRAY))
                 }
             }
@@ -205,7 +205,7 @@ fun DisplayScoreCardTeams(
                 modifier = Modifier.width(COLUMN_TOTAL_WIDTH.dp)
                 for (idx in teamUsedHeading.indices) {
                     teamUsedHeading[idx].mTotal =       // Calculate "Team" and "Used" score totals
-                        scoreCardViewModel.getTotalForNineCell(teamUsedHeading[idx].mHole, false)
+                        scoreCardViewModel.getTotalForNineCell(teamUsedHeading[idx].mHole)
                     Log.d("VIN", "Calculate Team and Used score totals Idx $idx - ${teamUsedHeading[idx].mTotal}")
                     DisplayRowHeading(teamUsedHeading[idx].mTotal, modifier, Color(VIN_LIGHT_GRAY))
                 }
@@ -235,7 +235,6 @@ fun DisplayScoreCardCell(
 
                 Text(
                     text = cellData[idx].toString(), //
-//                    text = if (cellData[idx] == 0) "" else cellData[idx].toString(), // do not display '0'++ on the score card
                     fontSize = SCORE_CARD_TEXT.sp,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(4.dp),
@@ -269,16 +268,16 @@ fun DisplayPlayerScoreCardCell(
         for (idx in startingCell until endingCell) {    // player score card loop
             val playerStokeHoleColor =
                 scoreCardViewModel.getStokeOnHolePlayerColor( //determine the stokes a player gets on hole by the color
-                    playerHeading.mDisplayScore[idx]
+                    playerHeading.mStokeHole[idx]
                 )
 
             val playerScoreColor =
                 scoreCardViewModel.getPlayerScoreColorForHole(   //check for a birdie and turn the score red.
-                    playerHeading.mDisplayScore[idx],
+                    playerHeading.mScore[idx],
                     parForTheHoles[idx]
                 )
             val teamScoreColor =
-                scoreCardViewModel.getTeamColorForHole(playerHeading.mDisplayScore[idx]) // did we use this score for the team game
+                scoreCardViewModel.getTeamColorForHole(playerHeading.mTeamHole[idx]) // did we use this score for the team game
             Surface(
                 modifier = modifier.width(45.dp),
                 border = BorderStroke(Dp.Hairline, color = Color.Blue),

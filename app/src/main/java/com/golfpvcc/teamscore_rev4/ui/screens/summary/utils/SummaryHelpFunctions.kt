@@ -5,10 +5,9 @@ import com.golfpvcc.teamscore_rev4.database.model.ScoreCardRecord
 import com.golfpvcc.teamscore_rev4.database.model.ScoreCardWithPlayers
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.HdcpParHoleHeading
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.PlayerHeading
-import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.ScoreCardViewModel
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.HDCP_HEADER
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.PAR_HEADER
-import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.updateNetAndGrossScoreCells
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.updatePlayersTeamScoreCells
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.SummaryViewModel
 
 
@@ -27,25 +26,26 @@ fun SummaryViewModel.updateScoreCardState(scoreCardWithPlayers: ScoreCardWithPla
         parCell.mHole = scoreCardRecord.mPar
         hdcpCell.mHole = scoreCardRecord.mHandicap
     }
-
+    val nineGames = scoreCardWithPlayers.playerRecords.size == 3
     for (idx in scoreCardWithPlayers.playerRecords.indices) { // player name and handicap
         state.playerHeading += PlayerHeading(
             idx,
             mName = scoreCardWithPlayers.playerRecords[idx].mName,
             mHdcp = scoreCardWithPlayers.playerRecords[idx].mHandicap,
-            mScore = scoreCardWithPlayers.playerRecords[idx].mScore
+            mScore = scoreCardWithPlayers.playerRecords[idx].mScore,
+            mTeamHole = scoreCardWithPlayers.playerRecords[idx].mTeamHole,
+            mGameNines = nineGames
         ) // add the player's name to the score card
     }
-    if (parCell != null) {
-        for (currentHole in parCell.mHole.indices) {
-            updateNetAndGrossScoreCells(        // fill in the team used and score fields
-                state.hdcpParHoleHeading,
-                currentHole,
-                state.teamUsedHeading,
-                state.playerHeading
-            )
-        }
-    }
+//    if (parCell != null) {
+//        for (currentHole in parCell.mHole.indices) {
+//            updatePlayersTeamScoreCells(        // fill in the team used and score fields
+//                currentHole,
+//                state.teamUsedHeading,
+//                state.playerHeading
+//            )
+//        }
+//    }
 
 
 }

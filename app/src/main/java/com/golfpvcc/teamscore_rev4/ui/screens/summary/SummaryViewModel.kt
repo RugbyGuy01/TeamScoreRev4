@@ -38,11 +38,11 @@ open class SummaryViewModel() : ViewModel() {
 
 
     fun getScoreCardAndPlayerRecord() {
-        val scoreCardWithPlayers: List<ScoreCardWithPlayers> =
+        val scoreCardWithPlayers: ScoreCardWithPlayers =
             scoreCardDao.getScoreRecordWithPlayers(Constants.SCORE_CARD_REC_ID)
 
-        if (scoreCardWithPlayers.isNotEmpty()) {     // found score record with players
-            updateScoreCardState(scoreCardWithPlayers[0])       // located in helper function file
+        if (scoreCardWithPlayers != null) {     // found score record with players
+            updateScoreCardState(scoreCardWithPlayers)       // located in helper function file
         } else
             Log.d("VIN1", "getScoreCardAndPlayerRecord is empty")
     }

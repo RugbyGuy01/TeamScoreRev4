@@ -13,16 +13,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.PlayerHeading
 import com.golfpvcc.teamscore_rev4.utils.Constants
 import com.golfpvcc.teamscore_rev4.utils.DOUBLE_TEAM_SCORE
-import com.golfpvcc.teamscore_rev4.utils.JUST_RAW_SCORE
-import com.golfpvcc.teamscore_rev4.utils.PLAYER_HDCP
 import com.golfpvcc.teamscore_rev4.utils.PLAYER_STROKES_1
 import com.golfpvcc.teamscore_rev4.utils.PLAYER_STROKES_2
 import com.golfpvcc.teamscore_rev4.utils.PLAYER_STROKES_3
 import com.golfpvcc.teamscore_rev4.utils.TEAM_GROSS_SCORE
 import com.golfpvcc.teamscore_rev4.utils.TEAM_NET_SCORE
-import com.golfpvcc.teamscore_rev4.utils.TEAM_SCORE_MASK
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -43,29 +41,34 @@ fun CardButton(buttonText: String,  onClick: () -> Unit) {
         )
     }
 }
+/*
+                team Score              Used Score
+gross Score     gross - Par             Count
+Net Score       gross - strokes         Count
+Stableford      net score               add flagged pts
+                table Lookup
+Pt Quote        gross score             add flagged pts
+                table Lookup
 
-//test.mDisplayScore[2] = test.mDisplayScore[2] or (PLAYER_HDCP and PLAYER_STROKES_0)
-//test.mDisplayScore[2] = test.mDisplayScore[2] or (TEAM_SCORE_MASK and TEAM_NET_SCORE)
-fun teamScore(playerScore:Int): Int {
+ */
+
+fun getTeamScore(grossScore:Int, strokes: Int, teamScoreMask:Int): Int {
     val teamScoreResults:Int
-    val score = playerScore and JUST_RAW_SCORE
-    val teamScoreMask = playerScore and TEAM_SCORE_MASK
-    val strokes = playerStokes(playerScore)
 
     when (teamScoreMask) {
         TEAM_GROSS_SCORE -> {
-            teamScoreResults = score
+            teamScoreResults = grossScore
         }
 
         TEAM_NET_SCORE -> {
-            teamScoreResults = score - strokes
+            teamScoreResults = grossScore - strokes
         }
 
         TEAM_GROSS_SCORE + DOUBLE_TEAM_SCORE -> {
-            teamScoreResults = score * 2
+            teamScoreResults = grossScore * 2
         }
         TEAM_NET_SCORE + DOUBLE_TEAM_SCORE -> {
-            teamScoreResults = (score - strokes) * 2
+            teamScoreResults = (grossScore - strokes) * 2
         }
 
         else -> {
@@ -76,9 +79,8 @@ fun teamScore(playerScore:Int): Int {
 }
 fun playerStokes(playerStrokes: Int): Int {
     val strokeResult:Int
-    val strokes = playerStrokes and PLAYER_HDCP
 
-    when (strokes) {
+    when (playerStrokes) {
         PLAYER_STROKES_1 -> {
             strokeResult = 1
         }

@@ -105,7 +105,7 @@ fun EnterPlayersScores(
                                     val backgroundColorForStokes: Color =
                                         scoreCardViewModel.getHighLiteActivePlayerColor(idx)
                                     val playerHoleScore =
-                                        scoreCardViewModel.getPlayerHoleScore(idx, currentHole)
+                                        scoreCardViewModel.getDialogPlayerHoleScore(idx, currentHole)
 
                                     DisplayPlayerNames(
                                         playerName,
