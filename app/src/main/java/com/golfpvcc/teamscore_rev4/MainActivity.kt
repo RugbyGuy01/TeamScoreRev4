@@ -9,14 +9,15 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.golfpvcc.teamscore_rev4.ui.navigation.SetupNavGraph
 import com.golfpvcc.teamscore_rev4.ui.theme.TeamScore_Rev4Theme
+import com.golfpvcc.teamscore_rev4.utils.createPointTableRecords
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,15 +29,14 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    TeamScoreAppl()
+                    TeamScoreApp()
                 }
             }
         }
     }
     @Composable
-    fun TeamScoreAppl(){
+    fun TeamScoreApp(){
         lateinit var navHostController : NavHostController
-
         navHostController = rememberNavController()
         SetupNavGraph(navHostController)
     }

@@ -153,12 +153,12 @@ fun DisplayScoreCardNames(
                 }
             }
             Column {
-                val holeHdcps = scoreCardViewModel.getHoleHdcps()
+                val holeHdcpCells = scoreCardViewModel.getHoleHdcpCells()
                 for (idx in playerHeading.indices) {        // here's the score card player's loop of scores
                     DisplayPlayerScoreCardCell(
                         Modifier,
                         playerHeading[idx],
-                        holeHdcps,      // the course handicap for the holes
+                        holeHdcpCells,      // the course handicap for the holes
                         scoreCardViewModel
                     )
                 }
@@ -273,7 +273,7 @@ fun DisplayPlayerScoreCardCell(
 
             val playerScoreColor =
                 scoreCardViewModel.getPlayerScoreColorForHole(   //check for a birdie and turn the score red.
-                    playerHeading.mScore[idx],
+                    playerHeading.mDisplayScore[idx],
                     parForTheHoles[idx]
                 )
             val teamScoreColor =

@@ -5,18 +5,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import com.golfpvcc.teamscore_rev4.database.model.CourseRecord
 
+
 const val VIN_LIGHT_GRAY = 0xFFE0E0E0
 const val DISPLAY_HOLE_NUMBER = 0xFF48EFF0
 const val YELLOW_GETS_1_STROKES = 0xFFFFFBBB
 const val ORANGE_GETS_2_STROKES = 0xFFFFE4C5
-const val RED_ONE_UNDER_PAR = 0xFFF53526
-const val PURPLE_TWO_UNDER_PAR = 0xFFDC0DFF
+const val RED_ONE_UNDER_PAR    = 0xFFF53526
+const val PURPLE_TWO_UNDER_PAR = 0xFF3633F6
 
 const val COLOR_NEXT_HOLE = 0xFF5BC23F
 const val COLOR_PREV_HOLE = 0xFFAB3654
 const val COLOR_SCREEN_MODE = 0xFF8389C2
 
-
+// Colors
 const val TEAM_SINGLE_NET_SCORE = 0xFF1BD914
 const val TEAM_SINGLE_GROSS_SCORE = 0xFF12B8D9
 const val TEAM_DOUBLE_NET_SCORE = 0xFF12910D
@@ -38,6 +39,7 @@ const val TEAM_CLEAR_SCORE = 0
 const val TEAM_GROSS_SCORE = 1
 const val TEAM_NET_SCORE = 2
 const val DOUBLE_TEAM_SCORE = 3
+const val DOUBLE_TEAM_MASK = TEAM_NET_SCORE
 // const val BIT_NOT_USED = 0x80
 // handicap masks
 const val PLAYER_STROKES_0 = 0

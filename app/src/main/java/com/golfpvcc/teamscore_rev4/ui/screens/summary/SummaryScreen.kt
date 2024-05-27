@@ -74,6 +74,7 @@ fun GetScoreCardRecord(
     LaunchedEffect(true) {
         scope.launch(Dispatchers.IO) {
             summaryViewModel.getScoreCardAndPlayerRecord()
+            summaryViewModel.checkPointRecords()
         }
     }
 }

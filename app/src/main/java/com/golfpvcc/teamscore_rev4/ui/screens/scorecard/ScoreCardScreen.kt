@@ -49,9 +49,6 @@ fun ScoreCardScreen(
     )
     GetScoreCardRecord(scoreCardViewModel)
 
-      
-
-
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.primary) {
         Scaffold()
         {

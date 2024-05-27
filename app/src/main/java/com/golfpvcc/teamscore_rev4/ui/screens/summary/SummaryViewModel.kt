@@ -1,6 +1,7 @@
 package com.golfpvcc.teamscore_rev4.ui.screens.summary
 
 import android.util.Log
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -22,6 +23,7 @@ import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.TEAM_HEADER
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.USED_HEADER
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.updateScoreCardState
 import com.golfpvcc.teamscore_rev4.utils.Constants
+import com.golfpvcc.teamscore_rev4.utils.createPointTableRecords
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -47,12 +49,15 @@ open class SummaryViewModel() : ViewModel() {
             Log.d("VIN1", "getScoreCardAndPlayerRecord is empty")
     }
 
+    suspend fun checkPointRecords() {
+        createPointTableRecords()
+    }
 }
 
 data class Summary(
     val mCourseName: String = "",    // current course name from the course list database
     val mTee: String = "",                   // the tee's played or the course yardage
-    val mCourseId:Int = 0,      // the current course we are using for the score card
+    val mCourseId: Int = 0,      // the current course we are using for the score card
     val hdcpParHoleHeading: List<HdcpParHoleHeading> = listOf(
         HdcpParHoleHeading(HDCP_HEADER, "HdCp"),
         HdcpParHoleHeading(PAR_HEADER, "Par"),

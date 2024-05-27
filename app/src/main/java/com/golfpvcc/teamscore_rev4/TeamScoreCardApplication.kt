@@ -7,6 +7,7 @@ import androidx.room.Room
 import com.golfpvcc.teamscore_rev4.utils.Constants.DATABASE_NAME
 import com.golfpvcc.teamscore_rev4.database.dao.CourseDao
 import com.golfpvcc.teamscore_rev4.database.dao.PlayerDao
+import com.golfpvcc.teamscore_rev4.database.dao.PointsDao
 import com.golfpvcc.teamscore_rev4.database.dao.ScoreCardDao
 import com.golfpvcc.teamscore_rev4.database.room.TeamScoreDatabase
 
@@ -47,6 +48,9 @@ class TeamScoreCardApp : Application() {
             return instance!!.getDb().playerDao()
         }
 
+        fun getPointsDao(): PointsDao {
+            return instance!!.getDb().pointsDao()
+        }
     }
 
 }

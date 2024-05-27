@@ -26,6 +26,7 @@ import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.USED_HEADER
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.changeDisplayScreenMode
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.getTotalScore
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.highLiteTotalColumn
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.refreshScoreCard
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.screenModeText
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.setBoardColorForPlayerTeamScore
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.updatePlayersTeamScoreCells
@@ -49,6 +50,7 @@ import com.golfpvcc.teamscore_rev4.utils.TOTAL_18_HOLE
 import com.golfpvcc.teamscore_rev4.utils.VIN_LIGHT_GRAY
 import com.golfpvcc.teamscore_rev4.utils.DISPLAY_HOLE_NUMBER
 import com.golfpvcc.teamscore_rev4.utils.HOLE_ARRAY_SIZE
+import com.golfpvcc.teamscore_rev4.utils.TEAM_CLEAR_SCORE
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -74,8 +76,18 @@ open class ScoreCardViewModel() : ViewModel() {
                 updateScoreCardState(scoreCardWithPlayers)       // located in helper function file
             } else
                 Log.d("VIN1", "getScoreCardAndPlayerRecord is empty")
+
+//
+//            state.mGamePointsTable = setUpPointTable(pointRecord)
+//            Log.d("VIN1", "getScoreCardAndPlayerRecord pt")
         }
     }
+
+//    fun setUpPointTable(pointRec: String): List<PtTable> {
+//        val GamePointsTable:List<PtTable>  = emptyList<PtTable>()
+//
+//        return (GamePointsTable)
+//    }
 
     private fun savePlayersScoresRecord() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -95,21 +107,19 @@ open class ScoreCardViewModel() : ViewModel() {
     }
 
     private suspend fun saveScoreCardRecord() {
-        val coursePar = state.hdcpParHoleHeading.find { it.vinTag == PAR_HEADER }
-        val handicap = state.hdcpParHoleHeading.find { it.vinTag == HDCP_HEADER }
-        if (coursePar != null && handicap != null) {
-            val scoreCardRecord: ScoreCardRecord = ScoreCardRecord(
-                mCourseName = state.mCourseName,
-                mTee = state.mTee,
-                mCurrentHole = state.mCurrentHole,
-                mCourseId = state.mCourseId,
-                mPar = coursePar.mHole,
-                mHandicap = handicap.mHole,
-                mScoreCardRecId = SCORE_CARD_REC_ID
-            )
-            scoreCardDao.addUpdateScoreCardRecord(scoreCardRecord)
-        }
+        val hdcpCells = getHoleHdcpCells()
+        val parCells = getHoleParCells()
 
+        val scoreCardRecord: ScoreCardRecord = ScoreCardRecord(
+            mCourseName = state.mCourseName,
+            mTee = state.mTee,
+            mCurrentHole = state.mCurrentHole,
+            mCourseId = state.mCourseId,
+            mPar = parCells,
+            mHandicap = hdcpCells,
+            mScoreCardRecId = SCORE_CARD_REC_ID
+        )
+        scoreCardDao.addUpdateScoreCardRecord(scoreCardRecord)
     }
 
     fun scoreCardActions(action: ScoreCardActions) {
@@ -128,6 +138,8 @@ open class ScoreCardViewModel() : ViewModel() {
         Log.d("VIN", "before mDisplayScreenModeText  ${state.mDisplayScreenModeText}")
 
         state.mDisplayScreenMode = changeDisplayScreenMode(state.mDisplayScreenMode)
+        val parCells = getHoleParCells()
+        refreshScoreCard(parCells)
         state =
             state.copy(mButtonScreenNextText = screenModeText(state.mDisplayScreenMode))  // change the button text now
     }
@@ -146,22 +158,50 @@ open class ScoreCardViewModel() : ViewModel() {
         return (displayPlayerHoleScore)
     }
 
-    fun getHoleHdcps(): IntArray {
+    fun getTeamUsedCells(): IntArray {
+        val teamUsedCells =
+            state.teamUsedHeading.find { it.vinTag == USED_HEADER }
+        return if (teamUsedCells != null) {
+            (teamUsedCells.mHole)
+        } else
+            (IntArray(HOLE_ARRAY_SIZE) { 0 })
+    }
+
+    fun getTeamPlayerScoreCells(): IntArray {
+        val teamUsedCells =
+            state.teamUsedHeading.find { it.vinTag == TEAM_HEADER }
+        return if (teamUsedCells != null) {
+            (teamUsedCells.mHole)
+        } else
+            (IntArray(HOLE_ARRAY_SIZE) { 0 })
+    }
+
+    fun getHoleHdcpCells(): IntArray {
         val hdcpCell: HdcpParHoleHeading? =
             state.hdcpParHoleHeading.find { it.vinTag == HDCP_HEADER }
-        if (hdcpCell != null) {
-            return (hdcpCell.mHole)
+        return if (hdcpCell != null) {
+            (hdcpCell.mHole)
         } else
-            return (IntArray(HOLE_ARRAY_SIZE) { 0 })
+            (IntArray(HOLE_ARRAY_SIZE) { 0 })
     }
 
     fun getHoleHandicap(hole: Int): Int {
-        val hdcpCell: HdcpParHoleHeading? =
-            state.hdcpParHoleHeading.find { it.vinTag == HDCP_HEADER }
-        if (hdcpCell != null) {
-            return (hdcpCell.mHole[hole])
+        val hdcpCells = getHoleHdcpCells()
+        return (hdcpCells[hole])
+    }
+
+    fun getHoleParCells(): IntArray {
+        val parCell: HdcpParHoleHeading? =
+            state.hdcpParHoleHeading.find { it.vinTag == PAR_HEADER }
+        return if (parCell != null) {
+            (parCell.mHole)
         } else
-            return (0)
+            (IntArray(HOLE_ARRAY_SIZE) { 0 })
+    }
+
+    fun getParForHole(hole: Int): Int {
+        val parCells = getHoleParCells()
+        return (parCells[hole])
     }
 
     fun getStartingHole(): Int {    // true for front nine being displayed
@@ -195,17 +235,8 @@ open class ScoreCardViewModel() : ViewModel() {
             -1 -> backGroundColor = Color(RED_ONE_UNDER_PAR)
             -2 -> backGroundColor = Color(PURPLE_TWO_UNDER_PAR)
         }
+        Log.d("SCORE", "Score $score")
         return backGroundColor
-    }
-
-    fun getParForHole(holeIdx: Int): Int {
-        val parForHole = state.hdcpParHoleHeading.find { it.vinTag == PAR_HEADER }
-        var par: Int = 4
-        if (parForHole != null) {
-            par = parForHole.mHole[holeIdx]
-        }
-
-        return (par)
     }
 
     fun getTeamColorForHole(teamScore: Int): Color {
@@ -308,6 +339,7 @@ open class ScoreCardViewModel() : ViewModel() {
     fun displayHoleNote() { //  Dialog Enter player scores function are below
         Log.d("VIN", "displayHoleNotee")
     }
+
     fun getDialogPlayerHoleScore(
         playerIdx: Int,
         idx: Int,
@@ -339,6 +371,7 @@ open class ScoreCardViewModel() : ViewModel() {
         updatePlayersTeamScoreCells( // doneScoringDialog
             state.mDisplayScreenMode,
             state.mCurrentHole,
+            getParForHole(state.mCurrentHole),
             state.playerHeading
         )
         clearGrossAndNetButtons()   // clear the color button array
@@ -384,14 +417,16 @@ open class ScoreCardViewModel() : ViewModel() {
         teamScoreMask: Int,
     ) { //  Dialog Enter player scores function are below
         val currentHole = getCurrentHole()
+        var currentTeamMask = state.playerHeading[playerIdx].mTeamHole[currentHole]
 
         state.grossButtonColor[playerIdx] = Color.LightGray
         state.netButtonColor[playerIdx] = Color.LightGray
-        if (0 < teamScoreMask) {
+        state.playerHeading[playerIdx].mTeamHole[currentHole] = TEAM_CLEAR_SCORE
+        if (currentTeamMask != teamScoreMask) {     // disable the selection if equal
             getGrossButtonColor(playerIdx, teamScoreMask)
+            state.playerHeading[playerIdx].mTeamHole[currentHole] = teamScoreMask
         }
-        state.playerHeading[playerIdx].mTeamHole[currentHole] = teamScoreMask
-        Log.d("VIN", "setTeamScoreButtonColor mask $teamScoreMask")
+        repaintScreen()
     }
 
     private fun getGrossButtonColor(
@@ -406,7 +441,6 @@ open class ScoreCardViewModel() : ViewModel() {
             state.grossButtonColor[playerIdx] = Color.LightGray
             state.netButtonColor[playerIdx] = getTeamButtonColor(teamHoleMask)
         }
-        repaintScreen()
     }
 
     private fun clearGrossAndNetButtons() { //  Dialog Enter player scores function are below
@@ -454,15 +488,7 @@ open class ScoreCardViewModel() : ViewModel() {
 }
 
 data class ScoreCard(
-    val mGamePointsTable: Map<Int, Int> = mapOf(
-        -3 to 5,
-        -2 to 4,
-        -1 to 3,
-        0 to 2,
-        1 to 1,
-        2 to 0,
-        3 to -1
-    ),
+//    var mGamePointsTable: List<PtTable> = emptyList(),
     var mHasDatabaseBeenRead: Boolean = false,
     val grossButtonColor: Array<Color> = Array(4) { Color.LightGray },
     val netButtonColor: Array<Color> = Array(4) { Color.LightGray },
@@ -519,3 +545,4 @@ data class TeamUsedHeading(
     var mHole: IntArray = IntArray(HOLE_ARRAY_SIZE) { 0 },
     var mTotal: String = "",
 )
+
