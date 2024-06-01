@@ -34,18 +34,6 @@ fun SummaryViewModel.updateScoreCardState(scoreCardWithPlayers: ScoreCardWithPla
             mHdcp = scoreCardWithPlayers.playerRecords[idx].mHandicap,
             mScore = scoreCardWithPlayers.playerRecords[idx].mScore,
             mTeamHole = scoreCardWithPlayers.playerRecords[idx].mTeamHole,
-            mGameNines = nineGames
         ) // add the player's name to the score card
     }
-//    if (parCell != null) {
-//        for (currentHole in parCell.mHole.indices) {
-//            updatePlayersTeamScoreCells(        // fill in the team used and score fields
-//                currentHole,
-//                state.teamUsedHeading,
-//                state.playerHeading
-//            )
-//        }
-//    }
-
-
 }

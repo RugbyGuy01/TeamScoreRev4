@@ -23,7 +23,8 @@ const val PQ_BOGGY = 4
 const val PQ_DOUBLE = 5
 const val PQ_OTHER = 6
 const val PQ_ALBATROSS = 7
-const val PQ_END = 8 // indexes into the point quota array
+const val PQ_TARGET = 8
+const val PQ_END = PQ_TARGET + 1 // indexes into the point quota array
 
 val pointsTable: List<PointRecord> = listOf(
     PointRecord(PQ_ALBATROSS, 5),
@@ -33,6 +34,7 @@ val pointsTable: List<PointRecord> = listOf(
     PointRecord(PQ_BOGGY, 1),
     PointRecord(PQ_DOUBLE, 0),
     PointRecord(PQ_OTHER, -1),
+    PointRecord(PQ_TARGET, 36),
     PointRecord(PQ_END, 20)
 )
 
@@ -41,7 +43,7 @@ suspend fun createPointTableRecords() {
     val pointsDao: PointsDao = TeamScoreCardApp.getPointsDao()   // are companion object
     val buildDatabase = pointsDao.isEmpty()
 
-    if (buildDatabase) {
+//    if (buildDatabase) {
         Log.d("VIN", "Build points table")
         coroutineScope {
             launch {
@@ -51,7 +53,7 @@ suspend fun createPointTableRecords() {
                 }
             }
         }
-    } else{
-        Log.d("VIN", "Have points table")
-    }
+//    } else{
+//        Log.d("VIN", "Have points table")
+//    }
 }

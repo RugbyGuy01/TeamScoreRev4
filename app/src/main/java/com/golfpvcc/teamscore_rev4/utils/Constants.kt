@@ -47,6 +47,14 @@ const val PLAYER_STROKES_1 = 1
 const val PLAYER_STROKES_2 = 2
 const val PLAYER_STROKES_3 = 3
 
+const val ALBATROSS_ON_HOLE = -3
+const val EAGLE_ON_HOLE = -2
+const val BIRDIES_ON_HOLE = -1
+const val PAR_ON_HOLE = 0
+const val BOGGY_ON_HOLE = 1
+const val DOUBLE_ON_HOLE = 2
+const val OTHER_ON_HOLE = 3
+
 object Constants {
     const val SCORE_CARD_REC_ID = 2024
     private const val MAX_PLAYERS = 4
