@@ -19,6 +19,7 @@ import com.golfpvcc.teamscore_rev4.utils.DOUBLE_TEAM_SCORE
 import com.golfpvcc.teamscore_rev4.utils.PLAYER_STROKES_1
 import com.golfpvcc.teamscore_rev4.utils.PLAYER_STROKES_2
 import com.golfpvcc.teamscore_rev4.utils.PLAYER_STROKES_3
+import com.golfpvcc.teamscore_rev4.utils.SUMMARY_BUTTON_TEXT
 import com.golfpvcc.teamscore_rev4.utils.TEAM_GROSS_SCORE
 import com.golfpvcc.teamscore_rev4.utils.TEAM_NET_SCORE
 
@@ -37,7 +38,7 @@ fun CardButton(buttonText: String,  onClick: () -> Unit) {
         Text(
             modifier = Modifier.padding(5.dp),
             text = buttonText,
-            fontSize = Constants.SUMMARY_BUTTON_TEXT.sp,
+            fontSize = SUMMARY_BUTTON_TEXT.sp,
         )
     }
 }

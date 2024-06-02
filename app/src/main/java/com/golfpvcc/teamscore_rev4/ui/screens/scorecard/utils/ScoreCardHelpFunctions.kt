@@ -11,7 +11,6 @@ import com.golfpvcc.teamscore_rev4.utils.ALBATROSS_ON_HOLE
 import com.golfpvcc.teamscore_rev4.utils.BIRDIES_ON_HOLE
 import com.golfpvcc.teamscore_rev4.utils.BOGGY_ON_HOLE
 import com.golfpvcc.teamscore_rev4.utils.DOUBLE_ON_HOLE
-import com.golfpvcc.teamscore_rev4.utils.DOUBLE_TEAM_MASK
 import com.golfpvcc.teamscore_rev4.utils.DOUBLE_TEAM_SCORE
 import com.golfpvcc.teamscore_rev4.utils.EAGLE_ON_HOLE
 import com.golfpvcc.teamscore_rev4.utils.OTHER_ON_HOLE
@@ -21,7 +20,6 @@ import com.golfpvcc.teamscore_rev4.utils.PQ_BIRDIES
 import com.golfpvcc.teamscore_rev4.utils.PQ_BOGGY
 import com.golfpvcc.teamscore_rev4.utils.PQ_DOUBLE
 import com.golfpvcc.teamscore_rev4.utils.PQ_EAGLE
-import com.golfpvcc.teamscore_rev4.utils.PQ_END
 import com.golfpvcc.teamscore_rev4.utils.PQ_OTHER
 import com.golfpvcc.teamscore_rev4.utils.PQ_PAR
 import com.golfpvcc.teamscore_rev4.utils.TEAM_DOUBLE_GROSS_SCORE
@@ -55,16 +53,13 @@ fun ScoreCardViewModel.updateScoreCardState(scoreCardWithPlayers: ScoreCardWithP
         parCells.mHole = scoreCardRecord.mPar
         hdcpCells.mHole = scoreCardRecord.mHandicap
     }
-
-
     val parCellsTest = getHoleParCells()
-    val hdcpCellsTest = getHoleHdcpCells()
 
     if (parCells != null) {
         Log.d("VIN", "parCellsTest $parCellsTest and parCells.mHole ${parCells.mHole}")
     }
 
-    var numberOfPlayers = scoreCardWithPlayers.playerRecords.size
+    val numberOfPlayers = scoreCardWithPlayers.playerRecords.size
     state.mGameNines = (numberOfPlayers == 3)
     for (idx in scoreCardWithPlayers.playerRecords.indices) { // player name and handicap
         state.mPlayerHeading += PlayerHeading(
@@ -106,15 +101,15 @@ fun ScoreCardViewModel.updatePlayersTeamScoreCells(
 ) {
     val teamPlayerScoreCells = getTeamPlayerScoreCells() // total hole score for selected player
     val teamUsedCells = getTeamUsedCells() // total hole score for selected player
-    var nineGameScores = NineGame()
+    val nineGameScores = NineGame()
 
     teamPlayerScoreCells[currentHole] = 0 //  scores that are used by players
     teamUsedCells[currentHole] = 0      // keeps track of the player scores are used
-    nineGameScores.ClearTotals()
+    nineGameScores.clearTotals()
 
     for (player in playerHeading) {
         if (0 < player.mScore[currentHole]) {
-            updatePlayerDisplayScore(
+            this.updatePlayerDisplayScore(
                 player,
                 displayScreenMode,
                 currentHole,
@@ -183,8 +178,8 @@ fun updateTeamDisplayScore(
             }
         }
 
-        DISPLAY_MODE_9_GAME -> {
-        }
+//        DISPLAY_MODE_9_GAME -> {
+//        }
     }
 }
 
@@ -308,17 +303,6 @@ fun ScoreCardViewModel.updatePlayerDisplayScore(
     }
 }
 
-fun getGrossDisplayScore(currentHole: Int, holePar: Int, player: PlayerHeading): Int {
-    val displayScore: Int = player.mScore[currentHole] - holePar
-    return (displayScore)
-}
-
-fun getNetScore(currentHole: Int, player: PlayerHeading): Int {
-    val displayScore: Int = player.mScore[currentHole] - player.mStokeHole[currentHole]
-
-    return (displayScore)
-}
-
 fun getPointQuoteKey(score: Int, parForHole: Int): Int {
     var pointQuoteKey: Int = PQ_ALBATROSS
 
@@ -342,7 +326,7 @@ fun getPointQuoteKey(score: Int, parForHole: Int): Int {
 }
 
 fun getTotalScore(holes: IntArray, mStartingCell: Int, mEndingCell: Int): String {
-    var mTotal: Int = 0
+    var mTotal = 0
     for (idx in mStartingCell until mEndingCell) {
         Log.d("VIN", "totalScore hole value ${holes[idx]} ")
         mTotal += holes[idx]
@@ -369,7 +353,7 @@ fun getPlayerStrokesForHole(
     currentHole: Int,
 ): Int {
     var playerIntHdcp = playerHdcp.toInt()
-    var strokesForHole: Int = 0
+    var strokesForHole = 0
     val currentHoleHandicap = holeHdcp[currentHole]
     if (currentHoleHandicap <= playerIntHdcp) {
         strokesForHole = 1

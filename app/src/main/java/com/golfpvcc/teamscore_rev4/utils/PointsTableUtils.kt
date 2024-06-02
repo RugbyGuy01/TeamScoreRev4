@@ -43,7 +43,7 @@ suspend fun createPointTableRecords() {
     val pointsDao: PointsDao = TeamScoreCardApp.getPointsDao()   // are companion object
     val buildDatabase = pointsDao.isEmpty()
 
-//    if (buildDatabase) {
+    if (buildDatabase) {
         Log.d("VIN", "Build points table")
         coroutineScope {
             launch {
@@ -53,7 +53,7 @@ suspend fun createPointTableRecords() {
                 }
             }
         }
-//    } else{
-//        Log.d("VIN", "Have points table")
-//    }
+    } else{
+        Log.d("VIN", "Have points table")
+    }
 }

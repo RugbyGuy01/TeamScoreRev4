@@ -2,7 +2,7 @@ package com.golfpvcc.teamscore_rev4.database.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.golfpvcc.teamscore_rev4.utils.Constants.SCORE_CARD_REC_ID
+import com.golfpvcc.teamscore_rev4.utils.SCORE_CARD_REC_ID
 
 
 @Entity(tableName = "PlayerRecord")

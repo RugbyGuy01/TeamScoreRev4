@@ -54,32 +54,30 @@ const val PAR_ON_HOLE = 0
 const val BOGGY_ON_HOLE = 1
 const val DOUBLE_ON_HOLE = 2
 const val OTHER_ON_HOLE = 3
+const val SCORE_CARD_REC_ID = 2024
+const val MAX_PLAYERS = 4
+const val MAX_PLAYER_NAME = 8
+const val MAX_HANDICAP = 2
+const val MAX_COURSE_YARDAGE = 5
+const val MAX_STARTING_HOLE = 2
+const val LAST_PLAYER = MAX_PLAYERS - 1
+const val DISPLAY_SCORE_CARD_SCREEN = 6
+const val MINIMUM_LEN_OF_PLAYER_NAME = 2
+
+// text size for forms
+const val DATABASE_NAME = "TeamDatabase"
+const val SCORE_CARD_TEXT = 18
+const val SCORE_CARD_COURSE_NAME_TEXT = 15
+const val SUMMARY_BUTTON_TEXT = 20
+const val COLUMN_TOTAL_WIDTH = 65
+
+
+const val USER_CANCEL = 100
+const val USER_SAVE = 101
+const val USER_TEXT_SAVE = 102
+const val USER_TEXT_UPDATE = 103
 
 object Constants {
-    const val SCORE_CARD_REC_ID = 2024
-    private const val MAX_PLAYERS = 4
-    const val MAX_PLAYER_NAME = 8
-    const val MAX_HANDICAP = 2
-    const val MAX_COURSE_YARDAGE = 5
-    const val MAX_STARTING_HOLE = 2
-    const val LAST_PLAYER = MAX_PLAYERS - 1
-    const val DISPLAY_SCORE_CARD_SCREEN = 6
-//    const val DISPLAY_COURSES_SCREEN = 7
-    const val MINIMUM_LEN_OF_PLAYER_NAME = 2
-
-    // text size for forms
-    const val DATABASE_NAME = "TeamDatabase"
-    const val SCORE_CARD_TEXT = 18
-    const val SCORE_CARD_COURSE_NAME_TEXT = 15
-    const val SUMMARY_BUTTON_TEXT = 20
-    const val COLUMN_TOTAL_WIDTH = 65
-
-
-    const val USER_CANCEL = 100
-    const val USER_SAVE = 101
-    const val USER_TEXT_SAVE = 102
-    const val USER_TEXT_UPDATE = 103
-
         val courseDetailPlaceHolder = CourseRecord(
             "No Course",
             "",

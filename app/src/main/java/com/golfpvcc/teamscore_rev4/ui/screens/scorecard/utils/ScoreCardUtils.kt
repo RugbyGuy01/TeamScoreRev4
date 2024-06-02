@@ -35,9 +35,9 @@ import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.dialogenterscore.DialogA
 import com.golfpvcc.teamscore_rev4.utils.COLOR_NEXT_HOLE
 import com.golfpvcc.teamscore_rev4.utils.COLOR_PREV_HOLE
 import com.golfpvcc.teamscore_rev4.utils.COLOR_SCREEN_MODE
-import com.golfpvcc.teamscore_rev4.utils.Constants.COLUMN_TOTAL_WIDTH
-import com.golfpvcc.teamscore_rev4.utils.Constants.SCORE_CARD_COURSE_NAME_TEXT
-import com.golfpvcc.teamscore_rev4.utils.Constants.SCORE_CARD_TEXT
+import com.golfpvcc.teamscore_rev4.utils.COLUMN_TOTAL_WIDTH
+import com.golfpvcc.teamscore_rev4.utils.SCORE_CARD_COURSE_NAME_TEXT
+import com.golfpvcc.teamscore_rev4.utils.SCORE_CARD_TEXT
 import com.golfpvcc.teamscore_rev4.utils.VIN_LIGHT_GRAY
 import com.golfpvcc.teamscore_rev4.utils.DISPLAY_HOLE_NUMBER
 

@@ -26,7 +26,7 @@ fun SummaryViewModel.updateScoreCardState(scoreCardWithPlayers: ScoreCardWithPla
         parCell.mHole = scoreCardRecord.mPar
         hdcpCell.mHole = scoreCardRecord.mHandicap
     }
-    val nineGames = scoreCardWithPlayers.playerRecords.size == 3
+    state.mGameNines = scoreCardWithPlayers.playerRecords.size == 3
     for (idx in scoreCardWithPlayers.playerRecords.indices) { // player name and handicap
         state.playerHeading += PlayerHeading(
             idx,

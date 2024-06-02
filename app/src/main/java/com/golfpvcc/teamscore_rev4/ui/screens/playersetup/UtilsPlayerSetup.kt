@@ -33,6 +33,11 @@ import com.golfpvcc.teamscore_rev4.ui.navigation.ROUTE_GAME_ON
 import com.golfpvcc.teamscore_rev4.ui.navigation.TeamScoreScreen
 import com.golfpvcc.teamscore_rev4.ui.theme.shape
 import com.golfpvcc.teamscore_rev4.utils.Constants
+import com.golfpvcc.teamscore_rev4.utils.DISPLAY_SCORE_CARD_SCREEN
+import com.golfpvcc.teamscore_rev4.utils.LAST_PLAYER
+import com.golfpvcc.teamscore_rev4.utils.MAX_HANDICAP
+import com.golfpvcc.teamscore_rev4.utils.MAX_PLAYER_NAME
+import com.golfpvcc.teamscore_rev4.utils.USER_CANCEL
 
 @Composable
 fun EnterPlayerInfo(
@@ -47,7 +52,7 @@ fun EnterPlayerInfo(
     ) {
         GetPlayerSetupInformation(
             index = index,
-            mMaxLength = Constants.MAX_PLAYER_NAME,
+            mMaxLength = MAX_PLAYER_NAME,
             placeHolder = "Enter Player Name",
             nameOrHandicap = viewModel.state.mPlayerRecords[index].mName,
             updatedData = viewModel::onPlayerNameChange,
@@ -57,7 +62,7 @@ fun EnterPlayerInfo(
         )
 
         val keyboardType: ImeAction
-        keyboardType = if (index == Constants.LAST_PLAYER) {
+        keyboardType = if (index == LAST_PLAYER) {
             ImeAction.Done
         } else {
             ImeAction.Next
@@ -65,7 +70,7 @@ fun EnterPlayerInfo(
         Spacer(modifier = Modifier.size(10.dp))
         GetPlayerSetupInformation(
             index = index,
-            Constants.MAX_HANDICAP,
+            MAX_HANDICAP,
             "Handicap",
             viewModel.state.mPlayerRecords[index].mHandicap.toString(),
             updatedData = viewModel::onPlayerHandicapChange,
@@ -204,7 +209,7 @@ fun moveToNextScreen(
 ) {
 
     when (viewModel.state.mNextScreen) {
-        Constants.DISPLAY_SCORE_CARD_SCREEN -> {
+        DISPLAY_SCORE_CARD_SCREEN -> {
             Log.d("VIN", "On to game on")
             navController.navigate(route = TeamScoreScreen.ScreenScoreCard.route) {
                 popUpTo(ROOT_GRAPH_ROUTE) {
@@ -212,7 +217,7 @@ fun moveToNextScreen(
                 }
             }
         }
-        Constants.USER_CANCEL -> {
+        USER_CANCEL -> {
             navController.navigate(ROUTE_CONFIGURATION) {
                 popUpTo(ROOT_GRAPH_ROUTE) {
                     inclusive = true

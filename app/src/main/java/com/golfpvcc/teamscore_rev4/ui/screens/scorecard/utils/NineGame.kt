@@ -38,19 +38,18 @@ else
     The m_Player_9_Score[PlayInx][ScoreInx] = (Player gross score)  The score
  */
 class NineGame {
-    var playerScoreArray: Array<Player9game?>
+    private var playerScoreArray: Array<Player9game?> = arrayOfNulls(size = NINE_PLAYERS)
 
     /*
 Constructor
  */
     init {
-        playerScoreArray = arrayOfNulls<Player9game>(size = NINE_PLAYERS)
         for (x in 0..<NINE_PLAYERS) {
             playerScoreArray[x] = Player9game() // allocate the player's class for the 9 game
         }
     }
 
-    fun ClearTotals() {
+    fun clearTotals() {
         for (x in 0..<NINE_PLAYERS) {
             playerScoreArray[x]!!.clearScore()
         }
@@ -62,7 +61,7 @@ Constructor
     fun sort9Scores() {
         var `in`: Int
         var inScore: Int
-        var OutScore: Int
+        var outScore: Int
 
         var out: Int = NINE_PLAYERS - 1
         while (out > 0) {
@@ -70,8 +69,8 @@ Constructor
             `in` = 0
             while (`in` < out) {
                 inScore = playerScoreArray[`in`]!!.holeScore
-                OutScore = playerScoreArray[`in` + 1]!!.holeScore
-                if (inScore > OutScore) // out of order?
+                outScore = playerScoreArray[`in` + 1]!!.holeScore
+                if (inScore > outScore) // out of order?
                     swap(`in`, `in` + 1) // swap them
 
                 `in`++
@@ -120,15 +119,15 @@ Constructor
     }
 
     fun get9GameScore(inx: Int): Int {
-        var Score = 0
+        var score = 0
 
         for (x in 0..<NINE_PLAYERS) {
             if (playerScoreArray[x]!!.playerInx == inx) {
-                Score = playerScoreArray[x]!!.playerNineScore
+                score = playerScoreArray[x]!!.playerNineScore
             }
         }
 
-        return Score
+        return score
     }
 
     /*

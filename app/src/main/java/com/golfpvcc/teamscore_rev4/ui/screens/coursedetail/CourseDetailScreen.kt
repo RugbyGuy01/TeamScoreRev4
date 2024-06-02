@@ -49,10 +49,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.golfpvcc.teamscore_rev4.ui.screens.courses.CoursesViewModel
 import com.golfpvcc.teamscore_rev4.ui.screens.courses.SaveCourseRecord
-import com.golfpvcc.teamscore_rev4.utils.Constants.USER_CANCEL
-import com.golfpvcc.teamscore_rev4.utils.Constants.USER_SAVE
-import com.golfpvcc.teamscore_rev4.utils.Constants.USER_TEXT_SAVE
-import com.golfpvcc.teamscore_rev4.utils.Constants.USER_TEXT_UPDATE
+import com.golfpvcc.teamscore_rev4.utils.USER_CANCEL
+import com.golfpvcc.teamscore_rev4.utils.USER_SAVE
+import com.golfpvcc.teamscore_rev4.utils.USER_TEXT_SAVE
+import com.golfpvcc.teamscore_rev4.utils.USER_TEXT_UPDATE
 import com.golfpvcc.teamscore_rev4.utils.Constants.courseDetailPlaceHolder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
