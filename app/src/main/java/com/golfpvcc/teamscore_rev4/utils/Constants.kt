@@ -23,6 +23,9 @@ const val TEAM_SINGLE_GROSS_SCORE = 0xFF12B8D9
 const val TEAM_DOUBLE_NET_SCORE = 0xFF12910D
 const val TEAM_DOUBLE_GROSS_SCORE = 0xFF0D869E
 
+// Screen Summary colors
+const val SUMMARY_PAYOUT_COLOR = 0xFFDFFFE5
+
 const val HOLE_ARRAY_SIZE = 18
 
 const val FRONT_NINE_DISPLAY = 9
@@ -66,11 +69,11 @@ const val MINIMUM_LEN_OF_PLAYER_NAME = 2
 
 // text size for forms
 const val DATABASE_NAME = "TeamDatabase"
-const val SCORE_CARD_TEXT = 18
+const val SCORE_CARD_TEXT = 40
 const val SCORE_CARD_COURSE_NAME_TEXT = 15
 const val SUMMARY_BUTTON_TEXT = 20
 const val COLUMN_TOTAL_WIDTH = 65
-
+const val SUMMARY_TEXT_SIZE = 18
 
 const val USER_CANCEL = 100
 const val USER_SAVE = 101
