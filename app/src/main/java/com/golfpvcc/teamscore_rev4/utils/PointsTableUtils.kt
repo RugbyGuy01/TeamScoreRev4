@@ -33,7 +33,7 @@ val pointsTable: List<PointRecord> = listOf(
     PointRecord(PQ_PAR, 2),
     PointRecord(PQ_BOGGY, 1),
     PointRecord(PQ_DOUBLE, 0),
-    PointRecord(PQ_OTHER, -1),
+    PointRecord(PQ_OTHER, 0),
     PointRecord(PQ_TARGET, 36),
     PointRecord(PQ_END, 20)
 )
@@ -43,7 +43,7 @@ suspend fun createPointTableRecords() {
     val pointsDao: PointsDao = TeamScoreCardApp.getPointsDao()   // are companion object
     val buildDatabase = pointsDao.isEmpty()
 
-    if (buildDatabase) {
+//    if (buildDatabase) {
         Log.d("VIN", "Build points table")
         coroutineScope {
             launch {
@@ -53,7 +53,7 @@ suspend fun createPointTableRecords() {
                 }
             }
         }
-    } else{
-        Log.d("VIN", "Have points table")
-    }
+//    } else{
+//        Log.d("VIN", "Have points table")
+//    }
 }

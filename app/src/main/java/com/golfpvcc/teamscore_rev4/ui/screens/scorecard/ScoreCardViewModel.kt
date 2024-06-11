@@ -178,13 +178,15 @@ open class ScoreCardViewModel() : ViewModel() {
     fun getPlayerHoleScore(
         playerIdx: Int,
         idx: Int,
-    ): String { //display the player's score on the score card
+    ): String { //display the player's score on the score card, howerver display 0 for point quota
         val playerHoleScore: Int =
             (state.mPlayerHeading[playerIdx].mDisplayScore[idx])
         var displayPlayerHoleScore: String = "  "
 
-        if (playerHoleScore != 0)
+        if (state.mPlayerHeading[playerIdx].mScore[idx] != 0) {
             displayPlayerHoleScore = playerHoleScore.toString()
+        }
+
         Log.d("VIN", "getPlayerHoleScore Player's score $displayPlayerHoleScore")
         return (displayPlayerHoleScore)
     }

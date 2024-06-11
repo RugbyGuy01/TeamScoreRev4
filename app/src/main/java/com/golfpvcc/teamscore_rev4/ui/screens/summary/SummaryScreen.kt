@@ -130,17 +130,17 @@ fun DisplayTeamPointQuoteSummary(summaryViewModel: SummaryViewModel) {
     ) {
         Text(text = "Pt. Quote (used)", Modifier.weight(2 / 4f), fontSize = SUMMARY_TEXT_SIZE.sp)
         Text(
-            text = summaryViewModel.frontPtQuotaUsed(),
+            text = summaryViewModel.frontPtQuota(),
             Modifier.weight(.5f),
             fontSize = SUMMARY_TEXT_SIZE.sp
         )
         Text(
-            text = summaryViewModel.backPtQuotaUsed(),
+            text = summaryViewModel.backPtQuota(),
             Modifier.weight(.5f),
             fontSize = SUMMARY_TEXT_SIZE.sp
         )
         Text(
-            text = summaryViewModel.totalPtQuotaUsed(),
+            text = summaryViewModel.totalPtQuota(),
             Modifier.weight(.5f),
             fontSize = SUMMARY_TEXT_SIZE.sp
         )

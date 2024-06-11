@@ -1,5 +1,6 @@
 package com.golfpvcc.teamscore_rev4.ui.screens.summary
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -17,6 +18,7 @@ import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.HOLE_HEADER
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.PAR_HEADER
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.TEAM_HEADER
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.USED_HEADER
+import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.calculatePtQuote
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.updateScoreCardState
 import com.golfpvcc.teamscore_rev4.utils.PQ_TARGET
 import com.golfpvcc.teamscore_rev4.utils.SCORE_CARD_REC_ID
@@ -45,7 +47,14 @@ open class SummaryViewModel() : ViewModel() {
                 Log.d("VIN1", "getScoreCardAndPlayerRecord is empty")
             state.mGamePointsTable = pointsRecordDoa.getAllPointRecords()
         }
+        teamAndPlayerSummary()
     }
+
+    private fun teamAndPlayerSummary() {
+        calculatePtQuote()
+
+    }
+
 
     suspend fun checkPointRecords() {
         createPointTableRecords()
@@ -74,87 +83,90 @@ open class SummaryViewModel() : ViewModel() {
         return (TeamBasePointsNeeded)
     }
 
-    fun frontPtQuotaUsed(): String {
-        val frontNinePtQuoteUsed: String
-        frontNinePtQuoteUsed = "1.0 (-20)"
 
-        return (frontNinePtQuoteUsed)
+    fun frontPtQuota(): String {
+        val frontNinePtQuote: String = String.format("%.1f", state.mTotalPtQuoteFront)
+        val frontUsedPtQuote: String = String.format("%.1f", state.mUsedPtQuoteFront)
+        val frontPtQuotaTotalAndUsed: String = "$frontNinePtQuote ($frontUsedPtQuote)"
+
+        return (frontPtQuotaTotalAndUsed)
     }
 
-    fun backPtQuotaUsed(): String {
-        val backNinePtQuoteUsed: String
-        backNinePtQuoteUsed = "9.0 (-16.0)"
+    fun backPtQuota(): String {
+        val backNinePtQuote: String = String.format("%.1f", state.mTotalPtQuoteBack)
+        val backUsedPtQuote: String = String.format("%.1f", state.mUsedPtQuoteBack)
+        val backPtQuotaTotalAndUsed: String = "$backNinePtQuote ($backUsedPtQuote)"
 
-        return (backNinePtQuoteUsed)
+        return (backPtQuotaTotalAndUsed)
     }
 
-    fun totalPtQuotaUsed(): String {
-        val totalNinePtQuoteUsed: String
-        totalNinePtQuoteUsed = "10.0 (-36.0)"
+    @SuppressLint("DefaultLocale")
+    fun totalPtQuota(): String {
+        val totalPointsQuota: String =
+            String.format("%.1f", (state.mTotalPtQuoteFront + state.mTotalPtQuoteBack))
+        val totalPointsUsedPtQuota: String =
+            String.format("%.1f", state.mUsedPtQuoteFront + state.mUsedPtQuoteBack)
+        val totalPointsQuotaTotalAndUsed: String = "$totalPointsQuota ($totalPointsUsedPtQuota)"
 
-        return (totalNinePtQuoteUsed)
+        return (totalPointsQuotaTotalAndUsed)
     }
 
     fun frontPointsQuota(): String {
-        val frontNinePointsQuota: String
-        frontNinePointsQuota = "52.0(51.0)"
-
+        val frontNinePointsQuota: String =
+            state.mTotalPointsFront.toString() + " (" + state.mQuotaPointsFront.toString() + ")"
         return (frontNinePointsQuota)
     }
 
     fun backPointsQuota(): String {
-        val backNinePointsQuota: String
-        backNinePointsQuota = "60.0 (51.0)"
-
+        val backNinePointsQuota: String =
+            state.mTotalPointsBack.toString() + " (" + state.mQuotaPointsBack.toString() + ")"
         return (backNinePointsQuota)
     }
 
     fun totalPointsQuota(): String {
-        val totalNinePointsQuota: String
-        totalNinePointsQuota = "112.0 (102.0)"
-
-        return (totalNinePointsQuota)
+        val pointsTotal: String
+        val totalPoints: Float = state.mTotalPointsFront + state.mTotalPointsBack
+        val usedPoints: Float = state.mQuotaPointsFront + state.mQuotaPointsBack
+        pointsTotal = "$totalPoints ($usedPoints)"
+        return (pointsTotal)
     }
 
     fun frontScoreOverUnder(): String {
-        val frontNineScoreOverUnder: String
-        frontNineScoreOverUnder = "56 (-10)"
-
-        return (frontNineScoreOverUnder)
+        val frontTotalScore: String =
+            state.mTotalScoreFront.toString() + " (" + state.mOverUnderScoreFront.toString() + ")"
+        return (frontTotalScore)
     }
 
     fun backScoreOverUnder(): String {
-        val backNineScoreOverUnder: String
-        backNineScoreOverUnder = "54 (-12)"
-
-        return (backNineScoreOverUnder)
+        val backTotalScore: String =
+            state.mTotalScoreBack.toString() + " (" + state.mOverUnderScoreBack.toString() + ")"
+        return (backTotalScore)
     }
 
     fun totalScoreOverUnder(): String {
-        val totalNineScoreOverUnder: String
-        totalNineScoreOverUnder = "110 (-22)"
-
-        return (totalNineScoreOverUnder)
+        val scoreTotal = state.mTotalScoreFront + state.mTotalScoreBack
+        val scoreTotalUnder = state.mOverUnderScoreFront + state.mOverUnderScoreBack
+        val totalScoreOverUnder = "$scoreTotal ($scoreTotalUnder)"
+        return (totalScoreOverUnder)
     }
 
     fun frontStablefordUsed(): String {
-        val frontStablefordUsed: String
-        frontStablefordUsed = "110 (-22)"
+        val frontStablefordUsed: String =
+            state.mTotalStablefordFront.toString() + " (" + state.mUsedStablefordFront.toString() + ")"
         return (frontStablefordUsed)
     }
 
     fun backStablefordUsed(): String {
-        val backStablefordUsed: String
-        backStablefordUsed = "54 (-12)"
-
+        val backStablefordUsed: String =
+            state.mTotalStablefordBack.toString() + " (" + state.mUsedStablefordBack.toString() + ")"
         return (backStablefordUsed)
     }
 
     fun totalStablefordUsed(): String {
-        val totalStablefordUsed: String
-        totalStablefordUsed = "152 (86)"
-
-        return (totalStablefordUsed)
+        val scoreTotalStableford = state.mTotalStablefordFront + state.mTotalStablefordBack
+        val scoreStablefordUnder = state.mUsedStablefordFront + state.mUsedStablefordBack
+        val totalStableford = "$scoreTotalStableford ($scoreStablefordUnder)"
+        return (totalStableford)
     }
 }
 
@@ -163,9 +175,30 @@ data class State(
     val mTee: String = "",                   // the tee's played or the course yardage
     val mCourseId: Int = 0,      // the current course we are using for the score card
     var mGameNines: Boolean = false,    // true if we only have 3 players
-    var mDisplayMenu:Boolean = false,
+    var mDisplayMenu: Boolean = false,
     var mHasDatabaseBeenRead: Boolean = false,
     var mGamePointsTable: List<PointsRecord> = emptyList(),
+
+    var mTotalPtQuoteFront: Float = 1f,
+    var mTotalPtQuoteBack: Float = 9f,
+    var mUsedPtQuoteFront: Float = -20f,
+    var mUsedPtQuoteBack: Float = -16f,
+
+    var mTotalPointsFront: Float = 52f,
+    var mTotalPointsBack: Float = 60f,
+    var mQuotaPointsFront: Float = 51f,
+    var mQuotaPointsBack: Float = 51f,
+
+    var mTotalScoreFront: Int = 56,
+    var mTotalScoreBack: Int = 54,
+    var mOverUnderScoreFront: Int = -10,
+    var mOverUnderScoreBack: Int = -12,
+
+    var mTotalStablefordFront: Int = 110,
+    var mTotalStablefordBack: Int = 54,
+    var mUsedStablefordFront: Int = -22,
+    var mUsedStablefordBack: Int = -12,
+
     val hdcpParHoleHeading: List<HdcpParHoleHeading> = listOf(
         HdcpParHoleHeading(HDCP_HEADER, "HdCp"),
         HdcpParHoleHeading(PAR_HEADER, "Par"),
@@ -189,9 +222,14 @@ data class PlayerSummary(
     var mDouble: Int = 0,
     var mOthers: Int = 0,
     var mQuote: Int = 0,
-    var mStableford:Int = 0,
+    var mStableford: Int = 0,
     var mNineTotal: Int = 0,
     var mSandy: Int = 0,
     var mCTP: Int = 0,
     var mOtherJunk: Int = 0,
+)
+
+data class TeamPtQuotePoint(
+    var teamTotalPoints: Int = 0,
+    var teamUsedPoints: Int = 0,
 )
