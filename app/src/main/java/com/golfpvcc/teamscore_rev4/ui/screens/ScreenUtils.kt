@@ -16,16 +16,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.golfpvcc.teamscore_rev4.database.model.PointsRecord
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.PlayerHeading
-import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DISPLAY_MODE_POINT_QUOTA
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.displayTeamGrossScore
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.displayTeamNetScore
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.getPointQuoteKey
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.PlayerSummary
-import com.golfpvcc.teamscore_rev4.ui.screens.summary.TeamPtQuotePoint
+import com.golfpvcc.teamscore_rev4.ui.screens.summary.TeamPoints
+import com.golfpvcc.teamscore_rev4.utils.BACK_NINE_TOTAL_DISPLAYED
 import com.golfpvcc.teamscore_rev4.utils.DOUBLE_TEAM_SCORE
 import com.golfpvcc.teamscore_rev4.utils.FRONT_NINE_DISPLAY
+import com.golfpvcc.teamscore_rev4.utils.FRONT_NINE_TOTAL_DISPLAYED
 import com.golfpvcc.teamscore_rev4.utils.PLAYER_STROKES_1
 import com.golfpvcc.teamscore_rev4.utils.PLAYER_STROKES_2
 import com.golfpvcc.teamscore_rev4.utils.PLAYER_STROKES_3
-import com.golfpvcc.teamscore_rev4.utils.PQ_TARGET
 import com.golfpvcc.teamscore_rev4.utils.SUMMARY_BUTTON_TEXT
 import com.golfpvcc.teamscore_rev4.utils.TEAM_GROSS_SCORE
 import com.golfpvcc.teamscore_rev4.utils.TEAM_NET_SCORE
@@ -110,18 +112,6 @@ fun playerStokes(playerStrokes: Int): Int {
     return (strokeResult)
 }
 
-
-fun getGamePointsScore(playerGrossNetScore: Int, par: Int, golfGamePoints: Map<Int, Int>): Int {
-    var stablefordScore: Int
-    var playerIndex: Int = playerGrossNetScore - par
-    val defaultValue: Map.Entry<Int, Int> = golfGamePoints.entries.last()
-
-    stablefordScore = golfGamePoints.getOrDefault(playerIndex, defaultValue.value)
-
-
-    return (stablefordScore)
-}
-
 /*
     This function will get the front/back point quota total for this player used by the Summary screen of the app.
      */
@@ -130,8 +120,8 @@ fun getTotalPlayerPointQuota(
     playerHeading: PlayerSummary,
     holePar: IntArray,
     gamePointsTable: List<PointsRecord>,
-): TeamPtQuotePoint {
-    val playerPtQuote = TeamPtQuotePoint(0, 0)
+): TeamPoints {
+    val playerPtQuote = TeamPoints(0, 0)
     var start: Int = 0
     var stop: Int = 8
 
@@ -159,17 +149,119 @@ fun getTotalPlayerPointQuota(
     return (playerPtQuote)
 }
 
-fun getTeamUsedScore(teamUsedMask: Int, playerPtQuotePoints: Int): Int {
+fun getTeamUsedScore(teamUsedMask: Int, playerPoints: Int): Int {
     var teamUsedScore: Int = 0
 
     if (0 < teamUsedMask) {
-        teamUsedScore = playerPtQuotePoints
+        teamUsedScore = playerPoints
 
         if (teamUsedMask == (TEAM_GROSS_SCORE + DOUBLE_TEAM_SCORE)
             || teamUsedMask == (TEAM_NET_SCORE + DOUBLE_TEAM_SCORE)
         ) {
-            teamUsedScore += playerPtQuotePoints
+            teamUsedScore += playerPoints
         }
     }
     return (teamUsedScore)
+}
+
+fun getTotalPlayerStableford(
+    whatNine: Int,
+    playerHeading: PlayerSummary,
+    holePar: IntArray,
+    gamePointsTable: List<PointsRecord>,
+): TeamPoints {
+    val playerStableford = TeamPoints(0, 0)
+    var start: Int = 0
+    var stop: Int = 8
+
+    if (whatNine == FRONT_NINE_DISPLAY) {
+        playerHeading.mStableford = 0
+    } else {
+        start = 9
+        stop = 17
+    }
+    for (idx in start..stop) {
+        if (0 < playerHeading.mPlayer.mScore[idx]) {    // only if have a score
+            val playerNetScore =
+                playerHeading.mPlayer.mScore[idx] - playerHeading.mPlayer.mStokeHole[idx]
+
+            val ptKey = getPointQuoteKey(playerNetScore, holePar[idx])
+            val stableford = gamePointsTable.filter { it.mId == ptKey }
+            if (stableford.isNotEmpty()) {
+                val stablefordRec = stableford.first()
+                playerHeading.mStableford += stablefordRec.mPoints
+                Log.d(
+                    "VIN",
+                    "${playerHeading.mPlayer.mName}  Par ${holePar[idx]} Net score $playerNetScore points ${stablefordRec.mPoints}"
+                )
+
+                playerStableford.teamTotalPoints += stablefordRec.mPoints
+                playerStableford.teamUsedPoints += getTeamUsedScore(
+                    teamUsedMask = playerHeading.mPlayer.mTeamHole[idx],
+                    playerPoints = stablefordRec.mPoints
+                )
+            }
+        }
+    }
+    return (playerStableford)
+}
+
+fun getTotalPlayerScore(
+    whatNine: Int,
+    playerHeading: PlayerSummary,
+    holePar: IntArray,
+): TeamPoints {
+    val teamOverUnderScore = TeamPoints(0, 0)
+    var start: Int = 0
+    var stop: Int = FRONT_NINE_TOTAL_DISPLAYED
+
+    if (whatNine == FRONT_NINE_DISPLAY) {
+        stop = FRONT_NINE_TOTAL_DISPLAYED
+    } else {
+        start = FRONT_NINE_DISPLAY
+        stop = BACK_NINE_TOTAL_DISPLAYED
+    }
+    for (currentHole in start..stop) {
+        if (0 < playerHeading.mPlayer.mScore[currentHole]) {    // only if have a score
+            if (0 < playerHeading.mPlayer.mTeamHole[currentHole]) {
+                teamOverUnderScore.teamTotalPoints += displayTeamNetScore(
+                    teamUsedCells = playerHeading.mPlayer.mTeamHole,
+                    currentHole = currentHole,
+                    player = playerHeading.mPlayer
+                )
+
+                teamOverUnderScore.teamUsedPoints += getUnderOverScore(
+                    player = playerHeading.mPlayer,
+                    currentHole = currentHole,
+                    holePar = holePar[currentHole]
+                )
+            }
+        }
+    }
+
+    return (teamOverUnderScore)
+}
+fun getUnderOverScore(player: PlayerHeading, currentHole: Int, holePar: Int): Int {
+    var teamScore: Int = player.mScore[currentHole] - holePar
+
+    when (player.mTeamHole[currentHole]) {
+        TEAM_GROSS_SCORE -> {
+        }
+
+        TEAM_NET_SCORE -> {
+            teamScore -= player.mStokeHole[currentHole]
+        }
+
+        TEAM_NET_SCORE + DOUBLE_TEAM_SCORE -> {
+            teamScore -= player.mStokeHole[currentHole]
+            teamScore *= 2
+        }
+
+        TEAM_GROSS_SCORE + DOUBLE_TEAM_SCORE -> {
+            teamScore *= 2
+        }
+
+        else -> {}
+    }
+    return (teamScore)
 }

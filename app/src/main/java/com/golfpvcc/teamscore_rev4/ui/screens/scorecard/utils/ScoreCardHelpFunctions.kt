@@ -53,11 +53,6 @@ fun ScoreCardViewModel.updateScoreCardState(scoreCardWithPlayers: ScoreCardWithP
         parCells.mHole = scoreCardRecord.mPar
         hdcpCells.mHole = scoreCardRecord.mHandicap
     }
-    val parCellsTest = getHoleParCells()
-
-    if (parCells != null) {
-        Log.d("VIN", "parCellsTest $parCellsTest and parCells.mHole ${parCells.mHole}")
-    }
 
     val numberOfPlayers = scoreCardWithPlayers.playerRecords.size
     state.mGameNines = (numberOfPlayers == 3)
@@ -158,8 +153,14 @@ fun updateTeamDisplayScore(
         }
 
         DISPLAY_MODE_NET -> {
-            if (0 < teamUsedMask)
-                displayTeamNetScore(teamPlayerScoreCells, teamUsedCells, currentHole, player)
+            if (0 < teamUsedMask) {
+                teamPlayerScoreCells[currentHole] += displayTeamNetScore(
+                    teamUsedCells,
+                    currentHole,
+                    player
+                )
+                teamUsedCells[currentHole] += 1
+            }
         }
 
         DISPLAY_MODE_STABLEFORD,
@@ -217,14 +218,13 @@ fun displayTeamGrossScore(
     teamPlayerScoreCells[currentHole] += teamScore
 }
 
+
 fun displayTeamNetScore(
-    teamPlayerScoreCells: IntArray,
     teamUsedCells: IntArray,
     currentHole: Int,
     player: PlayerHeading,
-) {
+): Int {
     var teamScore = player.mScore[currentHole]
-    teamUsedCells[currentHole] += 1
 
     when (player.mTeamHole[currentHole]) {
         TEAM_GROSS_SCORE -> {
@@ -247,7 +247,7 @@ fun displayTeamNetScore(
 
         else -> {}
     }
-    teamPlayerScoreCells[currentHole] += teamScore
+    return (teamScore)
 }
 
 fun ScoreCardViewModel.updatePlayerDisplayScore(

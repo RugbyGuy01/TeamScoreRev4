@@ -99,6 +99,7 @@ open class ScoreCardViewModel() : ViewModel() {
                     mHandicap = playerHeadRecord.mHdcp,
                     mScore = playerHeadRecord.mScore,
                     mTeamHole = playerHeadRecord.mTeamHole,
+                    mJunk = playerHeadRecord.mJunk,
                     mScoreCardRecFk = SCORE_CARD_REC_ID,
                     mId = playerHeadRecord.vinTag
                 )
@@ -598,6 +599,7 @@ data class PlayerHeading(
     var mDisplayScore: IntArray = IntArray(HOLE_ARRAY_SIZE) { 0 },
     var mStokeHole: IntArray = IntArray(HOLE_ARRAY_SIZE) { 0 },
     var mTeamHole: IntArray = IntArray(HOLE_ARRAY_SIZE),  // used for team scoring
+    val mJunk: IntArray = IntArray(HOLE_ARRAY_SIZE),
     var mTotal: String = "",
 )
 

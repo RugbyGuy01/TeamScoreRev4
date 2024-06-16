@@ -73,7 +73,8 @@ const val SCORE_CARD_TEXT = 18
 const val SCORE_CARD_COURSE_NAME_TEXT = 15
 const val SUMMARY_BUTTON_TEXT = 20
 const val COLUMN_TOTAL_WIDTH = 65
-const val SUMMARY_TEXT_SIZE = 18
+const val SUMMARY_TEXT_SIZE = 22
+const val SUMMARY_NAME_TEXT_SIZE = 22
 
 const val USER_CANCEL = 100
 const val USER_SAVE = 101

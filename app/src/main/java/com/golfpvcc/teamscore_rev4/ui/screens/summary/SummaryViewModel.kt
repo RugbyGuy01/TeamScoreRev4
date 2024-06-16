@@ -18,7 +18,10 @@ import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.HOLE_HEADER
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.PAR_HEADER
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.TEAM_HEADER
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.USED_HEADER
+import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.calculateOverUnderScores
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.calculatePtQuote
+import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.calculateStableford
+import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.playerScoreSummary
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.updateScoreCardState
 import com.golfpvcc.teamscore_rev4.utils.PQ_TARGET
 import com.golfpvcc.teamscore_rev4.utils.SCORE_CARD_REC_ID
@@ -46,15 +49,17 @@ open class SummaryViewModel() : ViewModel() {
             } else
                 Log.d("VIN1", "getScoreCardAndPlayerRecord is empty")
             state.mGamePointsTable = pointsRecordDoa.getAllPointRecords()
+            teamAndPlayerSummary()
         }
-        teamAndPlayerSummary()
     }
 
     private fun teamAndPlayerSummary() {
         calculatePtQuote()
+        calculateStableford()
+        calculateOverUnderScores()
+        playerScoreSummary()
 
     }
-
 
     suspend fun checkPointRecords() {
         createPointTableRecords()
@@ -82,8 +87,6 @@ open class SummaryViewModel() : ViewModel() {
         TeamBasePointsNeeded -= playersHandicap // however, subtract the total handicap of all of the players from the team bas point needed
         return (TeamBasePointsNeeded)
     }
-
-
     fun frontPtQuota(): String {
         val frontNinePtQuote: String = String.format("%.1f", state.mTotalPtQuoteFront)
         val frontUsedPtQuote: String = String.format("%.1f", state.mUsedPtQuoteFront)
@@ -179,25 +182,25 @@ data class State(
     var mHasDatabaseBeenRead: Boolean = false,
     var mGamePointsTable: List<PointsRecord> = emptyList(),
 
-    var mTotalPtQuoteFront: Float = 1f,
-    var mTotalPtQuoteBack: Float = 9f,
-    var mUsedPtQuoteFront: Float = -20f,
-    var mUsedPtQuoteBack: Float = -16f,
+    var mTotalPtQuoteFront: Float = 0f,
+    var mTotalPtQuoteBack: Float = 0f,
+    var mUsedPtQuoteFront: Float = 0f,
+    var mUsedPtQuoteBack: Float = 0f,
 
-    var mTotalPointsFront: Float = 52f,
-    var mTotalPointsBack: Float = 60f,
-    var mQuotaPointsFront: Float = 51f,
-    var mQuotaPointsBack: Float = 51f,
+    var mTotalPointsFront: Float = 0f,
+    var mTotalPointsBack: Float = 0f,
+    var mQuotaPointsFront: Float = 0f,
+    var mQuotaPointsBack: Float = 0f,
 
-    var mTotalScoreFront: Int = 56,
-    var mTotalScoreBack: Int = 54,
-    var mOverUnderScoreFront: Int = -10,
-    var mOverUnderScoreBack: Int = -12,
+    var mTotalScoreFront: Int = 0,
+    var mTotalScoreBack: Int = 0,
+    var mOverUnderScoreFront: Int = 0,
+    var mOverUnderScoreBack: Int = 0,
 
-    var mTotalStablefordFront: Int = 110,
-    var mTotalStablefordBack: Int = 54,
-    var mUsedStablefordFront: Int = -22,
-    var mUsedStablefordBack: Int = -12,
+    var mTotalStablefordFront: Int = 0,
+    var mTotalStablefordBack: Int = 0,
+    var mUsedStablefordFront: Int = 0,
+    var mUsedStablefordBack: Int = 0,
 
     val hdcpParHoleHeading: List<HdcpParHoleHeading> = listOf(
         HdcpParHoleHeading(HDCP_HEADER, "HdCp"),
@@ -229,7 +232,7 @@ data class PlayerSummary(
     var mOtherJunk: Int = 0,
 )
 
-data class TeamPtQuotePoint(
+data class TeamPoints(
     var teamTotalPoints: Int = 0,
     var teamUsedPoints: Int = 0,
 )

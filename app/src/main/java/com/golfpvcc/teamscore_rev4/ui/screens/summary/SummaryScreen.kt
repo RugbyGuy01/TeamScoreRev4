@@ -41,6 +41,7 @@ import androidx.navigation.NavHostController
 import com.golfpvcc.teamscore_rev4.ui.navigation.ROOT_GRAPH_ROUTE
 import com.golfpvcc.teamscore_rev4.ui.navigation.TeamScoreScreen
 import com.golfpvcc.teamscore_rev4.ui.screens.CardButton
+import com.golfpvcc.teamscore_rev4.utils.SUMMARY_NAME_TEXT_SIZE
 import com.golfpvcc.teamscore_rev4.utils.SUMMARY_PAYOUT_COLOR
 import com.golfpvcc.teamscore_rev4.utils.SUMMARY_TEXT_SIZE
 import com.golfpvcc.teamscore_rev4.utils.SetScreenOrientation
@@ -79,7 +80,7 @@ fun SummaryScreen(
                     BottomButtons(navController, summaryViewModel.state.mCourseId)
                 }
             }
-            if(summaryViewModel.state.mDisplayMenu){
+            if (summaryViewModel.state.mDisplayMenu) {
                 BottomButtons(navController, summaryViewModel.state.mCourseId)
             }
         }
@@ -180,7 +181,7 @@ fun DisplayScoreOverUnderSummary(summaryViewModel: SummaryViewModel) {
             .background(Color.White)
             .fillMaxWidth(),
     ) {
-        Text(text = "Score (O/U", Modifier.weight(2 / 4f), fontSize = SUMMARY_TEXT_SIZE.sp)
+        Text(text = "Score (O/U)", Modifier.weight(2 / 4f), fontSize = SUMMARY_TEXT_SIZE.sp)
         Text(
             text = summaryViewModel.frontScoreOverUnder(),
             Modifier.weight(.5f),
@@ -276,12 +277,36 @@ fun DisplayPlayerScorePayouts(player: PlayerSummary) {
             .padding(4.dp)
             .fillMaxWidth(),
     ) {
-        Text(text = "Payouts:",Modifier.weight(1.1f), fontSize = SUMMARY_TEXT_SIZE.sp)
-        Text(text = "Eagles: ${player.mEagles}", Modifier.weight(1f), fontSize = SUMMARY_TEXT_SIZE.sp)
-        Text(text = "Birdies: ${player.mBirdies}", Modifier.weight(1f), fontSize = SUMMARY_TEXT_SIZE.sp)
-        Text(text = "Sandy: ${player.mSandy}", Modifier.weight(1f), fontSize = SUMMARY_TEXT_SIZE.sp)
-        Text(text = "CTP: ${player.mCTP}", Modifier.weight(1f), fontSize = SUMMARY_TEXT_SIZE.sp)
-        Text(text = "Junk: ${player.mOtherJunk}", Modifier.weight(1f), fontSize = SUMMARY_TEXT_SIZE.sp)
+        Text(
+            text = "Payouts:",
+            Modifier.weight(1.1f),
+            fontSize = SUMMARY_TEXT_SIZE.sp
+        )
+        Text(
+            text = "Eagles: ${player.mEagles}",
+            Modifier.weight(1f),
+            fontSize = SUMMARY_TEXT_SIZE.sp
+        )
+        Text(
+            text = "Birdies: ${player.mBirdies}",
+            Modifier.weight(1f),
+            fontSize = SUMMARY_TEXT_SIZE.sp
+        )
+        Text(
+            text = "Sandy: ${player.mSandy}",
+            Modifier.weight(1f),
+            fontSize = SUMMARY_TEXT_SIZE.sp
+        )
+        Text(
+            text = "CTP: ${player.mCTP}",
+            Modifier.weight(1f),
+            fontSize = SUMMARY_TEXT_SIZE.sp
+        )
+        Text(
+            text = "Junk: ${player.mOtherJunk}",
+            Modifier.weight(1f),
+            fontSize = SUMMARY_TEXT_SIZE.sp
+        )
     }
 }
 
@@ -300,22 +325,27 @@ fun DisplayPlayerNameAndScore(player: PlayerSummary) {
         Text(
             text = player.mPlayer.mHdcp + "-" + player.mPlayer.mName,
             Modifier.weight(.5f),
-            fontSize = SUMMARY_TEXT_SIZE.sp,
+            fontSize = SUMMARY_NAME_TEXT_SIZE.sp,
             color = Color.Blue
         )
         Text(
             text = "Front: ${player.mFront}",
             Modifier.weight(.5f),
-            fontSize = SUMMARY_TEXT_SIZE.sp
+            fontSize = SUMMARY_NAME_TEXT_SIZE.sp
         )
-        Text(text = "Back: ${player.mBack}", Modifier.weight(.5f), fontSize = SUMMARY_TEXT_SIZE.sp)
+        Text(
+            text = "Back: ${player.mBack}",
+            Modifier.weight(.5f),
+            fontSize = SUMMARY_NAME_TEXT_SIZE.sp
+        )
         Text(
             text = "Total: ${player.mBack + player.mFront}",
             Modifier.weight(.5f),
-            fontSize = SUMMARY_TEXT_SIZE.sp
+            fontSize = SUMMARY_NAME_TEXT_SIZE.sp
         )
     }
 }
+
 @Composable
 fun DisplayPlayerScoreLine1(player: PlayerSummary) {
     Row(
@@ -328,17 +358,11 @@ fun DisplayPlayerScoreLine1(player: PlayerSummary) {
             Modifier.weight(.5f), fontSize = SUMMARY_TEXT_SIZE.sp
         )
         Text(
-            text = "Bogeys: ${player.mBogeys}",
-            Modifier.weight(.5f), fontSize = SUMMARY_TEXT_SIZE.sp
+            text = "Birdies: ${player.mBirdies}",
+            Modifier.weight(.5f),
+            fontSize = SUMMARY_TEXT_SIZE.sp
         )
-        Text(
-            text = "Quote: ${player.mQuote}",
-            Modifier.weight(.5f), fontSize = SUMMARY_TEXT_SIZE.sp
-        )
-        Text(
-            text = "Sandy: ${player.mSandy}",
-            Modifier.weight(.5f), fontSize = SUMMARY_TEXT_SIZE.sp
-        )
+        Text(text = "Pars: ${player.mPars}", Modifier.weight(.5f), fontSize = SUMMARY_TEXT_SIZE.sp)
     }
 }
 
@@ -350,9 +374,8 @@ fun DisplayPlayerScoreLine2(player: PlayerSummary) {
             .fillMaxWidth(),
     ) {
         Text(
-            text = "Birdies: ${player.mBirdies}",
-            Modifier.weight(.5f),
-            fontSize = SUMMARY_TEXT_SIZE.sp
+            text = "Bogeys: ${player.mBogeys}",
+            Modifier.weight(.5f), fontSize = SUMMARY_TEXT_SIZE.sp
         )
         Text(
             text = "Double: ${player.mDouble}",
@@ -360,11 +383,10 @@ fun DisplayPlayerScoreLine2(player: PlayerSummary) {
             fontSize = SUMMARY_TEXT_SIZE.sp
         )
         Text(
-            text = "Stableford: ${player.mStableford}",
+            text = "Other: ${player.mOthers}",
             Modifier.weight(.5f),
             fontSize = SUMMARY_TEXT_SIZE.sp
         )
-        Text(text = "CTP: ${player.mCTP}", Modifier.weight(.5f), fontSize = SUMMARY_TEXT_SIZE.sp)
     }
 }
 
@@ -375,19 +397,17 @@ fun DisplayPlayerScoreLine3(player: PlayerSummary) {
             .background(Color.White)
             .fillMaxWidth(),
     ) {
-        Text(text = "Pars: ${player.mPars}", Modifier.weight(.5f), fontSize = SUMMARY_TEXT_SIZE.sp)
         Text(
-            text = "Other: ${player.mOthers}",
+            text = "Stableford: ${player.mStableford}",
             Modifier.weight(.5f),
             fontSize = SUMMARY_TEXT_SIZE.sp
         )
         Text(
-            text = "9 Points: ${player.mNineTotal}",
-            Modifier.weight(.5f),
-            fontSize = SUMMARY_TEXT_SIZE.sp
+            text = "Quote: ${player.mQuote}",
+            Modifier.weight(.5f), fontSize = SUMMARY_TEXT_SIZE.sp
         )
         Text(
-            text = "Junk: ${player.mOtherJunk}",
+            text = "Nine Pts: ${player.mNineTotal}",
             Modifier.weight(.5f),
             fontSize = SUMMARY_TEXT_SIZE.sp
         )

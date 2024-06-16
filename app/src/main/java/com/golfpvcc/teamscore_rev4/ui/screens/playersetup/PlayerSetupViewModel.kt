@@ -204,6 +204,7 @@ class PlayerSetupViewModel(
                     player.mHandicap,
                     player.mScore,
                     player.mTeamHole,
+                    player.mJunk,
                     SCORE_CARD_REC_ID,
                     mId = count
                 )
