@@ -23,6 +23,8 @@ import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.calculatePtQuote
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.calculateStableford
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.playerScoreSummary
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.updateScoreCardState
+import com.golfpvcc.teamscore_rev4.utils.HOLE_ARRAY_SIZE
+import com.golfpvcc.teamscore_rev4.utils.MAX_PLAYERS
 import com.golfpvcc.teamscore_rev4.utils.PQ_TARGET
 import com.golfpvcc.teamscore_rev4.utils.SCORE_CARD_REC_ID
 import com.golfpvcc.teamscore_rev4.utils.createPointTableRecords
@@ -178,6 +180,7 @@ data class State(
     val mTee: String = "",                   // the tee's played or the course yardage
     val mCourseId: Int = 0,      // the current course we are using for the score card
     var mGameNines: Boolean = false,    // true if we only have 3 players
+    var mGameABCD: IntArray = IntArray(MAX_PLAYERS) { 0 },   // A player index 0
     var mDisplayMenu: Boolean = false,
     var mHasDatabaseBeenRead: Boolean = false,
     var mGamePointsTable: List<PointsRecord> = emptyList(),

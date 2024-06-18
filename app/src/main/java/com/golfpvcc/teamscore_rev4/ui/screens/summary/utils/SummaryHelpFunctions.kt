@@ -9,6 +9,7 @@ import com.golfpvcc.teamscore_rev4.ui.screens.getTotalPlayerScore
 import com.golfpvcc.teamscore_rev4.ui.screens.getTotalPlayerStableford
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.HdcpParHoleHeading
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.PlayerHeading
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.GameABCD
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.HDCP_HEADER
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.NineGame
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.PAR_HEADER
@@ -191,12 +192,13 @@ fun SummaryViewModel.playerScoreSummary() {
             calculatePlayerScoreSummary(playerSummary, parCell.mHole, hdcpCell.mHole)
         }
         if(state.playerSummary.count() == 3){
-            calculatePlayerNineScores()
+            calculatePlayerNineScores()     // and ABCD game
         }
     }
 }
 fun SummaryViewModel.calculatePlayerNineScores(){
     var nineGameScores = NineGame()
+    var gameABCD = GameABCD()
     var currentHole : Int = 0
 
     while (currentHole < TOTAL_18_HOLE) { // holes 1 to 18
@@ -206,11 +208,18 @@ fun SummaryViewModel.calculatePlayerNineScores(){
                 val playerNetScore =
                     playerSummary.mPlayer.mScore[currentHole] - playerSummary.mPlayer.mStokeHole[currentHole]
                 nineGameScores.addPlayerGrossScore(playerSummary.mPlayer.vinTag, playerNetScore)
+                gameABCD.addPlayer(playerNetScore)
             }
         }
         nineGameScores.sort9Scores()    // calculate player's scores
+        gameABCD.sortScores()
+        var idx:Int = 0
+
         for (playerSummary in state.playerSummary) {
             playerSummary.mNineTotal += nineGameScores.get9GameScore(playerSummary.mPlayer.vinTag)
+
+            state.mGameABCD[idx] += gameABCD.getPlayerScore(idx)
+            idx++
         }
         currentHole++
     }

@@ -106,8 +106,6 @@ fun DisplayTeamTotalScore(summaryViewModel: SummaryViewModel) {
         }
     }
 }
-
-
 @Composable
 fun TeamScoreHeader(modifier: Modifier = Modifier) {
     Row(
