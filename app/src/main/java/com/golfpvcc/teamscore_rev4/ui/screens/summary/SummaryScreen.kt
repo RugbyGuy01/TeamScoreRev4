@@ -4,7 +4,9 @@ import android.content.pm.ActivityInfo
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,6 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -23,6 +26,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -31,8 +36,14 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -41,6 +52,9 @@ import androidx.navigation.NavHostController
 import com.golfpvcc.teamscore_rev4.ui.navigation.ROOT_GRAPH_ROUTE
 import com.golfpvcc.teamscore_rev4.ui.navigation.TeamScoreScreen
 import com.golfpvcc.teamscore_rev4.ui.screens.CardButton
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.ScoreCardActions
+import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.SummaryActions
+import com.golfpvcc.teamscore_rev4.utils.SUMMARY_BUTTON_TEXT
 import com.golfpvcc.teamscore_rev4.utils.SUMMARY_NAME_TEXT_SIZE
 import com.golfpvcc.teamscore_rev4.utils.SUMMARY_PAYOUT_COLOR
 import com.golfpvcc.teamscore_rev4.utils.SUMMARY_TEXT_SIZE
@@ -66,6 +80,9 @@ fun SummaryScreen(
         Scaffold()
         {
             Column {
+                Row() {
+                    BottomButtons(navController, summaryViewModel.state.mCourseId, summaryViewModel)
+                }
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -76,12 +93,7 @@ fun SummaryScreen(
                 Row() {
                     DisplayPlayersTotalScore(summaryViewModel.state)
                 }
-                Row() {
-                    BottomButtons(navController, summaryViewModel.state.mCourseId)
-                }
-            }
-            if (summaryViewModel.state.mDisplayMenu) {
-                BottomButtons(navController, summaryViewModel.state.mCourseId)
+
             }
         }
     } // end of Scaffold
@@ -103,9 +115,31 @@ fun DisplayTeamTotalScore(summaryViewModel: SummaryViewModel) {
             DisplayTeamPointsSummary(summaryViewModel)
             DisplayScoreOverUnderSummary(summaryViewModel)
             DisplayStablefordSummary(summaryViewModel)
+            DisplayABCDGameSummary(summaryViewModel)
         }
     }
 }
+
+@Composable
+fun DisplayABCDGameSummary(summaryViewModel: SummaryViewModel) {
+    val player = listOf("A", "B", "C", "D")
+    Row(
+        Modifier
+            .background(Color.White)
+            .fillMaxWidth(),
+    ) {
+        Text(text = "Game ABCD", Modifier.weight(2 / 4f), fontSize = SUMMARY_TEXT_SIZE.sp)
+        for ((idx, element) in summaryViewModel.state.playerSummary.withIndex()) {
+            Text(
+                text = "${player[idx]} - ${summaryViewModel.getABCDGameScore(idx)}",
+                Modifier.weight(.5f),
+                fontSize = SUMMARY_TEXT_SIZE.sp
+            )
+        }
+    }
+}
+
+
 @Composable
 fun TeamScoreHeader(modifier: Modifier = Modifier) {
     Row(
@@ -230,7 +264,7 @@ fun DisplayPlayersTotalScore(state: State) {
     Column(
         Modifier
             .height(160.dp)
-            .padding(3.dp),
+            .padding(1.dp),
     ) {
         LazyRow(Modifier.padding(4.dp)) {
             items(playersRecord) { player ->
@@ -249,7 +283,7 @@ fun DisplayPlayerScore(player: PlayerSummary) {
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {
         Column(
             Modifier
@@ -429,15 +463,17 @@ fun GetScoreCardRecord(
 }
 
 @Composable
-fun BottomButtons(navController: NavHostController, courseId: Int) {
+fun BottomButtons(
+    navController: NavHostController,
+    courseId: Int,
+    summaryViewModel: SummaryViewModel,
+) {
     Log.d("VIN", "Summary buttons Id $courseId")
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(3.dp),
+            .fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-
         CardButton("Resume") {
             navController.navigate(route = TeamScoreScreen.ScreenScoreCard.route) { // back to the start of configuration
                 popUpTo(ROOT_GRAPH_ROUTE)    // clear the back stack
@@ -450,17 +486,45 @@ fun BottomButtons(navController: NavHostController, courseId: Int) {
                 popUpTo(ROOT_GRAPH_ROUTE)    // clear the back stack
             }
         }
-
         CardButton("Courses") {
             navController.navigate(TeamScoreScreen.ScreenCourses.route) {
                 popUpTo(ROOT_GRAPH_ROUTE)    // clear the back stack
             }
         }
+        DisplayTestMenuDown(summaryViewModel::summaryActions)
 
         CardButton(" Exit ") {
             navController.navigate("exit")
         }
+    } // end of row
+}
 
+@Composable
+fun DisplayTestMenuDown(onAction: (SummaryActions) -> Unit) {
+
+    var expanded by remember { mutableStateOf(false) }
+
+    Card(modifier = Modifier
+        .wrapContentSize()
+        .clip(RoundedCornerShape(4.dp))
+        .padding(1.dp),
+        border = BorderStroke(2.dp, Color.LightGray),
+        onClick = { expanded = true }
+    ){
+        Text(
+            modifier = Modifier.padding(5.dp),
+            text = "Menu",
+            fontSize = SUMMARY_BUTTON_TEXT.sp,
+            )
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            DropdownMenuItem({ Text(text = "Gross") }, onClick = {})
+            DropdownMenuItem({ Text(text = "Net") }, onClick = {})
+            DropdownMenuItem({ Text(text = "Standford") }, onClick = {})
+            DropdownMenuItem({ Text(text = "Pt Quote") }, onClick = {})
+        }
     }
-
 }

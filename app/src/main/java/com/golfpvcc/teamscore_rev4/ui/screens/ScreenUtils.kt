@@ -40,7 +40,7 @@ fun CardButton(buttonText: String, onClick: () -> Unit) {
     Card(modifier = Modifier
         .wrapContentSize()
         .clip(RoundedCornerShape(4.dp))
-        .padding(4.dp),
+        .padding(1.dp),
         border = BorderStroke(2.dp, Color.LightGray),
         onClick = { onClick() }
     ) {

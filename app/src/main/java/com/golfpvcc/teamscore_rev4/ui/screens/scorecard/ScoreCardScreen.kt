@@ -127,9 +127,5 @@ fun DisplayControlButtons(scoreCardViewModel: ScoreCardViewModel, navController:
     DisplaySummaryButton(navController)
     Spacer(modifier = Modifier.size(20.dp))
     DisplayModeDropDown( scoreCardViewModel::scoreCardActions, scoreCardViewModel.state.mGameNines)
-//    DisplayScreenModeButton(
-//        scoreCardViewModel.state.mButtonScreenNextText, // what will be display gross, net point quote, stableford screens
-//        scoreCardViewModel::scoreCardActions
-//    )
 
 }

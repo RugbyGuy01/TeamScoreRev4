@@ -18,12 +18,12 @@ import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.HOLE_HEADER
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.PAR_HEADER
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.TEAM_HEADER
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.USED_HEADER
+import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.SummaryActions
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.calculateOverUnderScores
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.calculatePtQuote
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.calculateStableford
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.playerScoreSummary
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.updateScoreCardState
-import com.golfpvcc.teamscore_rev4.utils.HOLE_ARRAY_SIZE
 import com.golfpvcc.teamscore_rev4.utils.MAX_PLAYERS
 import com.golfpvcc.teamscore_rev4.utils.PQ_TARGET
 import com.golfpvcc.teamscore_rev4.utils.SCORE_CARD_REC_ID
@@ -54,7 +54,14 @@ open class SummaryViewModel() : ViewModel() {
             teamAndPlayerSummary()
         }
     }
-
+    fun summaryActions(action: SummaryActions) {
+        when(action){
+            SummaryActions.DisplayMenuItems -> displaySummaryMenuOptions()
+        }
+    }
+    fun displaySummaryMenuOptions(){
+        Log.d("VIN", "displaySummaryMenuOptions")
+    }
     private fun teamAndPlayerSummary() {
         calculatePtQuote()
         calculateStableford()
@@ -88,6 +95,10 @@ open class SummaryViewModel() : ViewModel() {
 
         TeamBasePointsNeeded -= playersHandicap // however, subtract the total handicap of all of the players from the team bas point needed
         return (TeamBasePointsNeeded)
+    }
+    fun getABCDGameScore(idx:Int):String{
+        val gameABCDScore:String = state.mGameABCD[idx].toString()
+        return (gameABCDScore)
     }
     fun frontPtQuota(): String {
         val frontNinePtQuote: String = String.format("%.1f", state.mTotalPtQuoteFront)

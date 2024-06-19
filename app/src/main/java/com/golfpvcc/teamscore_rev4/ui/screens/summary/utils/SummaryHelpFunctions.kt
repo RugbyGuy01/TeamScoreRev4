@@ -13,6 +13,7 @@ import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.GameABCD
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.HDCP_HEADER
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.NineGame
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.PAR_HEADER
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.ScoreCardActions
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.setPlayerStrokeHoles
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.updatePlayerDisplayScore
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.updatePlayersTeamScoreCells
@@ -25,7 +26,9 @@ import com.golfpvcc.teamscore_rev4.utils.FRONT_NINE_DISPLAY
 import com.golfpvcc.teamscore_rev4.utils.PQ_TARGET
 import com.golfpvcc.teamscore_rev4.utils.TOTAL_18_HOLE
 
-
+sealed class SummaryActions {
+    data object DisplayMenuItems : SummaryActions()
+}
 fun SummaryViewModel.updateScoreCardState(scoreCardWithPlayers: ScoreCardWithPlayers) {
     val scoreCardRecord: ScoreCardRecord = scoreCardWithPlayers.scoreCardRecord
 
@@ -208,20 +211,20 @@ fun SummaryViewModel.calculatePlayerNineScores(){
                 val playerNetScore =
                     playerSummary.mPlayer.mScore[currentHole] - playerSummary.mPlayer.mStokeHole[currentHole]
                 nineGameScores.addPlayerGrossScore(playerSummary.mPlayer.vinTag, playerNetScore)
-                gameABCD.addPlayer(playerNetScore)
+                gameABCD.addPlayer(playerNetScore)          // add each player score to  ABCD Class
             }
         }
         nineGameScores.sort9Scores()    // calculate player's scores
-        gameABCD.sortScores()
+        gameABCD.sortScores()           // sort player scores
         var idx:Int = 0
 
         for (playerSummary in state.playerSummary) {
             playerSummary.mNineTotal += nineGameScores.get9GameScore(playerSummary.mPlayer.vinTag)
 
-            state.mGameABCD[idx] += gameABCD.getPlayerScore(idx)
+            state.mGameABCD[idx] += gameABCD.getPlayerScore(idx)    // now get each player score
             idx++
         }
-        currentHole++
+        currentHole++       // do the next hole
     }
 }
 
