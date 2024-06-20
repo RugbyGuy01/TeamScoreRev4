@@ -6,6 +6,7 @@ import android.app.Application
 import androidx.room.Room
 import com.golfpvcc.teamscore_rev4.utils.DATABASE_NAME
 import com.golfpvcc.teamscore_rev4.database.dao.CourseDao
+import com.golfpvcc.teamscore_rev4.database.dao.JunkDao
 import com.golfpvcc.teamscore_rev4.database.dao.PlayerDao
 import com.golfpvcc.teamscore_rev4.database.dao.PointsDao
 import com.golfpvcc.teamscore_rev4.database.dao.ScoreCardDao
@@ -50,6 +51,9 @@ class TeamScoreCardApp : Application() {
 
         fun getPointsDao(): PointsDao {
             return instance!!.getDb().pointsDao()
+        }
+        fun getJunkDao(): JunkDao {
+            return instance!!.getDb().junkDao()
         }
     }
 

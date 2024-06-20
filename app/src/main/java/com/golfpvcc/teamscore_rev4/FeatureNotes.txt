@@ -1,0 +1,41 @@
+June 20, 2024
+
+Features to be added to the Team Score App.
+
+. Build junk configuration database screen
+. Player’s Junk dialog screen for score card
+
+1. Point Quota configuration dialog screen
+
+
+3. Summary Screen for the player junk
+4. Email Address database and setup dialog screen
+5. Sending an email from the summary screen
+6. Backup dialog screen - where to send backup file.
+7. Restore dialog screen - where get backup file and restore
+8. About screen, reversion and Contact information.
+9. Add note dialog screen for hole on the course.
+10. Add score card with 6 holes per screen. 6-6-6 game
+11. Add update summary screen with 6-6-6 game
+
+13. 9 Payout dialog screen
+12. Add Team Match Play on score card
+
+
+What's done
+. Build junk database
+
+
+
+Junk options:
+
+Closest to Pin
+Polies
+Green side sandy
+Sandy
+Birdies
+Chippies
+Putt made longer than the flag stick.
+Fairway bunkers
+Clouseau
+

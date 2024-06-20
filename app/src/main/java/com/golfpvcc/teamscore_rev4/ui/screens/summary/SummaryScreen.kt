@@ -21,7 +21,9 @@ import androidx.compose.foundation.layout.wrapContentSize
 
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material3.Card
@@ -54,6 +56,7 @@ import com.golfpvcc.teamscore_rev4.ui.navigation.TeamScoreScreen
 import com.golfpvcc.teamscore_rev4.ui.screens.CardButton
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.ScoreCardActions
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.SummaryActions
+import com.golfpvcc.teamscore_rev4.utils.MENU_BUTTON_TEXT
 import com.golfpvcc.teamscore_rev4.utils.SUMMARY_BUTTON_TEXT
 import com.golfpvcc.teamscore_rev4.utils.SUMMARY_NAME_TEXT_SIZE
 import com.golfpvcc.teamscore_rev4.utils.SUMMARY_PAYOUT_COLOR
@@ -79,16 +82,19 @@ fun SummaryScreen(
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.primary) {
         Scaffold()
         {
-            Column {
-                Row() {
-                    BottomButtons(navController, summaryViewModel.state.mCourseId, summaryViewModel)
-                }
+            Column(modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+            ) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(it)
                 ) {
                     DisplayTeamTotalScore(summaryViewModel)
+                }
+                Row() {
+                    BottomButtons(navController, summaryViewModel.state.mCourseId, summaryViewModel)
                 }
                 Row() {
                     DisplayPlayersTotalScore(summaryViewModel.state)
@@ -521,10 +527,11 @@ fun DisplayTestMenuDown(onAction: (SummaryActions) -> Unit) {
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
-            DropdownMenuItem({ Text(text = "Gross") }, onClick = {})
-            DropdownMenuItem({ Text(text = "Net") }, onClick = {})
-            DropdownMenuItem({ Text(text = "Standford") }, onClick = {})
-            DropdownMenuItem({ Text(text = "Pt Quote") }, onClick = {})
+            DropdownMenuItem({ Text(text = "Junk",fontSize = MENU_BUTTON_TEXT.sp,) }, onClick = {})
+            DropdownMenuItem({ Text(text = "Points",fontSize = MENU_BUTTON_TEXT.sp) }, onClick = {})
+            DropdownMenuItem({ Text(text = "Email",fontSize = MENU_BUTTON_TEXT.sp) }, onClick = {})
+            DropdownMenuItem({ Text(text = "Backup/Restore",fontSize = MENU_BUTTON_TEXT.sp) }, onClick = {})
+            DropdownMenuItem({ Text(text = "About",fontSize = MENU_BUTTON_TEXT.sp) }, onClick = {})
         }
     }
 }
