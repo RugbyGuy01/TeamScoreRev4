@@ -70,9 +70,9 @@ fun EnterPlayerInfo(
         Spacer(modifier = Modifier.size(10.dp))
         GetPlayerSetupInformation(
             index = index,
-            MAX_HANDICAP,
-            "Handicap",
-            viewModel.state.mPlayerRecords[index].mHandicap.toString(),
+            mMaxLength = MAX_HANDICAP,
+            placeHolder = "Handicap",
+            nameOrHandicap = viewModel.state.mPlayerRecords[index].mHandicap.toString(),
             updatedData = viewModel::onPlayerHandicapChange,
             KeyboardType.Number,
             imeAction = keyboardType,
@@ -205,7 +205,7 @@ fun DisplayPlayerSetupButtons(
 fun moveToNextScreen(
     viewModel: PlayerSetupViewModel,
     navController: NavHostController,
-    scoreCardId: Int
+    scoreCardId: Int,
 ) {
 
     when (viewModel.state.mNextScreen) {
@@ -217,6 +217,7 @@ fun moveToNextScreen(
                 }
             }
         }
+
         USER_CANCEL -> {
             navController.navigate(ROUTE_CONFIGURATION) {
                 popUpTo(ROOT_GRAPH_ROUTE) {
@@ -224,6 +225,7 @@ fun moveToNextScreen(
                 }
             }
         }
+
         else -> {
             // display user setup screen
         }

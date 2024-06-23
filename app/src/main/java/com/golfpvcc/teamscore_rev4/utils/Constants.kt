@@ -42,10 +42,7 @@ const val TEAM_CLEAR_SCORE = 0
 const val TEAM_GROSS_SCORE = 1
 const val TEAM_NET_SCORE = 2
 const val DOUBLE_TEAM_SCORE = 3
-const val DOUBLE_TEAM_MASK = TEAM_NET_SCORE
-// const val BIT_NOT_USED = 0x80
 // handicap masks
-const val PLAYER_STROKES_0 = 0
 const val PLAYER_STROKES_1 = 1
 const val PLAYER_STROKES_2 = 2
 const val PLAYER_STROKES_3 = 3
@@ -76,7 +73,8 @@ const val MENU_BUTTON_TEXT = 20
 const val COLUMN_TOTAL_WIDTH = 65
 const val SUMMARY_TEXT_SIZE = 18
 const val SUMMARY_NAME_TEXT_SIZE = 22
-
+const val SUMMARY_DIALOG_TEXT_SIZE = 20
+const val DIALOG_BUTTON_TEXT_SIZE = 20
 const val USER_CANCEL = 100
 const val USER_SAVE = 101
 const val USER_TEXT_SAVE = 102
@@ -88,7 +86,7 @@ object Constants {
             "",
             mPar = IntArray(18) { 4 },
             mHandicap = IntArray(18),
-            mNotes = Array<String>(18) { "" }
+            mNotes = Array(18) { "" }
         )
     fun List<CourseRecord>?.orCourseRecHolderList(): List<CourseRecord> {
         fun courseRecHolderList(): List<CourseRecord> {
@@ -97,7 +95,7 @@ object Constants {
                 "",
                 mPar = IntArray(18) { 4 },
                 mHandicap = IntArray(18),
-                mNotes = Array<String>(18) { "" }
+                mNotes = Array(18) { "" }
             ))
         }
         return if (!this.isNullOrEmpty()){

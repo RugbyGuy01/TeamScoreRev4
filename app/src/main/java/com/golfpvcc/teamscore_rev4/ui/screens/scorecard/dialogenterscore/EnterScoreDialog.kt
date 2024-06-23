@@ -117,12 +117,8 @@ fun EnterPlayersScores(
                                     DisplayTeamGrossNetButton(scoreCardViewModel, idx, onAction)
                                     DisplayJunkButton(scoreCardViewModel, idx, onAction)
                                 }
-                            } else {
-                                Log.d("VIN", "DisplayPlayerNameAndScoreHeading ERROR ")
-                                Log.d("VIN", "DisplayPlayerNameAndScoreHeading ERROR ${rowPlayerNames[idx].mName}")
                             }
                         }
-
                     }
 
                     Column(

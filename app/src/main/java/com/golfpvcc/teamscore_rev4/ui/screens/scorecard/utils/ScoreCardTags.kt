@@ -1,7 +1,6 @@
 package com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils
 
 import com.golfpvcc.teamscore_rev4.utils.DOUBLE_TEAM_SCORE
-import com.golfpvcc.teamscore_rev4.utils.PLAYER_STROKES_0
 import com.golfpvcc.teamscore_rev4.utils.PLAYER_STROKES_1
 import com.golfpvcc.teamscore_rev4.utils.PLAYER_STROKES_2
 import com.golfpvcc.teamscore_rev4.utils.PLAYER_STROKES_3

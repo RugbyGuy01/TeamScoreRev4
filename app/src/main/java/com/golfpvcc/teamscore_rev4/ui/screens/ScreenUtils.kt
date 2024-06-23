@@ -14,9 +14,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.golfpvcc.teamscore_rev4.database.model.PointsRecord
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.PlayerHeading
-import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.displayTeamGrossScore
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.displayTeamNetScore
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.getPointQuoteKey
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.PlayerSummary
@@ -28,6 +26,7 @@ import com.golfpvcc.teamscore_rev4.utils.FRONT_NINE_TOTAL_DISPLAYED
 import com.golfpvcc.teamscore_rev4.utils.PLAYER_STROKES_1
 import com.golfpvcc.teamscore_rev4.utils.PLAYER_STROKES_2
 import com.golfpvcc.teamscore_rev4.utils.PLAYER_STROKES_3
+import com.golfpvcc.teamscore_rev4.utils.PointTable
 import com.golfpvcc.teamscore_rev4.utils.SUMMARY_BUTTON_TEXT
 import com.golfpvcc.teamscore_rev4.utils.TEAM_GROSS_SCORE
 import com.golfpvcc.teamscore_rev4.utils.TEAM_NET_SCORE
@@ -119,7 +118,7 @@ fun getTotalPlayerPointQuota(
     whatNine: Int,
     playerHeading: PlayerSummary,
     holePar: IntArray,
-    gamePointsTable: List<PointsRecord>,
+    gamePointsTable: List<PointTable>,
 ): TeamPoints {
     val playerPtQuote = TeamPoints(0, 0)
     var start: Int = 0
@@ -135,13 +134,13 @@ fun getTotalPlayerPointQuota(
         if (0 < playerHeading.mPlayer.mScore[idx]) {
             val playerScore = playerHeading.mPlayer.mScore[idx]
             val ptKey = getPointQuoteKey(playerScore, holePar[idx])
-            val ptQuota = gamePointsTable.filter { it.mId == ptKey }
+            val ptQuota = gamePointsTable.filter { it.key == ptKey }
             if (ptQuota.isNotEmpty()) {
                 val ptQuoteRec = ptQuota.first()
-                playerHeading.mQuote += ptQuoteRec.mPoints
-                playerPtQuote.teamTotalPoints += ptQuoteRec.mPoints
+                playerHeading.mQuote += ptQuoteRec.value.toInt()
+                playerPtQuote.teamTotalPoints += ptQuoteRec.value.toInt()
                 playerPtQuote.teamUsedPoints += getTeamUsedScore(
-                    playerHeading.mPlayer.mTeamHole[idx], ptQuoteRec.mPoints
+                    playerHeading.mPlayer.mTeamHole[idx], ptQuoteRec.value.toInt()
                 )
             }
         }
@@ -168,7 +167,7 @@ fun getTotalPlayerStableford(
     whatNine: Int,
     playerHeading: PlayerSummary,
     holePar: IntArray,
-    gamePointsTable: List<PointsRecord>,
+    gamePointsTable: List<PointTable>,
 ): TeamPoints {
     val playerStableford = TeamPoints(0, 0)
     var start: Int = 0
@@ -186,19 +185,19 @@ fun getTotalPlayerStableford(
                 playerHeading.mPlayer.mScore[idx] - playerHeading.mPlayer.mStokeHole[idx]
 
             val ptKey = getPointQuoteKey(playerNetScore, holePar[idx])
-            val stableford = gamePointsTable.filter { it.mId == ptKey }
+            val stableford = gamePointsTable.filter { it.key == ptKey }
             if (stableford.isNotEmpty()) {
                 val stablefordRec = stableford.first()
-                playerHeading.mStableford += stablefordRec.mPoints
+                playerHeading.mStableford += stablefordRec.value.toInt()
                 Log.d(
                     "VIN",
-                    "${playerHeading.mPlayer.mName}  Par ${holePar[idx]} Net score $playerNetScore points ${stablefordRec.mPoints}"
+                    "${playerHeading.mPlayer.mName}  Par ${holePar[idx]} Net score $playerNetScore points ${stablefordRec.value.toInt()}"
                 )
 
-                playerStableford.teamTotalPoints += stablefordRec.mPoints
+                playerStableford.teamTotalPoints += stablefordRec.value.toInt()
                 playerStableford.teamUsedPoints += getTeamUsedScore(
                     teamUsedMask = playerHeading.mPlayer.mTeamHole[idx],
-                    playerPoints = stablefordRec.mPoints
+                    playerPoints = stablefordRec.value.toInt()
                 )
             }
         }

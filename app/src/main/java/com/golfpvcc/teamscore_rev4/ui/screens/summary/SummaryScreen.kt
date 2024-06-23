@@ -4,9 +4,7 @@ import android.content.pm.ActivityInfo
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -43,7 +41,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -54,7 +51,8 @@ import androidx.navigation.NavHostController
 import com.golfpvcc.teamscore_rev4.ui.navigation.ROOT_GRAPH_ROUTE
 import com.golfpvcc.teamscore_rev4.ui.navigation.TeamScoreScreen
 import com.golfpvcc.teamscore_rev4.ui.screens.CardButton
-import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.ScoreCardActions
+import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.AboutDialog
+import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.ConfigurePointsDialog
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.SummaryActions
 import com.golfpvcc.teamscore_rev4.utils.MENU_BUTTON_TEXT
 import com.golfpvcc.teamscore_rev4.utils.SUMMARY_BUTTON_TEXT
@@ -82,9 +80,10 @@ fun SummaryScreen(
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.primary) {
         Scaffold()
         {
-            Column(modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
             ) {
                 Row(
                     modifier = Modifier
@@ -95,15 +94,32 @@ fun SummaryScreen(
                 }
                 Row() {
                     BottomButtons(navController, summaryViewModel.state.mCourseId, summaryViewModel)
+                    DisplayMenuOptionDialogs(summaryViewModel)
                 }
                 Row() {
                     DisplayPlayersTotalScore(summaryViewModel.state)
                 }
 
+
             }
         }
     } // end of Scaffold
 }
+
+@Composable
+fun DisplayMenuOptionDialogs(summaryViewModel: SummaryViewModel) {
+    Log.d("VIN", "DisplayMenuOptionDialogs State ${summaryViewModel.state.mShowAboutDialog}")
+    if (summaryViewModel.state.mShowAboutDialog) {
+        AboutDialog(summaryViewModel::summaryActions)
+    }
+    if (summaryViewModel.state.mShowPointsDialog) {
+        SetScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+        ConfigurePointsDialog(summaryViewModel::summaryActions, summaryViewModel)
+    } else
+        SetScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
+
+}
+
 
 @Composable
 fun DisplayTeamTotalScore(summaryViewModel: SummaryViewModel) {
@@ -477,6 +493,7 @@ fun BottomButtons(
     Log.d("VIN", "Summary buttons Id $courseId")
     Row(
         modifier = Modifier
+            .padding(10.dp)
             .fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -497,7 +514,7 @@ fun BottomButtons(
                 popUpTo(ROOT_GRAPH_ROUTE)    // clear the back stack
             }
         }
-        DisplayTestMenuDown(summaryViewModel::summaryActions)
+        DisplayOptionMenuDown(summaryViewModel::summaryActions)
 
         CardButton(" Exit ") {
             navController.navigate("exit")
@@ -506,7 +523,7 @@ fun BottomButtons(
 }
 
 @Composable
-fun DisplayTestMenuDown(onAction: (SummaryActions) -> Unit) {
+fun DisplayOptionMenuDown(onAction: (SummaryActions) -> Unit) {
 
     var expanded by remember { mutableStateOf(false) }
 
@@ -516,22 +533,44 @@ fun DisplayTestMenuDown(onAction: (SummaryActions) -> Unit) {
         .padding(1.dp),
         border = BorderStroke(2.dp, Color.LightGray),
         onClick = { expanded = true }
-    ){
+    ) {
         Text(
             modifier = Modifier.padding(5.dp),
             text = "Menu",
             fontSize = SUMMARY_BUTTON_TEXT.sp,
-            )
+        )
 
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
-            DropdownMenuItem({ Text(text = "Junk",fontSize = MENU_BUTTON_TEXT.sp,) }, onClick = {})
-            DropdownMenuItem({ Text(text = "Points",fontSize = MENU_BUTTON_TEXT.sp) }, onClick = {})
-            DropdownMenuItem({ Text(text = "Email",fontSize = MENU_BUTTON_TEXT.sp) }, onClick = {})
-            DropdownMenuItem({ Text(text = "Backup/Restore",fontSize = MENU_BUTTON_TEXT.sp) }, onClick = {})
-            DropdownMenuItem({ Text(text = "About",fontSize = MENU_BUTTON_TEXT.sp) }, onClick = {})
+            DropdownMenuItem(
+                { Text(text = "Junk", fontSize = MENU_BUTTON_TEXT.sp) },
+                onClick = {
+                    expanded = false
+                    onAction(SummaryActions.DisplayJunkDialog)
+                    }
+            )
+            DropdownMenuItem(
+                { Text(text = "Points", fontSize = MENU_BUTTON_TEXT.sp) },
+                onClick = {
+                    expanded = false
+                    onAction(SummaryActions.DisplayPointsDialog) })
+            DropdownMenuItem(
+                { Text(text = "Email", fontSize = MENU_BUTTON_TEXT.sp) },
+                onClick = {
+                    expanded = false
+                    onAction(SummaryActions.DisplayEmailDialog) })
+            DropdownMenuItem(
+                { Text(text = "Backup/Restore", fontSize = MENU_BUTTON_TEXT.sp) },
+                onClick = {
+                    expanded = false
+                    onAction(SummaryActions.DisplayBackupRestoreDialog) })
+            DropdownMenuItem(
+                { Text(text = "About", fontSize = MENU_BUTTON_TEXT.sp) },
+                onClick = {
+                    expanded = false
+                    onAction(SummaryActions.DisplayAboutDialog) })
         }
     }
 }

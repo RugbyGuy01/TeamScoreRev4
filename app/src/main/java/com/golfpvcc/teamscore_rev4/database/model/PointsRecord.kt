@@ -5,7 +5,8 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "PointsTable")
 data class PointsRecord(
-    @PrimaryKey(autoGenerate = false)    // default is false
-    val mId: Int = 0,
-    val mPoints: Int = 0,
+    @PrimaryKey(autoGenerate = true)    // default is false
+        val mId: Int = 0,
+    var mPoints: Int = 0,
+    val label:String = "",
 )

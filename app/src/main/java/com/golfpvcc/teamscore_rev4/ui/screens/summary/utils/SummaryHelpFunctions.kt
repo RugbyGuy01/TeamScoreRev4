@@ -24,11 +24,19 @@ import com.golfpvcc.teamscore_rev4.utils.BACK_NINE_DISPLAY
 import com.golfpvcc.teamscore_rev4.utils.BACK_NINE_TOTAL_DISPLAYED
 import com.golfpvcc.teamscore_rev4.utils.FRONT_NINE_DISPLAY
 import com.golfpvcc.teamscore_rev4.utils.PQ_TARGET
+import com.golfpvcc.teamscore_rev4.utils.PointTable
 import com.golfpvcc.teamscore_rev4.utils.TOTAL_18_HOLE
 
 sealed class SummaryActions {
-    data object DisplayMenuItems : SummaryActions()
+    data object DisplayJunkDialog : SummaryActions()
+    data object DisplayPointsDialog : SummaryActions()
+    data object DisplayEmailDialog : SummaryActions()
+    data object DisplayBackupRestoreDialog : SummaryActions()
+    data object DisplayAboutDialog : SummaryActions()
+
 }
+
+
 fun SummaryViewModel.updateScoreCardState(scoreCardWithPlayers: ScoreCardWithPlayers) {
     val scoreCardRecord: ScoreCardRecord = scoreCardWithPlayers.scoreCardRecord
 
@@ -70,7 +78,7 @@ Now subtract team's need points from the player flag points to equal the used po
  */
 fun SummaryViewModel.calculatePtQuote() {
     val parCell: HdcpParHoleHeading? = state.hdcpParHoleHeading.find { it.vinTag == PAR_HEADER }
-    var pointQuotaTargetValue: PointsRecord = PointsRecord(0, 36)
+    var pointQuotaTargetValue = PointTable(0, "36")
 
     state.mTotalPtQuoteFront = 0f
     state.mTotalPtQuoteBack = 0f
@@ -82,7 +90,7 @@ fun SummaryViewModel.calculatePtQuote() {
     state.mQuotaPointsFront = 0f
     state.mQuotaPointsBack = 0f
 
-    val pointQuotaRecord = state.mGamePointsTable.filter { it.mId == PQ_TARGET }
+    val pointQuotaRecord = state.mGamePointsTable.filter { it.key == PQ_TARGET }
     if (pointQuotaRecord.isNotEmpty()) {
         pointQuotaTargetValue = pointQuotaRecord.first()
     }
@@ -95,14 +103,14 @@ fun SummaryViewModel.calculatePtQuote() {
                 holePar = parCell.mHole,
                 gamePointsTable = state.mGamePointsTable
             )
-            state.mTotalPtQuoteFront -= (pointQuotaTargetValue.mPoints - playerSummary.mPlayer.mHdcp.toInt()) / 2f // target points to make
+            state.mTotalPtQuoteFront -= (pointQuotaTargetValue.value.toInt() - playerSummary.mPlayer.mHdcp.toInt()) / 2f // target points to make
             state.mTotalPtQuoteFront += teamPoints.teamTotalPoints  // player front nine points
 
-            state.mUsedPtQuoteFront -= (pointQuotaTargetValue.mPoints - playerSummary.mPlayer.mHdcp.toInt()) / 2f // target points to make
+            state.mUsedPtQuoteFront -= (pointQuotaTargetValue.value.toInt() - playerSummary.mPlayer.mHdcp.toInt()) / 2f // target points to make
             state.mUsedPtQuoteFront += teamPoints.teamUsedPoints
 
             state.mTotalPointsFront += teamPoints.teamTotalPoints  // player front nine points
-            state.mQuotaPointsFront += (pointQuotaTargetValue.mPoints - playerSummary.mPlayer.mHdcp.toInt()) / 2f // target points to make
+            state.mQuotaPointsFront += (pointQuotaTargetValue.value.toInt() - playerSummary.mPlayer.mHdcp.toInt()) / 2f // target points to make
 
             teamPoints = getTotalPlayerPointQuota(
                 whatNine = BACK_NINE_DISPLAY,
@@ -110,16 +118,16 @@ fun SummaryViewModel.calculatePtQuote() {
                 holePar = parCell.mHole,
                 gamePointsTable = state.mGamePointsTable
             )
-            state.mTotalPtQuoteBack -= (pointQuotaTargetValue.mPoints - playerSummary.mPlayer.mHdcp.toInt()) / 2f // target points to make
+            state.mTotalPtQuoteBack -= (pointQuotaTargetValue.value.toInt() - playerSummary.mPlayer.mHdcp.toInt()) / 2f // target points to make
             state.mTotalPtQuoteBack += teamPoints.teamTotalPoints     // player back nine points
 
-            state.mUsedPtQuoteBack -= (pointQuotaTargetValue.mPoints - playerSummary.mPlayer.mHdcp.toInt()) / 2f // target points to make
+            state.mUsedPtQuoteBack -= (pointQuotaTargetValue.value.toInt() - playerSummary.mPlayer.mHdcp.toInt()) / 2f // target points to make
             state.mUsedPtQuoteBack += teamPoints.teamUsedPoints
 
             state.mTotalPointsBack += teamPoints.teamTotalPoints  // player back nine points
-            state.mQuotaPointsBack += (pointQuotaTargetValue.mPoints - playerSummary.mPlayer.mHdcp.toInt()) / 2f // target points to make
+            state.mQuotaPointsBack += (pointQuotaTargetValue.value.toInt() - playerSummary.mPlayer.mHdcp.toInt()) / 2f // target points to make
 
-            playerSummary.mQuote -= (pointQuotaTargetValue.mPoints - playerSummary.mPlayer.mHdcp.toInt()) // target points to make
+            playerSummary.mQuote -= (pointQuotaTargetValue.value.toInt() - playerSummary.mPlayer.mHdcp.toInt()) // target points to make
             Log.d("VIN","calculatePtQuote Player ${playerSummary.mPlayer.mName} qt pts ${playerSummary.mQuote}" )
         }
     }

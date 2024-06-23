@@ -26,8 +26,10 @@ import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.playerScoreSummary
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.updateScoreCardState
 import com.golfpvcc.teamscore_rev4.utils.MAX_PLAYERS
 import com.golfpvcc.teamscore_rev4.utils.PQ_TARGET
+import com.golfpvcc.teamscore_rev4.utils.PointTable
 import com.golfpvcc.teamscore_rev4.utils.SCORE_CARD_REC_ID
 import com.golfpvcc.teamscore_rev4.utils.createPointTableRecords
+
 
 open class SummaryViewModel() : ViewModel() {
     var state by mutableStateOf(State())
@@ -50,18 +52,79 @@ open class SummaryViewModel() : ViewModel() {
                 updateScoreCardState(scoreCardWithPlayers)       // located in helper function file
             } else
                 Log.d("VIN1", "getScoreCardAndPlayerRecord is empty")
-            state.mGamePointsTable = pointsRecordDoa.getAllPointRecords()
+            configurePointTable()
             teamAndPlayerSummary()
         }
     }
-    fun summaryActions(action: SummaryActions) {
-        when(action){
-            SummaryActions.DisplayMenuItems -> displaySummaryMenuOptions()
+
+    private fun configurePointTable() {
+        val pointsTableRecords = pointsRecordDoa.getAllPointRecords()
+        val sortPointTable = pointsTableRecords.sortedByDescending { it.mPoints }
+        Log.d("Sort", " sortedBy points $sortPointTable")
+        for (ptRecord: PointsRecord in sortPointTable) {
+            var pointTable: PointTable
+            pointTable = PointTable(ptRecord.mId, ptRecord.mPoints.toString(), ptRecord.label)
+            state.mGamePointsTable += pointTable    // the record to the point table list
         }
     }
-    fun displaySummaryMenuOptions(){
-        Log.d("VIN", "displaySummaryMenuOptions")
+
+    fun summaryActions(action: SummaryActions) {
+        when (action) {
+            SummaryActions.DisplayAboutDialog -> displayAboutDialog()
+            SummaryActions.DisplayBackupRestoreDialog -> displayBackupRestoreDialog()
+            SummaryActions.DisplayEmailDialog -> displayEmailDialog()
+            SummaryActions.DisplayJunkDialog -> displayJunkDialog()
+            SummaryActions.DisplayPointsDialog -> displayPointsDialog()
+        }
     }
+
+    fun displayAboutDialog() {
+        Log.d("VIN", "displayAboutDialog  state ${state.mShowAboutDialog}")
+        state.mShowAboutDialog = !state.mShowAboutDialog
+        repaintScreen()
+    }
+
+    fun displayBackupRestoreDialog() {
+        Log.d("VIN", "displayBackupRestoreDialog")
+    }
+
+    fun displayEmailDialog() {
+        Log.d("VIN", "displayEmailDialog")
+    }
+
+    fun displayJunkDialog() {
+        Log.d("VIN", "displayJunkDialog")
+    }
+
+    fun displayPointsDialog() {
+        Log.d("VIN", "displayPointsDialog")
+        state.mShowPointsDialog = !state.mShowPointsDialog
+        repaintScreen()
+    }
+
+    private fun repaintScreen() {
+        state = state.copy(mRepaintScreen = !state.mRepaintScreen)
+    }
+
+    fun onPointsTableChange(idx: Int, newValue: String) {
+        val specialChar: String
+        specialChar = if (newValue == ".")
+            "-"
+        else newValue
+
+        state.mGamePointsTable.find { it.key == idx }?.value = specialChar
+        repaintScreen()
+        Log.d("VIN", "onPointsTableChange after ${state.mGamePointsTable}")
+    }
+
+    fun getPointTableValue(idx: Int): String {
+        var ptValue = state.mGamePointsTable.find { it.key == idx }?.value
+        if (ptValue == null)
+            ptValue = "0"
+
+        return (ptValue)
+    }
+
     private fun teamAndPlayerSummary() {
         calculatePtQuote()
         calculateStableford()
@@ -87,8 +150,8 @@ open class SummaryViewModel() : ViewModel() {
         for (idx in 0 until numberOfPlayers) {
             playersHandicap += state.playerSummary[idx].mPlayer.mHdcp.toInt()
         }
-        val ptQuota = state.mGamePointsTable.filter { it.mId == PQ_TARGET }
-        var TeamBasePointsNeeded = ptQuota.first().mPoints
+        val ptQuota = state.mGamePointsTable.filter { it.key == PQ_TARGET }
+        var TeamBasePointsNeeded = ptQuota.first().value.toInt()
         if (ptQuota.isNotEmpty()) {
             TeamBasePointsNeeded *= state.playerSummary.size //if all players had a 0 handicap, this is how many point they would need
         }
@@ -96,10 +159,12 @@ open class SummaryViewModel() : ViewModel() {
         TeamBasePointsNeeded -= playersHandicap // however, subtract the total handicap of all of the players from the team bas point needed
         return (TeamBasePointsNeeded)
     }
-    fun getABCDGameScore(idx:Int):String{
-        val gameABCDScore:String = state.mGameABCD[idx].toString()
+
+    fun getABCDGameScore(idx: Int): String {
+        val gameABCDScore: String = state.mGameABCD[idx].toString()
         return (gameABCDScore)
     }
+
     fun frontPtQuota(): String {
         val frontNinePtQuote: String = String.format("%.1f", state.mTotalPtQuoteFront)
         val frontUsedPtQuote: String = String.format("%.1f", state.mUsedPtQuoteFront)
@@ -194,7 +259,14 @@ data class State(
     var mGameABCD: IntArray = IntArray(MAX_PLAYERS) { 0 },   // A player index 0
     var mDisplayMenu: Boolean = false,
     var mHasDatabaseBeenRead: Boolean = false,
-    var mGamePointsTable: List<PointsRecord> = emptyList(),
+    var mShowJunkDialog: Boolean = false,
+    var mShowPointsDialog: Boolean = false,
+    var mShowEmailDialog: Boolean = false,
+    var mShowBackupRestoreDialog: Boolean = false,
+    var mShowAboutDialog: Boolean = false,
+
+    val mRepaintScreen: Boolean = false,
+    var mGamePointsTable: List<PointTable> = emptyList(),
 
     var mTotalPtQuoteFront: Float = 0f,
     var mTotalPtQuoteBack: Float = 0f,
