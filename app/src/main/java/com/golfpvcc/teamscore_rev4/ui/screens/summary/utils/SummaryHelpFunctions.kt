@@ -30,10 +30,11 @@ import com.golfpvcc.teamscore_rev4.utils.TOTAL_18_HOLE
 sealed class SummaryActions {
     data object DisplayJunkDialog : SummaryActions()
     data object DisplayPointsDialog : SummaryActions()
+    data object SavePointsDialog : SummaryActions()
+    data object CancelPointsDialog : SummaryActions()
     data object DisplayEmailDialog : SummaryActions()
     data object DisplayBackupRestoreDialog : SummaryActions()
     data object DisplayAboutDialog : SummaryActions()
-
 }
 
 

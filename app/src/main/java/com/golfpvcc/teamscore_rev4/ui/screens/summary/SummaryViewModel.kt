@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import com.golfpvcc.teamscore_rev4.TeamScoreCardApp
 import com.golfpvcc.teamscore_rev4.database.model.PointsRecord
 import com.golfpvcc.teamscore_rev4.database.model.ScoreCardWithPlayers
@@ -29,6 +30,8 @@ import com.golfpvcc.teamscore_rev4.utils.PQ_TARGET
 import com.golfpvcc.teamscore_rev4.utils.PointTable
 import com.golfpvcc.teamscore_rev4.utils.SCORE_CARD_REC_ID
 import com.golfpvcc.teamscore_rev4.utils.createPointTableRecords
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 open class SummaryViewModel() : ViewModel() {
@@ -75,6 +78,8 @@ open class SummaryViewModel() : ViewModel() {
             SummaryActions.DisplayEmailDialog -> displayEmailDialog()
             SummaryActions.DisplayJunkDialog -> displayJunkDialog()
             SummaryActions.DisplayPointsDialog -> displayPointsDialog()
+            SummaryActions.SavePointsDialog -> savePointsDialogRecords()
+            SummaryActions.CancelPointsDialog -> cancelPointsDialogRecords()
         }
     }
 
@@ -99,6 +104,11 @@ open class SummaryViewModel() : ViewModel() {
     fun displayPointsDialog() {
         Log.d("VIN", "displayPointsDialog")
         state.mShowPointsDialog = !state.mShowPointsDialog
+        if(state.mShowPointsDialog) {
+            for (ptRecord: PointTable in state.mGamePointsTable) {
+                ptRecord.oldValue = ptRecord.value  // save all of the old value in case the user cancels
+            }
+        }
         repaintScreen()
     }
 
@@ -107,8 +117,7 @@ open class SummaryViewModel() : ViewModel() {
     }
 
     fun onPointsTableChange(idx: Int, newValue: String) {
-        val specialChar: String
-        specialChar = if (newValue == ".")
+        val specialChar: String = if (newValue == ".")
             "-"
         else newValue
 
@@ -123,6 +132,24 @@ open class SummaryViewModel() : ViewModel() {
             ptValue = "0"
 
         return (ptValue)
+    }
+
+    private fun savePointsDialogRecords() {
+        viewModelScope.launch(Dispatchers.IO) {
+            for (ptRecord: PointTable in state.mGamePointsTable) {
+                val pointsRecord =
+                    PointsRecord(ptRecord.key, ptRecord.value.toInt(), ptRecord.label)
+                pointsRecordDoa.addUpdatePointTableRecord(pointsRecord)
+            }
+            displayPointsDialog()   // exit dialog
+        }
+    }
+
+    private fun cancelPointsDialogRecords() {
+        for (ptRecord: PointTable in state.mGamePointsTable) {
+            ptRecord.value = ptRecord.oldValue  // replace all of the old values
+        }
+        displayPointsDialog()   // exit dialog
     }
 
     private fun teamAndPlayerSummary() {

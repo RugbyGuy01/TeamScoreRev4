@@ -11,6 +11,7 @@ data class PointTable(
     val key: Int = 0,
     var value: String = "",
     val label: String = "",
+    var oldValue: String = "",  // kept track off the old value in case the user cancels
 )
 
 const val PQ_EAGLE = 1

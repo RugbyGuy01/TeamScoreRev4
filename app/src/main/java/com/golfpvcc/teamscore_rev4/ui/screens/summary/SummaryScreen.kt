@@ -497,26 +497,26 @@ fun BottomButtons(
             .fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        CardButton("Resume") {
+        CardButton("Resume", Color.Transparent) {
             navController.navigate(route = TeamScoreScreen.ScreenScoreCard.route) { // back to the start of configuration
                 popUpTo(ROOT_GRAPH_ROUTE)    // clear the back stack
             }
         }
         Log.d("VIN", "Summary buttons Id $courseId")
-        CardButton("Players") {
+        CardButton("Players", Color.Transparent) {
             navController.navigate(TeamScoreScreen.ScreenPlayerSetup.passId(courseId))
             { // back to the start of configuration
                 popUpTo(ROOT_GRAPH_ROUTE)    // clear the back stack
             }
         }
-        CardButton("Courses") {
+        CardButton("Courses", Color.Transparent) {
             navController.navigate(TeamScoreScreen.ScreenCourses.route) {
                 popUpTo(ROOT_GRAPH_ROUTE)    // clear the back stack
             }
         }
         DisplayOptionMenuDown(summaryViewModel::summaryActions)
 
-        CardButton(" Exit ") {
+        CardButton(" Exit ", Color.Transparent) {
             navController.navigate("exit")
         }
     } // end of row
@@ -532,6 +532,9 @@ fun DisplayOptionMenuDown(onAction: (SummaryActions) -> Unit) {
         .clip(RoundedCornerShape(4.dp))
         .padding(1.dp),
         border = BorderStroke(2.dp, Color.LightGray),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.Transparent,
+        ),
         onClick = { expanded = true }
     ) {
         Text(
@@ -549,28 +552,32 @@ fun DisplayOptionMenuDown(onAction: (SummaryActions) -> Unit) {
                 onClick = {
                     expanded = false
                     onAction(SummaryActions.DisplayJunkDialog)
-                    }
+                }
             )
             DropdownMenuItem(
                 { Text(text = "Points", fontSize = MENU_BUTTON_TEXT.sp) },
                 onClick = {
                     expanded = false
-                    onAction(SummaryActions.DisplayPointsDialog) })
+                    onAction(SummaryActions.DisplayPointsDialog)
+                })
             DropdownMenuItem(
                 { Text(text = "Email", fontSize = MENU_BUTTON_TEXT.sp) },
                 onClick = {
                     expanded = false
-                    onAction(SummaryActions.DisplayEmailDialog) })
+                    onAction(SummaryActions.DisplayEmailDialog)
+                })
             DropdownMenuItem(
                 { Text(text = "Backup/Restore", fontSize = MENU_BUTTON_TEXT.sp) },
                 onClick = {
                     expanded = false
-                    onAction(SummaryActions.DisplayBackupRestoreDialog) })
+                    onAction(SummaryActions.DisplayBackupRestoreDialog)
+                })
             DropdownMenuItem(
                 { Text(text = "About", fontSize = MENU_BUTTON_TEXT.sp) },
                 onClick = {
                     expanded = false
-                    onAction(SummaryActions.DisplayAboutDialog) })
+                    onAction(SummaryActions.DisplayAboutDialog)
+                })
         }
     }
 }

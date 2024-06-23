@@ -1,61 +1,45 @@
 package com.golfpvcc.teamscore_rev4.ui.screens.summary.utils
 
-import android.content.pm.ActivityInfo
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.text2.BasicTextField2
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import androidx.room.util.TableInfo
 import com.golfpvcc.teamscore_rev4.ui.screens.CardButton
-import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.dialogenterscore.DialogAction
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.SummaryViewModel
 import com.golfpvcc.teamscore_rev4.utils.DIALOG_BUTTON_TEXT_SIZE
-import com.golfpvcc.teamscore_rev4.utils.PQ_EAGLE
-import com.golfpvcc.teamscore_rev4.utils.PQ_TARGET
+import com.golfpvcc.teamscore_rev4.utils.LAST_PLAYER
+import com.golfpvcc.teamscore_rev4.utils.PQ_OTHER
 import com.golfpvcc.teamscore_rev4.utils.SUMMARY_DIALOG_TEXT_SIZE
-import com.golfpvcc.teamscore_rev4.utils.SUMMARY_TEXT_SIZE
-import com.golfpvcc.teamscore_rev4.utils.SetScreenOrientation
 
 @Composable
 fun ConfigurePointsDialog(onAction: (SummaryActions) -> Unit, summaryViewModel: SummaryViewModel) {
-
 
     Dialog(properties = DialogProperties(usePlatformDefaultWidth = false),
         onDismissRequest = { onAction(SummaryActions.DisplayPointsDialog) }) {
@@ -70,16 +54,31 @@ fun ConfigurePointsDialog(onAction: (SummaryActions) -> Unit, summaryViewModel: 
                     .padding(10.dp)
             ) {
                 for (ptTable in summaryViewModel.state.mGamePointsTable) {
+                    val keyboardType: ImeAction
+                    keyboardType = if (ptTable.key == PQ_OTHER) {
+                        ImeAction.Done
+                    } else {
+                        ImeAction.Next
+                    }
+
                     UpdatePointsTable(
                         ptTable.key,
                         ptTable.label,
                         summaryViewModel.getPointTableValue(ptTable.key),
-                        if (ptTable.key == PQ_TARGET) 2 else 1,
+                        2,
+                        keyboardType,
                         summaryViewModel::onPointsTableChange
                     )
                 }
-                CardButton("Save")
-                { onAction(SummaryActions.DisplayPointsDialog) }
+                Row(
+                    Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    CardButton("Save", Color.LightGray)
+                    { onAction(SummaryActions.SavePointsDialog) }
+                    CardButton("Cancel", Color.Transparent)
+                    { onAction(SummaryActions.CancelPointsDialog) }
+                }
             }
         }
     }
@@ -91,6 +90,7 @@ fun UpdatePointsTable(
     prompt: String,
     pointsValue: String,
     mMaxLength: Int,
+    imeAction: ImeAction,
     updatedData: (Int, String) -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
@@ -118,7 +118,7 @@ fun UpdatePointsTable(
         keyboardOptions = KeyboardOptions(
             capitalization = KeyboardCapitalization.Sentences,
             keyboardType = KeyboardType.Number,
-            imeAction = ImeAction.Next,  //.Done
+            imeAction = imeAction,  //.Done
         ),
         keyboardActions = KeyboardActions(
             onDone = {
