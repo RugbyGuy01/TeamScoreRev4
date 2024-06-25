@@ -4,6 +4,7 @@ import android.content.pm.ActivityInfo
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -30,6 +31,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -44,6 +46,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -51,9 +54,12 @@ import androidx.navigation.NavHostController
 import com.golfpvcc.teamscore_rev4.ui.navigation.ROOT_GRAPH_ROUTE
 import com.golfpvcc.teamscore_rev4.ui.navigation.TeamScoreScreen
 import com.golfpvcc.teamscore_rev4.ui.screens.CardButton
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.dialogenterscore.DialogAction
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.AboutDialog
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.ConfigurePointsDialog
+import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.EmailScores
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.SummaryActions
+import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.sendPlayerEmail
 import com.golfpvcc.teamscore_rev4.utils.MENU_BUTTON_TEXT
 import com.golfpvcc.teamscore_rev4.utils.SUMMARY_BUTTON_TEXT
 import com.golfpvcc.teamscore_rev4.utils.SUMMARY_NAME_TEXT_SIZE
@@ -97,10 +103,11 @@ fun SummaryScreen(
                     DisplayMenuOptionDialogs(summaryViewModel)
                 }
                 Row() {
-                    DisplayPlayersTotalScore(summaryViewModel.state)
+                    DisplayPlayersTotalScore(
+                        summaryViewModel.state,
+                        summaryViewModel::summaryActions
+                    )
                 }
-
-
             }
         }
     } // end of Scaffold
@@ -108,7 +115,7 @@ fun SummaryScreen(
 
 @Composable
 fun DisplayMenuOptionDialogs(summaryViewModel: SummaryViewModel) {
-    Log.d("VIN", "DisplayMenuOptionDialogs State ${summaryViewModel.state.mShowAboutDialog}")
+    Log.d("VIN", "mShowEmailDialog State ${summaryViewModel.state.mShowEmailDialog}")
     if (summaryViewModel.state.mShowAboutDialog) {
         AboutDialog(summaryViewModel::summaryActions)
     }
@@ -118,6 +125,10 @@ fun DisplayMenuOptionDialogs(summaryViewModel: SummaryViewModel) {
     } else
         SetScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
 
+    if (summaryViewModel.state.mShowEmailDialog) {
+        val mContext = LocalContext.current
+        summaryViewModel.sendPlayerEmail(mContext, 0, "Vgamble@golfpvcc.com")
+    }
 }
 
 
@@ -281,7 +292,7 @@ fun DisplayStablefordSummary(summaryViewModel: SummaryViewModel) {
 }
 
 @Composable
-fun DisplayPlayersTotalScore(state: State) {
+fun DisplayPlayersTotalScore(state: State, onAction: (SummaryActions) -> Unit) {
     val playersRecord = state.playerSummary
     Column(
         Modifier
@@ -290,7 +301,7 @@ fun DisplayPlayersTotalScore(state: State) {
     ) {
         LazyRow(Modifier.padding(4.dp)) {
             items(playersRecord) { player ->
-                DisplayPlayerScore(player)
+                DisplayPlayerScore(player, onAction)
                 Spacer(modifier = Modifier.size(10.dp))
             }
         }
@@ -298,7 +309,7 @@ fun DisplayPlayersTotalScore(state: State) {
 }
 
 @Composable
-fun DisplayPlayerScore(player: PlayerSummary) {
+fun DisplayPlayerScore(player: PlayerSummary, onAction: (SummaryActions) -> Unit) {
     Card(
         Modifier.fillMaxWidth(),
         border = BorderStroke(1.dp, Color.Black),
@@ -312,7 +323,7 @@ fun DisplayPlayerScore(player: PlayerSummary) {
                 .padding(3.dp)
                 .width(550.dp)
         ) {
-            DisplayPlayerNameAndScore(player)
+            DisplayPlayerNameAndScore(player, onAction)
             HorizontalDivider(thickness = 2.dp)
             DisplayPlayerScoreLine1(player)
             DisplayPlayerScoreLine2(player)
@@ -365,7 +376,7 @@ fun DisplayPlayerScorePayouts(player: PlayerSummary) {
 }
 
 @Composable
-fun DisplayPlayerNameAndScore(player: PlayerSummary) {
+fun DisplayPlayerNameAndScore(player: PlayerSummary, onAction: (SummaryActions) -> Unit) {
     Row(
         Modifier
             .background(Color.LightGray)
@@ -373,7 +384,8 @@ fun DisplayPlayerNameAndScore(player: PlayerSummary) {
     ) {
         Icon(
             imageVector = Icons.Default.Email,
-            contentDescription = "Email"
+            contentDescription = "Email",
+            modifier = Modifier.clickable { onAction(SummaryActions.DisplayEmailDialog) }
         )
         Spacer(modifier = Modifier.width(15.dp))
         Text(

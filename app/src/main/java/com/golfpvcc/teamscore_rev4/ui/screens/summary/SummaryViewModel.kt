@@ -95,6 +95,8 @@ open class SummaryViewModel() : ViewModel() {
 
     fun displayEmailDialog() {
         Log.d("VIN", "displayEmailDialog")
+        state.mShowEmailDialog = true
+        repaintScreen()
     }
 
     fun displayJunkDialog() {
@@ -104,9 +106,10 @@ open class SummaryViewModel() : ViewModel() {
     fun displayPointsDialog() {
         Log.d("VIN", "displayPointsDialog")
         state.mShowPointsDialog = !state.mShowPointsDialog
-        if(state.mShowPointsDialog) {
+        if (state.mShowPointsDialog) {
             for (ptRecord: PointTable in state.mGamePointsTable) {
-                ptRecord.oldValue = ptRecord.value  // save all of the old value in case the user cancels
+                ptRecord.oldValue =
+                    ptRecord.value  // save all of the old value in case the user cancels
             }
         }
         repaintScreen()

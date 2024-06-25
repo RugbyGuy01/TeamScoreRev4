@@ -7,6 +7,6 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "JunkTable")
 data class JunkRecord(
     val mJunkName: String = "",
-    @PrimaryKey(autoGenerate = true)    // default is false
+    @PrimaryKey(autoGenerate = false)    // autoGenerate is false
     val mId: Int = 0,
 )

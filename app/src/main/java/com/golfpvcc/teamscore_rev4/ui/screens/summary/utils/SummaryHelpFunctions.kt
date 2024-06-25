@@ -1,7 +1,8 @@
 package com.golfpvcc.teamscore_rev4.ui.screens.summary.utils
 
+import android.content.Context
 import android.util.Log
-import com.golfpvcc.teamscore_rev4.database.model.PointsRecord
+import androidx.compose.ui.platform.LocalContext
 import com.golfpvcc.teamscore_rev4.database.model.ScoreCardRecord
 import com.golfpvcc.teamscore_rev4.database.model.ScoreCardWithPlayers
 import com.golfpvcc.teamscore_rev4.ui.screens.getTotalPlayerPointQuota
@@ -13,15 +14,11 @@ import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.GameABCD
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.HDCP_HEADER
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.NineGame
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.PAR_HEADER
-import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.ScoreCardActions
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.setPlayerStrokeHoles
-import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.updatePlayerDisplayScore
-import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.updatePlayersTeamScoreCells
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.PlayerSummary
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.SummaryViewModel
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.TeamPoints
 import com.golfpvcc.teamscore_rev4.utils.BACK_NINE_DISPLAY
-import com.golfpvcc.teamscore_rev4.utils.BACK_NINE_TOTAL_DISPLAYED
 import com.golfpvcc.teamscore_rev4.utils.FRONT_NINE_DISPLAY
 import com.golfpvcc.teamscore_rev4.utils.PQ_TARGET
 import com.golfpvcc.teamscore_rev4.utils.PointTable
@@ -267,7 +264,26 @@ fun SummaryViewModel.calculatePlayerScoreSummary(
         currentHole++
     }
 }
+fun SummaryViewModel.sendPlayerEmail( mContext: Context, playerIdx:Int, emailTo:String){
+    var subject = "Player's Score: "
+    val  MyEmailApp = EmailScores(mContext)
 
+    subject += state.playerSummary[playerIdx].mPlayer.mName  // subject line
+    subject += "  - " + state.mCourseName // get the current score for today's game
+
+    val parCell: HdcpParHoleHeading? = state.hdcpParHoleHeading.find { it.vinTag == PAR_HEADER }
+    if( parCell != null) {
+        var body: String =
+            getSpreadSheetScore(state.playerSummary[playerIdx].mPlayer, parCell.mHole)
+        body += state.mCourseName + "," // add course name, user will add the tee box or yardage
+        body += state.mTee
+
+        MyEmailApp.setEmailAddress("vgamble@golfpvcc.com")
+        MyEmailApp.setEmailSubject(subject)
+        MyEmailApp.setEmailBody(body)
+        MyEmailApp.toPostOffice()
+    }
+}
 fun clearSummaryScores(playerHeading: PlayerSummary) {
     playerHeading.mFront = 0
     playerHeading.mBack = 0

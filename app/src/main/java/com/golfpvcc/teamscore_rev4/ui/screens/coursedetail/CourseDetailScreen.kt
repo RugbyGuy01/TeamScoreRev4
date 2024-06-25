@@ -54,6 +54,7 @@ import com.golfpvcc.teamscore_rev4.utils.USER_SAVE
 import com.golfpvcc.teamscore_rev4.utils.USER_TEXT_SAVE
 import com.golfpvcc.teamscore_rev4.utils.USER_TEXT_UPDATE
 import com.golfpvcc.teamscore_rev4.utils.Constants.courseDetailPlaceHolder
+import com.golfpvcc.teamscore_rev4.utils.SetScreenOrientation
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -68,8 +69,7 @@ fun CourseDetailScreen(
 
     val courseDetailViewModel = remember { CourseDetailViewModel() }
     val saveButtonState = remember { mutableStateOf(USER_TEXT_SAVE) }
-    val activity = LocalContext.current as Activity
-    activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+    SetScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
 
     GetCourseRecord(
         courseViewModel,
