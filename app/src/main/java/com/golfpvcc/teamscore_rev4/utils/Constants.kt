@@ -63,6 +63,8 @@ const val MAX_STARTING_HOLE = 2
 const val LAST_PLAYER = MAX_PLAYERS - 1
 const val DISPLAY_SCORE_CARD_SCREEN = 6
 const val MINIMUM_LEN_OF_PLAYER_NAME = 2
+const val MAX_EMAIL_NAME_LEN = 10
+const val MAX_EMAIL_ADDRESS_LEN = 50
 
 // text size for forms
 const val DATABASE_NAME = "TeamDatabase"

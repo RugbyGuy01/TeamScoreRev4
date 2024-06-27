@@ -31,7 +31,6 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -54,11 +53,9 @@ import androidx.navigation.NavHostController
 import com.golfpvcc.teamscore_rev4.ui.navigation.ROOT_GRAPH_ROUTE
 import com.golfpvcc.teamscore_rev4.ui.navigation.TeamScoreScreen
 import com.golfpvcc.teamscore_rev4.ui.screens.CardButton
-import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.dialogenterscore.DialogAction
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.AboutDialog
+import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.ConfigureEmailDialog
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.ConfigurePointsDialog
-import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.EmailScores
-import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.SummaryActions
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.sendPlayerEmail
 import com.golfpvcc.teamscore_rev4.utils.MENU_BUTTON_TEXT
 import com.golfpvcc.teamscore_rev4.utils.SUMMARY_BUTTON_TEXT
@@ -115,8 +112,7 @@ fun SummaryScreen(
 
 @Composable
 fun DisplayMenuOptionDialogs(summaryViewModel: SummaryViewModel) {
-    Log.d("VIN", "mShowEmailDialog State ${summaryViewModel.state.mShowEmailDialog}")
-    if (summaryViewModel.state.mShowAboutDialog) {
+        if (summaryViewModel.state.mShowAboutDialog) {
         AboutDialog(summaryViewModel::summaryActions)
     }
     if (summaryViewModel.state.mShowPointsDialog) {
@@ -126,8 +122,8 @@ fun DisplayMenuOptionDialogs(summaryViewModel: SummaryViewModel) {
         SetScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
 
     if (summaryViewModel.state.mShowEmailDialog) {
-        val mContext = LocalContext.current
-        summaryViewModel.sendPlayerEmail(mContext, 0, "Vgamble@golfpvcc.com")
+        Log.d("VIN", "mShowEmailDialog")
+        ConfigureEmailDialog(summaryViewModel::summaryActions, summaryViewModel)
     }
 }
 
@@ -377,6 +373,8 @@ fun DisplayPlayerScorePayouts(player: PlayerSummary) {
 
 @Composable
 fun DisplayPlayerNameAndScore(player: PlayerSummary, onAction: (SummaryActions) -> Unit) {
+    val mContext = LocalContext.current
+
     Row(
         Modifier
             .background(Color.LightGray)
@@ -385,7 +383,7 @@ fun DisplayPlayerNameAndScore(player: PlayerSummary, onAction: (SummaryActions) 
         Icon(
             imageVector = Icons.Default.Email,
             contentDescription = "Email",
-            modifier = Modifier.clickable { onAction(SummaryActions.DisplayEmailDialog) }
+            modifier = Modifier.clickable { onAction(SummaryActions.SendEmailToUser(player.mPlayer.vinTag, mContext))}
         )
         Spacer(modifier = Modifier.width(15.dp))
         Text(
@@ -481,7 +479,6 @@ fun DisplayPlayerScoreLine3(player: PlayerSummary) {
 
 }
 
-
 @Composable
 fun GetScoreCardRecord(
     summaryViewModel: SummaryViewModel,
@@ -576,7 +573,7 @@ fun DisplayOptionMenuDown(onAction: (SummaryActions) -> Unit) {
                 { Text(text = "Email", fontSize = MENU_BUTTON_TEXT.sp) },
                 onClick = {
                     expanded = false
-                    onAction(SummaryActions.DisplayEmailDialog)
+                    onAction(SummaryActions.ShowEmailDialog)
                 })
             DropdownMenuItem(
                 { Text(text = "Backup/Restore", fontSize = MENU_BUTTON_TEXT.sp) },

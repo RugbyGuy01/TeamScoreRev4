@@ -36,12 +36,13 @@ import com.golfpvcc.teamscore_rev4.utils.TEAM_NET_SCORE
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CardButton(buttonText: String, backGroundColor:Color,  onClick: () -> Unit) {
+fun CardButton(buttonText: String, backGroundColor:Color,enableButton:Boolean = true,  onClick: () -> Unit) {
 
     Card(modifier = Modifier
         .wrapContentSize()
         .clip(RoundedCornerShape(4.dp))
         .padding(1.dp),
+        enabled = enableButton,
         border = BorderStroke(2.dp, Color.LightGray),
         colors = CardDefaults.cardColors(
             containerColor = backGroundColor,

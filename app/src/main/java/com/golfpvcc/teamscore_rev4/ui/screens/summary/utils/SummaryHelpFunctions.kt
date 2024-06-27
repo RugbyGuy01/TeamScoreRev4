@@ -2,7 +2,7 @@ package com.golfpvcc.teamscore_rev4.ui.screens.summary.utils
 
 import android.content.Context
 import android.util.Log
-import androidx.compose.ui.platform.LocalContext
+import com.golfpvcc.teamscore_rev4.TeamScoreCardApp
 import com.golfpvcc.teamscore_rev4.database.model.ScoreCardRecord
 import com.golfpvcc.teamscore_rev4.database.model.ScoreCardWithPlayers
 import com.golfpvcc.teamscore_rev4.ui.screens.getTotalPlayerPointQuota
@@ -24,15 +24,7 @@ import com.golfpvcc.teamscore_rev4.utils.PQ_TARGET
 import com.golfpvcc.teamscore_rev4.utils.PointTable
 import com.golfpvcc.teamscore_rev4.utils.TOTAL_18_HOLE
 
-sealed class SummaryActions {
-    data object DisplayJunkDialog : SummaryActions()
-    data object DisplayPointsDialog : SummaryActions()
-    data object SavePointsDialog : SummaryActions()
-    data object CancelPointsDialog : SummaryActions()
-    data object DisplayEmailDialog : SummaryActions()
-    data object DisplayBackupRestoreDialog : SummaryActions()
-    data object DisplayAboutDialog : SummaryActions()
-}
+
 
 
 fun SummaryViewModel.updateScoreCardState(scoreCardWithPlayers: ScoreCardWithPlayers) {
@@ -126,7 +118,10 @@ fun SummaryViewModel.calculatePtQuote() {
             state.mQuotaPointsBack += (pointQuotaTargetValue.value.toInt() - playerSummary.mPlayer.mHdcp.toInt()) / 2f // target points to make
 
             playerSummary.mQuote -= (pointQuotaTargetValue.value.toInt() - playerSummary.mPlayer.mHdcp.toInt()) // target points to make
-            Log.d("VIN","calculatePtQuote Player ${playerSummary.mPlayer.mName} qt pts ${playerSummary.mQuote}" )
+            Log.d(
+                "VIN",
+                "calculatePtQuote Player ${playerSummary.mPlayer.mName} qt pts ${playerSummary.mQuote}"
+            )
         }
     }
 }
@@ -169,7 +164,10 @@ fun SummaryViewModel.calculateOverUnderScores() {
 
     if (parCell != null) {
         for (playerSummary in state.playerSummary) {
-            Log.d("VIN","2 calculateOverUnderScores Player ${playerSummary.mPlayer.mName} qt pts ${playerSummary.mQuote}" )
+            Log.d(
+                "VIN",
+                "2 calculateOverUnderScores Player ${playerSummary.mPlayer.mName} qt pts ${playerSummary.mQuote}"
+            )
 
             var teamPoints = getTotalPlayerScore(
                 whatNine = FRONT_NINE_DISPLAY,
@@ -186,7 +184,10 @@ fun SummaryViewModel.calculateOverUnderScores() {
             )
             state.mTotalScoreBack += teamPoints.teamTotalPoints
             state.mOverUnderScoreBack += teamPoints.teamUsedPoints
-            Log.d("VIN","2 calculateOverUnderScores Player ${playerSummary.mPlayer.mName} qt pts ${playerSummary.mQuote}" )
+            Log.d(
+                "VIN",
+                "2 calculateOverUnderScores Player ${playerSummary.mPlayer.mName} qt pts ${playerSummary.mQuote}"
+            )
 
         }
     }
@@ -197,18 +198,22 @@ fun SummaryViewModel.playerScoreSummary() {
     val hdcpCell: HdcpParHoleHeading? = state.hdcpParHoleHeading.find { it.vinTag == HDCP_HEADER }
     if ((parCell != null) && (hdcpCell != null)) {
         for (playerSummary in state.playerSummary) {
-            Log.d("VIN","2 playerScoreSummary Player ${playerSummary.mPlayer.mName} qt pts ${playerSummary.mQuote}" )
+            Log.d(
+                "VIN",
+                "2 playerScoreSummary Player ${playerSummary.mPlayer.mName} qt pts ${playerSummary.mQuote}"
+            )
             calculatePlayerScoreSummary(playerSummary, parCell.mHole, hdcpCell.mHole)
         }
-        if(state.playerSummary.count() == 3){
+        if (state.playerSummary.count() == 3) {
             calculatePlayerNineScores()     // and ABCD game
         }
     }
 }
-fun SummaryViewModel.calculatePlayerNineScores(){
+
+fun SummaryViewModel.calculatePlayerNineScores() {
     var nineGameScores = NineGame()
     var gameABCD = GameABCD()
-    var currentHole : Int = 0
+    var currentHole: Int = 0
 
     while (currentHole < TOTAL_18_HOLE) { // holes 1 to 18
         nineGameScores.clearTotals()
@@ -222,7 +227,7 @@ fun SummaryViewModel.calculatePlayerNineScores(){
         }
         nineGameScores.sort9Scores()    // calculate player's scores
         gameABCD.sortScores()           // sort player scores
-        var idx:Int = 0
+        var idx: Int = 0
 
         for (playerSummary in state.playerSummary) {
             playerSummary.mNineTotal += nineGameScores.get9GameScore(playerSummary.mPlayer.vinTag)
@@ -264,26 +269,32 @@ fun SummaryViewModel.calculatePlayerScoreSummary(
         currentHole++
     }
 }
-fun SummaryViewModel.sendPlayerEmail( mContext: Context, playerIdx:Int, emailTo:String){
+
+fun SummaryViewModel.sendPlayerEmail( playerIdx: Int, mContext: Context) {
     var subject = "Player's Score: "
-    val  MyEmailApp = EmailScores(mContext)
+    val myEmailApp = EmailScores(mContext)
+    var emailAddress = "vgamble@golfpvcc.com"       // default address
+
+    if(state.mEmailRecords.isNotEmpty())
+        emailAddress = state.mEmailRecords[0].mEmailAddress
 
     subject += state.playerSummary[playerIdx].mPlayer.mName  // subject line
     subject += "  - " + state.mCourseName // get the current score for today's game
 
     val parCell: HdcpParHoleHeading? = state.hdcpParHoleHeading.find { it.vinTag == PAR_HEADER }
-    if( parCell != null) {
+    if (parCell != null) {
         var body: String =
             getSpreadSheetScore(state.playerSummary[playerIdx].mPlayer, parCell.mHole)
         body += state.mCourseName + "," // add course name, user will add the tee box or yardage
         body += state.mTee
 
-        MyEmailApp.setEmailAddress("vgamble@golfpvcc.com")
-        MyEmailApp.setEmailSubject(subject)
-        MyEmailApp.setEmailBody(body)
-        MyEmailApp.toPostOffice()
+        myEmailApp.setEmailAddress(emailAddress)
+        myEmailApp.setEmailSubject(subject)
+        myEmailApp.setEmailBody(body)
+        myEmailApp.toPostOffice()
     }
 }
+
 fun clearSummaryScores(playerHeading: PlayerSummary) {
     playerHeading.mFront = 0
     playerHeading.mBack = 0

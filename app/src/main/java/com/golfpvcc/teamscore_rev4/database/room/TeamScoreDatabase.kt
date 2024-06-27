@@ -25,7 +25,7 @@ import com.golfpvcc.teamscore_rev4.database.model.ScoreCardRecord
 
 @Database(
     entities = [CourseRecord::class, ScoreCardRecord::class, PlayerRecord::class, PointsRecord::class, JunkRecord::class, EmailRecord::class],
-    version = 3,
+    version = 4,
     exportSchema = false
 )
 

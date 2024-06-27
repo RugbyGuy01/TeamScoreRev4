@@ -2,6 +2,7 @@ package com.golfpvcc.teamscore_rev4.ui.screens.summary
 
 import android.annotation.SuppressLint
 import android.util.Log
+import android.util.Patterns
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -9,6 +10,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.golfpvcc.teamscore_rev4.TeamScoreCardApp
+import com.golfpvcc.teamscore_rev4.database.model.EmailRecord
 import com.golfpvcc.teamscore_rev4.database.model.PointsRecord
 import com.golfpvcc.teamscore_rev4.database.model.ScoreCardWithPlayers
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.HdcpParHoleHeading
@@ -19,11 +21,11 @@ import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.HOLE_HEADER
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.PAR_HEADER
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.TEAM_HEADER
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.USED_HEADER
-import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.SummaryActions
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.calculateOverUnderScores
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.calculatePtQuote
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.calculateStableford
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.playerScoreSummary
+import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.sendPlayerEmail
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.updateScoreCardState
 import com.golfpvcc.teamscore_rev4.utils.MAX_PLAYERS
 import com.golfpvcc.teamscore_rev4.utils.PQ_TARGET
@@ -38,6 +40,8 @@ open class SummaryViewModel() : ViewModel() {
     var state by mutableStateOf(State())
     private val scoreCardDao = TeamScoreCardApp.getScoreCardDao()
     private val pointsRecordDoa = TeamScoreCardApp.getPointsDao()
+    val emailDao = TeamScoreCardApp.getEmailDao()
+
 
     class SummaryViewModelFactor() : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -57,6 +61,7 @@ open class SummaryViewModel() : ViewModel() {
                 Log.d("VIN1", "getScoreCardAndPlayerRecord is empty")
             configurePointTable()
             teamAndPlayerSummary()
+            state.mEmailRecords = emailDao.getAllEmailRecords()
         }
     }
 
@@ -71,16 +76,54 @@ open class SummaryViewModel() : ViewModel() {
         }
     }
 
+
     fun summaryActions(action: SummaryActions) {
         when (action) {
             SummaryActions.DisplayAboutDialog -> displayAboutDialog()
             SummaryActions.DisplayBackupRestoreDialog -> displayBackupRestoreDialog()
-            SummaryActions.DisplayEmailDialog -> displayEmailDialog()
             SummaryActions.DisplayJunkDialog -> displayJunkDialog()
             SummaryActions.DisplayPointsDialog -> displayPointsDialog()
             SummaryActions.SavePointsDialog -> savePointsDialogRecords()
             SummaryActions.CancelPointsDialog -> cancelPointsDialogRecords()
+            SummaryActions.ShowEmailDialog -> showEmailDialog()
+            SummaryActions.SaveEmailRecord -> saveEmailRecord()
+            is SummaryActions.SendEmailToUser -> sendPlayerEmail(action.playerIdx, action.context)
         }
+    }
+
+
+    fun onEmailNameChange(emailName: String) {
+        state.mEmailRecords[0].mEmailName = emailName
+        repaintScreen()
+
+//        state = state.copy(mEmailName = emailName)
+        Log.d("VIN", "onEmailNameChange ${state.mEmailName} ")
+    }
+
+    fun onEmailAddressChange(emailAddress: String) {
+        state.mEmailRecords[0].mEmailAddress = emailAddress
+        repaintScreen()
+
+        //      state = state.copy(mEmailAddress = emailAddress)
+        Log.d("VIN", "onEmailAddressChange ${state.mEmailAddress} ")
+    }
+
+    fun checkForValidEmailAddress(): Boolean {
+        return(state.mEmailRecords[0].mEmailAddress.isValidEmail())
+        //return (state.mEmailAddress.isValidEmail())
+    }
+
+    fun CharSequence?.isValidEmail() =
+        !isNullOrEmpty() && Patterns.EMAIL_ADDRESS.matcher(this).matches()
+
+    private fun saveEmailRecord() {
+        Log.d("VIN", "saveEmailRecord ")
+        viewModelScope.launch(Dispatchers.IO) {
+//            val emailRecord = EmailRecord(state.mEmailName, state.mEmailAddress)
+            emailDao.addUpdateEmailTableRecord(state.mEmailRecords[0])  // only one email record
+        }
+
+        showEmailDialog()
     }
 
     fun displayAboutDialog() {
@@ -93,9 +136,9 @@ open class SummaryViewModel() : ViewModel() {
         Log.d("VIN", "displayBackupRestoreDialog")
     }
 
-    fun displayEmailDialog() {
-        Log.d("VIN", "displayEmailDialog")
-        state.mShowEmailDialog = true
+    fun showEmailDialog() {
+        Log.d("VIN", "displayEmailDialog ")
+        state.mShowEmailDialog = !state.mShowEmailDialog
         repaintScreen()
     }
 
@@ -291,12 +334,17 @@ data class State(
     var mHasDatabaseBeenRead: Boolean = false,
     var mShowJunkDialog: Boolean = false,
     var mShowPointsDialog: Boolean = false,
-    var mShowEmailDialog: Boolean = false,
     var mShowBackupRestoreDialog: Boolean = false,
     var mShowAboutDialog: Boolean = false,
-
-    val mRepaintScreen: Boolean = false,
+    var mShowEmailDialog: Boolean = false,
+    var mSendEmailToUser: Boolean = false,
+    var mSendEmailToPlayerIdx: Int = -1,
+    var mEmailAddress: String = "",
+    var mValidEmailAddress: Boolean = false,
+    var mEmailName: String = "",
+    var mEmailRecords: List<EmailRecord> = emptyList(),
     var mGamePointsTable: List<PointTable> = emptyList(),
+    val mRepaintScreen: Boolean = false,
 
     var mTotalPtQuoteFront: Float = 0f,
     var mTotalPtQuoteBack: Float = 0f,

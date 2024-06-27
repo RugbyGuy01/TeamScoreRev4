@@ -6,8 +6,8 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "EmailTable")
 data class EmailRecord(
-    val mEmailName: String = "",
-    val mEmailAddress: String = "",
+    var mEmailName: String = "",
+    var mEmailAddress: String = "",
     @PrimaryKey(autoGenerate = true)    // autoGenerate is false
     val mId: Int = 0,
 )
