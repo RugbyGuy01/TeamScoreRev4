@@ -27,7 +27,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.golfpvcc.teamscore_rev4.utils.Constants
-import com.golfpvcc.teamscore_rev4.utils.Constants.SCORE_CARD_REC_ID
+import com.golfpvcc.teamscore_rev4.utils.MAX_COURSE_YARDAGE
+import com.golfpvcc.teamscore_rev4.utils.MAX_STARTING_HOLE
+import com.golfpvcc.teamscore_rev4.utils.SCORE_CARD_REC_ID
 import com.golfpvcc.teamscore_rev4.utils.SetScreenOrientation
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -94,7 +96,7 @@ fun DisplayCourseNameAndTeeSelection(
             )
             Spacer(modifier = Modifier.size(14.dp))
             GetTeeInformation(
-                mMaxLength = Constants.MAX_COURSE_YARDAGE,
+                mMaxLength = MAX_COURSE_YARDAGE,
                 placeHolder = "Tee or Yardage",
                 playerData = viewModel.state.mTee,
                 updatedData = viewModel::onTeeStateChange,
@@ -107,7 +109,7 @@ fun DisplayCourseNameAndTeeSelection(
 
         Row(){
             GetTeeInformation(
-                mMaxLength = Constants.MAX_STARTING_HOLE,
+                mMaxLength = MAX_STARTING_HOLE,
                 placeHolder = "Starting Hole",
                 playerData = viewModel.state.mStartingHole,
                 updatedData = viewModel::onStartingHoleChange,

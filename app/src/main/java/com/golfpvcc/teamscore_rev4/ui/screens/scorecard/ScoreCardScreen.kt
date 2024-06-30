@@ -24,13 +24,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.dialogenterscore.ButtonEnterScore
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.displayoptions.DisplayModeDropDown
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DisplayCourseName
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DisplaySummaryButton
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DisplayPrevNextHoleButton
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DisplayScoreCardHeader
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DisplayScoreCardNames
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DisplayScoreCardTeams
-import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DisplayScreenModeButton
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.FlipFrontAndBackNine
 import com.golfpvcc.teamscore_rev4.utils.SetScreenOrientation
 import kotlinx.coroutines.Dispatchers
@@ -48,9 +48,6 @@ fun ScoreCardScreen(
         factory = ScoreCardViewModel.ScoreCardViewModelFactor()
     )
     GetScoreCardRecord(scoreCardViewModel)
-
-      
-
 
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.primary) {
         Scaffold()
@@ -127,11 +124,8 @@ fun DisplayControlButtons(scoreCardViewModel: ScoreCardViewModel, navController:
     Spacer(modifier = Modifier.size(20.dp))
     DisplayPrevNextHoleButton(scoreCardViewModel::scoreCardActions)
     Spacer(modifier = Modifier.size(25.dp))
-    DisplayScreenModeButton(
-        scoreCardViewModel.state.mButtonScreenNextText, // what will be display gross, net point quote, stableford screens
-        scoreCardViewModel::scoreCardActions
-    )
-    Spacer(modifier = Modifier.size(15.dp))
     DisplaySummaryButton(navController)
+    Spacer(modifier = Modifier.size(20.dp))
+    DisplayModeDropDown( scoreCardViewModel::scoreCardActions, scoreCardViewModel.state.mGameNines)
 
 }

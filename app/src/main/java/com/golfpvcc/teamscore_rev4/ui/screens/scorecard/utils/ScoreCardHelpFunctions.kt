@@ -7,8 +7,21 @@ import com.golfpvcc.teamscore_rev4.database.model.ScoreCardWithPlayers
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.HdcpParHoleHeading
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.PlayerHeading
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.ScoreCardViewModel
-import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.TeamUsedHeading
+import com.golfpvcc.teamscore_rev4.utils.ALBATROSS_ON_HOLE
+import com.golfpvcc.teamscore_rev4.utils.BIRDIES_ON_HOLE
+import com.golfpvcc.teamscore_rev4.utils.BOGGY_ON_HOLE
+import com.golfpvcc.teamscore_rev4.utils.DOUBLE_ON_HOLE
 import com.golfpvcc.teamscore_rev4.utils.DOUBLE_TEAM_SCORE
+import com.golfpvcc.teamscore_rev4.utils.EAGLE_ON_HOLE
+import com.golfpvcc.teamscore_rev4.utils.OTHER_ON_HOLE
+import com.golfpvcc.teamscore_rev4.utils.PAR_ON_HOLE
+import com.golfpvcc.teamscore_rev4.utils.PQ_ALBATROSS
+import com.golfpvcc.teamscore_rev4.utils.PQ_BIRDIES
+import com.golfpvcc.teamscore_rev4.utils.PQ_BOGGY
+import com.golfpvcc.teamscore_rev4.utils.PQ_DOUBLE
+import com.golfpvcc.teamscore_rev4.utils.PQ_EAGLE
+import com.golfpvcc.teamscore_rev4.utils.PQ_OTHER
+import com.golfpvcc.teamscore_rev4.utils.PQ_PAR
 import com.golfpvcc.teamscore_rev4.utils.TEAM_DOUBLE_GROSS_SCORE
 import com.golfpvcc.teamscore_rev4.utils.TEAM_DOUBLE_NET_SCORE
 import com.golfpvcc.teamscore_rev4.utils.TEAM_GROSS_SCORE
@@ -19,7 +32,7 @@ import com.golfpvcc.teamscore_rev4.utils.TEAM_SINGLE_NET_SCORE
 
 fun ScoreCardViewModel.highLiteTotalColumn(displayColor: Long) {
     val holeHeading: HdcpParHoleHeading? =
-        state.hdcpParHoleHeading.find { it.vinTag == HOLE_HEADER }
+        state.mHdcpParHoleHeading.find { it.vinTag == HOLE_HEADER }
     if (holeHeading != null) {
         holeHeading.mColor = Color(displayColor)
     }
@@ -33,88 +46,223 @@ fun ScoreCardViewModel.updateScoreCardState(scoreCardWithPlayers: ScoreCardWithP
     state = state.copy(mCurrentHole = (scoreCardRecord.mCurrentHole))   // zero based
     state = state.copy(mTee = scoreCardRecord.mTee)
     Log.d("VIN1", "updateScoreCardState read records - mDisplayScore")
-    val parCells: HdcpParHoleHeading? = state.hdcpParHoleHeading.find { it.vinTag == PAR_HEADER }
-    val hdcpCells: HdcpParHoleHeading? = state.hdcpParHoleHeading.find { it.vinTag == HDCP_HEADER }
+
+    val parCells: HdcpParHoleHeading? = state.mHdcpParHoleHeading.find { it.vinTag == PAR_HEADER }
+    val hdcpCells: HdcpParHoleHeading? = state.mHdcpParHoleHeading.find { it.vinTag == HDCP_HEADER }
     if (parCells != null && hdcpCells != null) {
         parCells.mHole = scoreCardRecord.mPar
         hdcpCells.mHole = scoreCardRecord.mHandicap
     }
-    var numberOfPlayers = scoreCardWithPlayers.playerRecords.size
+
+    val numberOfPlayers = scoreCardWithPlayers.playerRecords.size
+    state.mGameNines = (numberOfPlayers == 3)
     for (idx in scoreCardWithPlayers.playerRecords.indices) { // player name and handicap
-        state.playerHeading += PlayerHeading(
+        state.mPlayerHeading += PlayerHeading(
             idx,
             mName = scoreCardWithPlayers.playerRecords[idx].mName,
             mHdcp = scoreCardWithPlayers.playerRecords[idx].mHandicap,
             mScore = scoreCardWithPlayers.playerRecords[idx].mScore,
             mTeamHole = scoreCardWithPlayers.playerRecords[idx].mTeamHole,
-            mGameNines = numberOfPlayers == 3
         ) /* add the player's name to the score card */
+
         if (hdcpCells != null) {
-            setDisplayCellsWithHdcp(state.playerHeading[idx], hdcpCells)
+            setPlayerStrokeHoles(state.mPlayerHeading[idx], hdcpCells.mHole)
         }
     }
-    Log.d("VIN1", "updateScoreCardState player record count ${state.playerHeading.size}")
+    Log.d("VIN1", "updateScoreCardState player record count ${state.mPlayerHeading.size}")
     if (parCells != null) {
-        for (currentHole in parCells.mHole.indices) {
-            updatePlayersTeamScoreCells(        // read record - fill in the team used and score fields
-                state.mDisplayScreenMode,
-                currentHole,
-                state.playerHeading
-            )
-        }
+        refreshScoreCard(parCells.mHole)
+    }
+}
+
+fun ScoreCardViewModel.refreshScoreCard(parCells: IntArray) {
+    for (currentHole in parCells.indices) {
+        updatePlayersTeamScoreCells(        // read record - fill in the team used and score fields
+            state.mDisplayScreenMode,
+            currentHole,        // getParForHole
+            parCells[currentHole],
+            state.mPlayerHeading
+        )
     }
 }
 
 // user just enter the all of the player scores - need to update the mDisplay score with current display mode
+// Also called by just read score card record
 fun ScoreCardViewModel.updatePlayersTeamScoreCells(
     displayScreenMode: Int,
     currentHole: Int,
+    holePar: Int,
     playerHeading: List<PlayerHeading>,
 ) {
-    val teamPlayerScore: TeamUsedHeading? =
-        state.teamUsedHeading.find { it.vinTag == TEAM_HEADER }  // total hole score for selected player
-    val teamUsed: TeamUsedHeading? =
-        state.teamUsedHeading.find { it.vinTag == USED_HEADER }  // total hole score for selected player
+    val teamPlayerScoreCells = getTeamPlayerScoreCells() // total hole score for selected player
+    val teamUsedCells = getTeamUsedCells() // total hole score for selected player
+    val nineGameScores = NineGame()
 
-    if (teamPlayerScore != null && teamUsed != null) {
-        teamPlayerScore.mHole[currentHole] = 0 //  scores that are used by players
-        teamUsed.mHole[currentHole] = 0      // keeps track of the player scores are used
+    teamPlayerScoreCells[currentHole] = 0 //  scores that are used by players
+    teamUsedCells[currentHole] = 0      // keeps track of the player scores are used
+    nineGameScores.clearTotals()
 
+    for (player in playerHeading) {
+        if (0 < player.mScore[currentHole]) {
+            this.updatePlayerDisplayScore(
+                player,
+                displayScreenMode,
+                currentHole,
+                holePar,
+                nineGameScores
+            )
+        }
+
+        updateTeamDisplayScore(
+            displayScreenMode,
+            teamPlayerScoreCells,
+            teamUsedCells,
+            currentHole,
+            holePar,
+            player
+        )
+    }
+    if (displayScreenMode == DISPLAY_MODE_9_GAME) {
+        nineGameScores.sort9Scores()    // calculate player's scores
         for (player in playerHeading) {
-            updateDisplayScore(player, displayScreenMode, currentHole)
-            if (0 < player.mTeamHole[currentHole]) {
-                when (displayScreenMode) {
-                    DISPLAY_MODE_NET, DISPLAY_MODE_GROSS -> {
-                        teamPlayerScore.mHole[currentHole] += player.mDisplayScore[currentHole]
-                        if (player.mTeamHole[currentHole] > TEAM_NET_SCORE) {
-                            teamUsed.mHole[currentHole] += 2
-                        } else {
-                            teamUsed.mHole[currentHole] += 1
-                        }
-                    }
-
-                    DISPLAY_MODE_POINT_QUOTA -> {
-                    }
-
-                    DISPLAY_MODE_9_GAME -> {
-                    }
-
-                    DISPLAY_MODE_STABLEFORD -> {
-                    }
-                }
-            }
+            player.mDisplayScore[currentHole] = nineGameScores.get9GameScore(player.vinTag)
         }
     }
 }
 
-fun ScoreCardViewModel.updateDisplayScore(
+fun updateTeamDisplayScore(
+    displayScreenMode: Int,
+    teamPlayerScoreCells: IntArray,
+    teamUsedCells: IntArray,
+    currentHole: Int,
+    holePar: Int,
+    player: PlayerHeading,
+) {
+    val teamUsedMask = player.mTeamHole[currentHole]
+
+    when (displayScreenMode) {
+        DISPLAY_MODE_GROSS -> {
+            if (0 < teamUsedMask)
+                displayTeamGrossScore(
+                    teamPlayerScoreCells,
+                    teamUsedCells,
+                    currentHole,
+                    holePar,
+                    player
+                )
+        }
+
+        DISPLAY_MODE_NET -> {
+            if (0 < teamUsedMask) {
+                teamPlayerScoreCells[currentHole] += displayTeamNetScore(
+                    teamUsedCells,
+                    currentHole,
+                    player
+                )
+                teamUsedCells[currentHole] += 1
+            }
+        }
+
+        DISPLAY_MODE_STABLEFORD,
+        DISPLAY_MODE_POINT_QUOTA,
+        -> {   // used field are score flags value, Team are all player score added
+            teamPlayerScoreCells[currentHole] += player.mDisplayScore[currentHole]
+
+            if (0 < teamUsedMask) {
+                teamUsedCells[currentHole] += player.mDisplayScore[currentHole]
+
+                if (teamUsedMask == (TEAM_GROSS_SCORE + DOUBLE_TEAM_SCORE)
+                    || teamUsedMask == (TEAM_NET_SCORE + DOUBLE_TEAM_SCORE)
+                ) {
+                    teamUsedCells[currentHole] += player.mDisplayScore[currentHole]
+                }
+            }
+        }
+
+//        DISPLAY_MODE_9_GAME -> {
+//        }
+    }
+}
+
+fun displayTeamGrossScore(
+    teamPlayerScoreCells: IntArray,
+    teamUsedCells: IntArray,
+    currentHole: Int,
+    holePar: Int,
+    player: PlayerHeading,
+) {
+    var teamScore = player.mDisplayScore[currentHole] - holePar
+    teamUsedCells[currentHole] += 1
+
+    when (player.mTeamHole[currentHole]) {
+        TEAM_GROSS_SCORE -> {
+        }
+
+        TEAM_NET_SCORE -> {
+            teamScore = player.mDisplayScore[currentHole] - holePar - player.mStokeHole[currentHole]
+        }
+
+        TEAM_NET_SCORE + DOUBLE_TEAM_SCORE -> {
+            teamScore = player.mDisplayScore[currentHole] - holePar - player.mStokeHole[currentHole]
+            teamScore *= 2
+            teamUsedCells[currentHole] += 1
+        }
+
+        TEAM_GROSS_SCORE + DOUBLE_TEAM_SCORE -> {
+            teamScore *= 2
+            teamUsedCells[currentHole] += 1
+        }
+
+        else -> {}
+    }
+    teamPlayerScoreCells[currentHole] += teamScore
+}
+
+
+fun displayTeamNetScore(
+    teamUsedCells: IntArray,
+    currentHole: Int,
+    player: PlayerHeading,
+): Int {
+    var teamScore = player.mScore[currentHole]
+
+    when (player.mTeamHole[currentHole]) {
+        TEAM_GROSS_SCORE -> {
+        }
+
+        TEAM_GROSS_SCORE + DOUBLE_TEAM_SCORE -> {
+            teamScore *= 2
+            teamUsedCells[currentHole] += 1
+        }
+
+        TEAM_NET_SCORE -> {
+            teamScore -= player.mStokeHole[currentHole]
+        }
+
+        TEAM_NET_SCORE + DOUBLE_TEAM_SCORE -> {
+            teamScore -= player.mStokeHole[currentHole]
+            teamScore *= 2
+            teamUsedCells[currentHole] += 1
+        }
+
+        else -> {}
+    }
+    return (teamScore)
+}
+
+fun ScoreCardViewModel.updatePlayerDisplayScore(
     playerHeading: PlayerHeading,
     displayScreenMode: Int,
     currentHole: Int,
+    holePar: Int,
+    nineGameScores: NineGame,
 ) {
     when (displayScreenMode) {
         DISPLAY_MODE_GROSS -> {
-            playerHeading.mDisplayScore[currentHole] = playerHeading.mScore[currentHole]
+            if (0 < playerHeading.mScore[currentHole]) {
+                playerHeading.mDisplayScore[currentHole] =
+                    playerHeading.mScore[currentHole]
+            }
         }
 
         DISPLAY_MODE_NET -> {
@@ -123,19 +271,62 @@ fun ScoreCardViewModel.updateDisplayScore(
         }
 
         DISPLAY_MODE_POINT_QUOTA -> {
-        }
-
-        DISPLAY_MODE_9_GAME -> {
+            if (0 < playerHeading.mScore[currentHole]) {
+                val ptKey = getPointQuoteKey(playerHeading.mScore[currentHole], holePar)
+                val ptQuota = state.mGamePointsTable.filter { it.mId == ptKey }
+                if (ptQuota.isNotEmpty()) {
+                    val ptQuoteRec = ptQuota.first()
+                    playerHeading.mDisplayScore[currentHole] = ptQuoteRec.mPoints
+                }
+            }
         }
 
         DISPLAY_MODE_STABLEFORD -> {
+            if (0 < playerHeading.mScore[currentHole]) {
+                val playerNetScore =
+                    playerHeading.mScore[currentHole] - playerHeading.mStokeHole[currentHole]
+                val ptKey = getPointQuoteKey(playerNetScore, holePar)
+                val ptQuota = state.mGamePointsTable.filter { it.mId == ptKey }
+                if (ptQuota.isNotEmpty()) {
+                    val ptQuoteRec = ptQuota.first()
+                    playerHeading.mDisplayScore[currentHole] = ptQuoteRec.mPoints
+                }
+            }
         }
+
+        DISPLAY_MODE_9_GAME -> {
+            val playerNetScore =
+                playerHeading.mScore[currentHole] - playerHeading.mStokeHole[currentHole]
+            nineGameScores.addPlayerGrossScore(playerHeading.vinTag, playerNetScore)
+        }
+
     }
 }
 
+fun getPointQuoteKey(score: Int, parForHole: Int): Int {
+    var pointQuoteKey: Int = PQ_ALBATROSS
+
+    when (score - parForHole) {
+        ALBATROSS_ON_HOLE -> pointQuoteKey = PQ_ALBATROSS
+
+        EAGLE_ON_HOLE -> pointQuoteKey = PQ_EAGLE
+
+        BIRDIES_ON_HOLE -> pointQuoteKey = PQ_BIRDIES
+
+        PAR_ON_HOLE -> pointQuoteKey = PQ_PAR
+
+        BOGGY_ON_HOLE -> pointQuoteKey = PQ_BOGGY
+
+        DOUBLE_ON_HOLE -> pointQuoteKey = PQ_DOUBLE
+
+        OTHER_ON_HOLE -> pointQuoteKey = PQ_OTHER
+    }
+
+    return (pointQuoteKey)
+}
 
 fun getTotalScore(holes: IntArray, mStartingCell: Int, mEndingCell: Int): String {
-    var mTotal: Int = 0
+    var mTotal = 0
     for (idx in mStartingCell until mEndingCell) {
         Log.d("VIN", "totalScore hole value ${holes[idx]} ")
         mTotal += holes[idx]
@@ -144,9 +335,9 @@ fun getTotalScore(holes: IntArray, mStartingCell: Int, mEndingCell: Int): String
     return mTotal.toString()
 }
 
-fun setDisplayCellsWithHdcp(
+fun setPlayerStrokeHoles(
     playerHeading: PlayerHeading,
-    hdcpHoles: HdcpParHoleHeading,
+    hdcpHoles: IntArray,
 ) {
     var strokeForHole: Int
     // set player's strokes in the player's mDisplay score
@@ -157,13 +348,13 @@ fun setDisplayCellsWithHdcp(
 }
 
 fun getPlayerStrokesForHole(
-    holeHdcp: HdcpParHoleHeading,
+    holeHdcp: IntArray,
     playerHdcp: String,
     currentHole: Int,
 ): Int {
     var playerIntHdcp = playerHdcp.toInt()
-    var strokesForHole: Int = 0
-    val currentHoleHandicap = holeHdcp.mHole[currentHole]
+    var strokesForHole = 0
+    val currentHoleHandicap = holeHdcp[currentHole]
     if (currentHoleHandicap <= playerIntHdcp) {
         strokesForHole = 1
         playerIntHdcp -= 18

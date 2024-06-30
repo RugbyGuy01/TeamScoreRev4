@@ -75,7 +75,7 @@ fun EnterPlayersScores(
     scoreCardViewModel: ScoreCardViewModel,
     onAction: (DialogAction) -> Unit,
 ) {
-    val rowPlayerNames = scoreCardViewModel.state.playerHeading
+    val rowPlayerNames = scoreCardViewModel.state.mPlayerHeading
     val state = scoreCardViewModel.state
     val currentHole: Int = state.mCurrentHole
     val holeHandicap: Int = scoreCardViewModel.getHoleHandicap(currentHole)
@@ -117,12 +117,8 @@ fun EnterPlayersScores(
                                     DisplayTeamGrossNetButton(scoreCardViewModel, idx, onAction)
                                     DisplayJunkButton(scoreCardViewModel, idx, onAction)
                                 }
-                            } else {
-                                Log.d("VIN", "DisplayPlayerNameAndScoreHeading ERROR ")
-                                Log.d("VIN", "DisplayPlayerNameAndScoreHeading ERROR ${rowPlayerNames[idx].mName}")
                             }
                         }
-
                     }
 
                     Column(
@@ -154,7 +150,7 @@ fun DisplayJunkButton(
         symbol = "Junk",
         modifier = Modifier.padding(1.dp),
         myFontSize = BUTTON_JUNK_FONT,
-        backGround = scoreCardViewModel.state.junkButtonColor[idx],
+        backGround = scoreCardViewModel.state.mJunkButtonColor[idx],
         textColor = Color.Black,
         onClick = { onAction(DialogAction.JunkClick(idx)) }) {
     }
@@ -168,7 +164,7 @@ fun DisplayTeamGrossNetButton(
     DialogCard(symbol = "Net",
         modifier = Modifier.padding(1.dp),
         myFontSize = BUTTON_NET_GROSS_FONT,
-        backGround = scoreCardViewModel.state.netButtonColor[idx],
+        backGround = scoreCardViewModel.state.mNetButtonColor[idx],
         textColor = Color.Black,
         onClick = { onAction(DialogAction.Net(idx)) },
         onLongClick = { onAction(DialogAction.NetLongClick(idx)) })
@@ -177,7 +173,7 @@ fun DisplayTeamGrossNetButton(
         symbol = "Gross",
         modifier = Modifier.padding(1.dp),
         myFontSize = BUTTON_NET_GROSS_FONT,
-        backGround = scoreCardViewModel.state.grossButtonColor[idx],
+        backGround = scoreCardViewModel.state.mGrossButtonColor[idx],
         textColor = Color.Black,
         onClick = { onAction(DialogAction.Gross(idx)) },
         onLongClick = { onAction(DialogAction.GrossLongClick(idx)) },

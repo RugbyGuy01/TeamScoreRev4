@@ -21,7 +21,6 @@ import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
@@ -36,9 +35,9 @@ import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.dialogenterscore.DialogA
 import com.golfpvcc.teamscore_rev4.utils.COLOR_NEXT_HOLE
 import com.golfpvcc.teamscore_rev4.utils.COLOR_PREV_HOLE
 import com.golfpvcc.teamscore_rev4.utils.COLOR_SCREEN_MODE
-import com.golfpvcc.teamscore_rev4.utils.Constants.COLUMN_TOTAL_WIDTH
-import com.golfpvcc.teamscore_rev4.utils.Constants.SCORE_CARD_COURSE_NAME_TEXT
-import com.golfpvcc.teamscore_rev4.utils.Constants.SCORE_CARD_TEXT
+import com.golfpvcc.teamscore_rev4.utils.COLUMN_TOTAL_WIDTH
+import com.golfpvcc.teamscore_rev4.utils.SCORE_CARD_COURSE_NAME_TEXT
+import com.golfpvcc.teamscore_rev4.utils.SCORE_CARD_TEXT
 import com.golfpvcc.teamscore_rev4.utils.VIN_LIGHT_GRAY
 import com.golfpvcc.teamscore_rev4.utils.DISPLAY_HOLE_NUMBER
 
@@ -46,23 +45,13 @@ sealed class ScoreCardActions {
     data object ButtonEnterScore : ScoreCardActions()
     data object Prev : ScoreCardActions()
     data object Next : ScoreCardActions()
-    data object ScreenMode : ScoreCardActions()
+    data object ScreenModeGross : ScoreCardActions()
+    data object ScreenModeNet : ScoreCardActions()
+    data object ScreenModeStableford : ScoreCardActions()
+    data object ScreenModePtQuote : ScoreCardActions()
+    data object ScreenModeNineGame : ScoreCardActions()
     data object SetDialogCurrentPlayer : ScoreCardActions()
     data object FlipFrontBackNine : ScoreCardActions()
-}
-@Composable
-fun FlipNineDisplay(scoreCardViewModel: ScoreCardViewModel) {
-    val buttonText: String =
-        if (scoreCardViewModel.state.mWhatNineIsBeingDisplayed) "Back Nine" else "Front Nine"
-    Button(
-        onClick = {
-            scoreCardViewModel.flipFrontNineBackNine()
-        },
-        modifier = Modifier
-            .height(40.dp),  //vpg
-    ) {
-        Text(text = buttonText)
-    }
 }
 
 @Composable
@@ -86,9 +75,9 @@ fun DisplayCourseName(scoreCardViewModel: ScoreCardViewModel) {
 
 @Composable
 fun DisplayScoreCardHeader(
-    scoreCardViewModel: ScoreCardViewModel
+    scoreCardViewModel: ScoreCardViewModel,
 ) {
-    val hdcpParHoleHeading = scoreCardViewModel.state.hdcpParHoleHeading
+    val hdcpParHoleHeading = scoreCardViewModel.state.mHdcpParHoleHeading
     var modifier = Modifier.width(100.dp)
 
     Column {
@@ -110,7 +99,8 @@ fun DisplayScoreCardHeader(
                         // Vin hole played is a flag to high light the hole being played
                         if (hdcpParHoleHeading[idx].vinTag == HOLE_HEADER) DISPLAY_HOLE_NUMBER else VIN_LIGHT_GRAY
 
-                    DisplayScoreCardCell(   // the cell function will display the 9 cell data - ie hdcp, par, and hole number
+                    DisplayScoreCardCell(
+                        // the cell function will display the 9 cell data - ie hdcp, par, and hole number
                         Modifier,
                         hdcpParHoleHeading[idx].mHole,
                         Color(holeNumberColor),
@@ -140,9 +130,9 @@ fun DisplayScoreCardHeader(
 
 @Composable
 fun DisplayScoreCardNames(
-    scoreCardViewModel: ScoreCardViewModel
+    scoreCardViewModel: ScoreCardViewModel,
 ) {
-    val playerHeading = scoreCardViewModel.state.playerHeading
+    val playerHeading = scoreCardViewModel.state.mPlayerHeading
     var modifier = Modifier.width(100.dp)
 
     Column {
@@ -153,12 +143,12 @@ fun DisplayScoreCardNames(
                 }
             }
             Column {
-                val holeHdcps = scoreCardViewModel.getHoleHdcps()
+                val holeHdcpCells = scoreCardViewModel.getHoleHdcpCells()
                 for (idx in playerHeading.indices) {        // here's the score card player's loop of scores
                     DisplayPlayerScoreCardCell(
                         Modifier,
                         playerHeading[idx],
-                        holeHdcps,      // the course handicap for the holes
+                        holeHdcpCells,      // the course handicap for the holes
                         scoreCardViewModel
                     )
                 }
@@ -167,7 +157,13 @@ fun DisplayScoreCardNames(
                 modifier = Modifier.width(COLUMN_TOTAL_WIDTH.dp)
                 for (idx in playerHeading.indices) {
                     playerHeading[idx].mTotal =
-                        scoreCardViewModel.getTotalForNineCell(playerHeading[idx].mScore)
+                        scoreCardViewModel.getTotalForNineCell(playerHeading[idx].mDisplayScore)
+
+                    playerHeading[idx].mTotal = scoreCardViewModel.getPlayerScoreAdjustedForPtQuote(
+                        playerHeading[idx].mTotal,
+                        playerHeading[idx].mHdcp.toInt()
+                    )
+
                     DisplayRowHeading(playerHeading[idx].mTotal, modifier, Color(VIN_LIGHT_GRAY))
                 }
             }
@@ -177,9 +173,9 @@ fun DisplayScoreCardNames(
 
 @Composable
 fun DisplayScoreCardTeams(
-    scoreCardViewModel: ScoreCardViewModel
+    scoreCardViewModel: ScoreCardViewModel,
 ) {
-    val teamUsedHeading = scoreCardViewModel.state.teamUsedHeading
+    val teamUsedHeading = scoreCardViewModel.state.mTeamUsedHeading
     var modifier = Modifier.width(100.dp)
 
     Column {
@@ -206,7 +202,10 @@ fun DisplayScoreCardTeams(
                 for (idx in teamUsedHeading.indices) {
                     teamUsedHeading[idx].mTotal =       // Calculate "Team" and "Used" score totals
                         scoreCardViewModel.getTotalForNineCell(teamUsedHeading[idx].mHole)
-                    Log.d("VIN", "Calculate Team and Used score totals Idx $idx - ${teamUsedHeading[idx].mTotal}")
+                    Log.d(
+                        "VIN",
+                        "Calculate Team and Used score totals Idx $idx - ${teamUsedHeading[idx].mTotal}"
+                    )
                     DisplayRowHeading(teamUsedHeading[idx].mTotal, modifier, Color(VIN_LIGHT_GRAY))
                 }
             }
@@ -231,7 +230,7 @@ fun DisplayScoreCardCell(
                 border = BorderStroke(Dp.Hairline, color = Color.Blue),
                 color = scoreCardViewModel.setHighLightCurrentHole(idx, color),
                 contentColor = contentColorFor(Color.Transparent),
-                ) {
+            ) {
 
                 Text(
                     text = cellData[idx].toString(), //
@@ -250,13 +249,13 @@ fun DisplayPlayerScoreCardCell(
     modifier: Modifier,
     playerHeading: PlayerHeading,
     holeHdcps: IntArray,
-    scoreCardViewModel: ScoreCardViewModel
+    scoreCardViewModel: ScoreCardViewModel,
 ) {
     Row()
     {
         val startingCell: Int = scoreCardViewModel.getStartingHole()
         val endingCell: Int = scoreCardViewModel.getEndingHole()
-        val hdcpParHoleHeading = scoreCardViewModel.state.hdcpParHoleHeading
+        val hdcpParHoleHeading = scoreCardViewModel.state.mHdcpParHoleHeading
         var parForTheHoles: IntArray = IntArray(18) { 4 }
 
         for (idx in hdcpParHoleHeading.indices) {
@@ -273,7 +272,7 @@ fun DisplayPlayerScoreCardCell(
 
             val playerScoreColor =
                 scoreCardViewModel.getPlayerScoreColorForHole(   //check for a birdie and turn the score red.
-                    playerHeading.mScore[idx],
+                    playerHeading.mDisplayScore[idx],
                     parForTheHoles[idx]
                 )
             val teamScoreColor =
@@ -326,6 +325,7 @@ fun DisplayRowHeading(
         )  // start at zero - get the first column of the data
     }
 }
+
 @Composable
 fun DisplayRowHeadingOnClick(
     rowHeading: String,
@@ -336,7 +336,7 @@ fun DisplayRowHeadingOnClick(
 
     Surface(
         modifier = modifier
-            .clickable {onAction(DialogAction.DisplayHoleNote)}, // modifier.width(100.dp),
+            .clickable { onAction(DialogAction.DisplayHoleNote) }, // modifier.width(100.dp),
         border = BorderStroke(Dp.Hairline, color = Color.Blue),
         color = color,
         contentColor = contentColorFor(Color.Transparent),
@@ -351,6 +351,7 @@ fun DisplayRowHeadingOnClick(
         )  // start at zero - get the first column of the data
     }
 }
+
 @Composable
 fun FlipFrontAndBackNine(FlipText: Boolean, onAction: (ScoreCardActions) -> Unit) {
     val displayFlipFrontBackText: String = if (FlipText) "Back Nine" else "Front Nine"
@@ -375,22 +376,22 @@ fun DisplayPrevNextHoleButton(onAction: (ScoreCardActions) -> Unit) {
         onClick = { onAction(ScoreCardActions.Next) })
 }
 
-@Composable
-fun DisplayScreenModeButton(displayScreenMode: String, onAction: (ScoreCardActions) -> Unit) {
-    RightSidePanelButton(
-        displayScreenMode,
-        Color(COLOR_SCREEN_MODE),
-        onClick = { onAction(ScoreCardActions.ScreenMode) })
-}
+//@Composable
+//fun DisplayScreenModeButton(displayScreenMode: String, onAction: (ScoreCardActions) -> Unit) {
+//    RightSidePanelButton(
+//        displayScreenMode,
+//        Color(COLOR_SCREEN_MODE),
+//        onClick = { onAction(ScoreCardActions.ScreenMode) })
+//}
 
 @Composable
-fun DisplaySummaryButton(navController: NavController,) {
+fun DisplaySummaryButton(navController: NavController) {
     RightSidePanelButton(
         "Summary",
         Color(COLOR_SCREEN_MODE),
         onClick = {
-            navController.navigate(route = TeamScoreScreen.ScreenSummary.route){
-            popUpTo(ROOT_GRAPH_ROUTE)
+            navController.navigate(route = TeamScoreScreen.ScreenSummary.route) {
+                popUpTo(ROOT_GRAPH_ROUTE)
             }
         }
     )

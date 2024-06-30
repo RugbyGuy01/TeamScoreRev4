@@ -14,10 +14,10 @@ import com.golfpvcc.teamscore_rev4.database.model.PlayerRecord
 import com.golfpvcc.teamscore_rev4.database.model.ScoreCardRecord
 import com.golfpvcc.teamscore_rev4.utils.BACK_NINE_TOTAL_DISPLAYED
 import com.golfpvcc.teamscore_rev4.utils.Constants
-import com.golfpvcc.teamscore_rev4.utils.Constants.DISPLAY_SCORE_CARD_SCREEN
-import com.golfpvcc.teamscore_rev4.utils.Constants.MINIMUM_LEN_OF_PLAYER_NAME
-import com.golfpvcc.teamscore_rev4.utils.Constants.SCORE_CARD_REC_ID
-import com.golfpvcc.teamscore_rev4.utils.Constants.USER_CANCEL
+import com.golfpvcc.teamscore_rev4.utils.DISPLAY_SCORE_CARD_SCREEN
+import com.golfpvcc.teamscore_rev4.utils.MINIMUM_LEN_OF_PLAYER_NAME
+import com.golfpvcc.teamscore_rev4.utils.SCORE_CARD_REC_ID
+import com.golfpvcc.teamscore_rev4.utils.USER_CANCEL
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -204,7 +204,8 @@ class PlayerSetupViewModel(
                     player.mHandicap,
                     player.mScore,
                     player.mTeamHole,
-                    Constants.SCORE_CARD_REC_ID,
+                    player.mJunk,
+                    SCORE_CARD_REC_ID,
                     mId = count
                 )
                 playerDao.addUpdatePlayerRecord(playerRecord)

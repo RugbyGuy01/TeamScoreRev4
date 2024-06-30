@@ -28,6 +28,9 @@ import com.golfpvcc.teamscore_rev4.database.model.CourseRecord
 import com.golfpvcc.teamscore_rev4.ui.screens.coursedetail.CourseDetailViewModel
 import com.golfpvcc.teamscore_rev4.utils.Constants
 import com.golfpvcc.teamscore_rev4.utils.TeamObjects
+import com.golfpvcc.teamscore_rev4.utils.USER_SAVE
+import com.golfpvcc.teamscore_rev4.utils.USER_TEXT_SAVE
+import com.golfpvcc.teamscore_rev4.utils.USER_TEXT_UPDATE
 
 @Composable
 fun SaveCourseRecord(
@@ -36,8 +39,8 @@ fun SaveCourseRecord(
     courseViewModel:CoursesViewModel,
     recDetail: CourseDetailViewModel
 ) {
-    if (!(saveButtonState.value == Constants.USER_TEXT_UPDATE || saveButtonState.value == Constants.USER_TEXT_SAVE)) {
-        if (saveButtonState.value == Constants.USER_SAVE)
+    if (!(saveButtonState.value == USER_TEXT_UPDATE || saveButtonState.value == USER_TEXT_SAVE)) {
+        if (saveButtonState.value == USER_SAVE)
             courseViewModel.addOrUpdateCourse(
                 CourseRecord(
                     mId = recDetail.state.mId,
@@ -48,7 +51,7 @@ fun SaveCourseRecord(
                 )
             )
         navController.popBackStack()
-        saveButtonState.value = Constants.USER_TEXT_UPDATE
+        saveButtonState.value = USER_TEXT_UPDATE
     }
 }
 
