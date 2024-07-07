@@ -4,9 +4,9 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 
-@Entity(tableName = "JunkTable")
-data class JunkRecord(
-    val mJunkName: String = "",
-    @PrimaryKey(autoGenerate = false)    // autoGenerate is false
-    val mId: Int = 0,
-)
+    @Entity(tableName = "JunkTable")
+    data class JunkRecord(
+        val mJunkName: String = "",
+        @PrimaryKey(autoGenerate = false)    // autoGenerate is false
+        val mId: Int = 0,
+    )

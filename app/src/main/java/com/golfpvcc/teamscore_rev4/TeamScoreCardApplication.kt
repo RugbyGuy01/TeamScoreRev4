@@ -9,6 +9,7 @@ import com.golfpvcc.teamscore_rev4.database.dao.CourseDao
 import com.golfpvcc.teamscore_rev4.database.dao.EmailDao
 import com.golfpvcc.teamscore_rev4.database.dao.JunkDao
 import com.golfpvcc.teamscore_rev4.database.dao.PlayerDao
+import com.golfpvcc.teamscore_rev4.database.dao.PlayerJunkDao
 import com.golfpvcc.teamscore_rev4.database.dao.PointsDao
 import com.golfpvcc.teamscore_rev4.database.dao.ScoreCardDao
 import com.golfpvcc.teamscore_rev4.database.room.TeamScoreDatabase
@@ -58,6 +59,9 @@ class TeamScoreCardApp : Application() {
         }
         fun getEmailDao(): EmailDao {
             return instance!!.getDb().emailDao()
+        }
+        fun playerJunkDao(): PlayerJunkDao {
+            return instance!!.getDb().playerJunkDao()
         }
     }
 

@@ -99,7 +99,6 @@ open class ScoreCardViewModel() : ViewModel() {
                     mHandicap = playerHeadRecord.mHdcp,
                     mScore = playerHeadRecord.mScore,
                     mTeamHole = playerHeadRecord.mTeamHole,
-                    mJunk = playerHeadRecord.mJunk,
                     mScoreCardRecFk = SCORE_CARD_REC_ID,
                     mId = playerHeadRecord.vinTag
                 )

@@ -12,7 +12,6 @@ data class PlayerRecord(
     var mHandicap: String = "",
     val mScore: IntArray = IntArray(HOLE_ARRAY_SIZE),
     val mTeamHole: IntArray = IntArray(HOLE_ARRAY_SIZE),
-    val mJunk: IntArray = IntArray(HOLE_ARRAY_SIZE),
     val mScoreCardRecFk: Int = SCORE_CARD_REC_ID,    // score card record ID
     @PrimaryKey(autoGenerate = false)    // default is false
     val mId: Int = 0
