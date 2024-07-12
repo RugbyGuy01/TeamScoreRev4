@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.golfpvcc.teamscore_rev4.TeamScoreCardApp
 import com.golfpvcc.teamscore_rev4.database.model.EmailRecord
+import com.golfpvcc.teamscore_rev4.database.model.JunkRecord
 import com.golfpvcc.teamscore_rev4.database.model.PointsRecord
 import com.golfpvcc.teamscore_rev4.database.model.ScoreCardWithPlayers
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.HdcpParHoleHeading
@@ -40,7 +41,8 @@ open class SummaryViewModel() : ViewModel() {
     var state by mutableStateOf(State())
     private val scoreCardDao = TeamScoreCardApp.getScoreCardDao()
     private val pointsRecordDoa = TeamScoreCardApp.getPointsDao()
-    val emailDao = TeamScoreCardApp.getEmailDao()
+    private val emailDao = TeamScoreCardApp.getEmailDao()
+    private val junkDao = TeamScoreCardApp.getJunkDao()
 
 
     class SummaryViewModelFactor() : ViewModelProvider.Factory {
@@ -82,12 +84,16 @@ open class SummaryViewModel() : ViewModel() {
             SummaryActions.DisplayAboutDialog -> displayAboutDialog()
             SummaryActions.DisplayBackupRestoreDialog -> displayBackupRestoreDialog()
             SummaryActions.DisplayJunkDialog -> displayJunkDialog()
+            is SummaryActions.UpdateJunkRecord -> updateJunkRecord(action.junkRecIdx)
+            SummaryActions.CancelJunkDialog -> cancelJunkDialogRecords()
+            SummaryActions.SaveJunkDialog -> saveJunkDialogRecords()
             SummaryActions.DisplayPointsDialog -> displayPointsDialog()
             SummaryActions.SavePointsDialog -> savePointsDialogRecords()
             SummaryActions.CancelPointsDialog -> cancelPointsDialogRecords()
             SummaryActions.ShowEmailDialog -> showEmailDialog()
             SummaryActions.SaveEmailRecord -> saveEmailRecord()
             is SummaryActions.SendEmailToUser -> sendPlayerEmail(action.playerIdx, action.context)
+
         }
     }
 
@@ -95,22 +101,15 @@ open class SummaryViewModel() : ViewModel() {
     fun onEmailNameChange(emailName: String) {
         state.mEmailRecords[0].mEmailName = emailName
         repaintScreen()
-
-//        state = state.copy(mEmailName = emailName)
-        Log.d("VIN", "onEmailNameChange ${state.mEmailName} ")
     }
 
     fun onEmailAddressChange(emailAddress: String) {
         state.mEmailRecords[0].mEmailAddress = emailAddress
         repaintScreen()
-
-        //      state = state.copy(mEmailAddress = emailAddress)
-        Log.d("VIN", "onEmailAddressChange ${state.mEmailAddress} ")
     }
 
     fun checkForValidEmailAddress(): Boolean {
-        return(state.mEmailRecords[0].mEmailAddress.isValidEmail())
-        //return (state.mEmailAddress.isValidEmail())
+        return (state.mEmailRecords[0].mEmailAddress.isValidEmail())
     }
 
     fun CharSequence?.isValidEmail() =
@@ -119,10 +118,8 @@ open class SummaryViewModel() : ViewModel() {
     private fun saveEmailRecord() {
         Log.d("VIN", "saveEmailRecord ")
         viewModelScope.launch(Dispatchers.IO) {
-//            val emailRecord = EmailRecord(state.mEmailName, state.mEmailAddress)
             emailDao.addUpdateEmailTableRecord(state.mEmailRecords[0])  // only one email record
         }
-
         showEmailDialog()
     }
 
@@ -142,8 +139,70 @@ open class SummaryViewModel() : ViewModel() {
         repaintScreen()
     }
 
+    fun getJunkRecord() {
+        if (state.mShowJunkDialog) {
+            Log.d("VIN", "getJunkRecord ")
+            state.mJunkRecordTable.addAll(junkDao.getAllJunkRecords())
+        }
+    }
+
     fun displayJunkDialog() {
         Log.d("VIN", "displayJunkDialog")
+        state.mShowJunkDialog = !state.mShowJunkDialog
+        repaintScreen()
+    }
+
+    //MutableList<JunkRecord>
+    fun updateJunkRecord(junkRecIdx: Int) {
+        Log.d(
+            "VIN",
+            "updateJunkRecord Index $junkRecIdx  current record ${state.mEditJunkRecordIndex}"
+        )
+        if (junkRecIdx == -1) {   // just save the update record.
+            if (state.mEditJunkRecordIndex == 0) {   // modified the Add record, need to add another add record
+                val tmpJunkRecords = state.mJunkRecordTable
+
+                val addRecord = JunkRecord("Add Record", 0) // keep this record on the top of list
+                state.mJunkRecordTable.add(addRecord)
+                state.mJunkRecordTable.addAll(tmpJunkRecords)
+
+                Log.d("VIN", "updateJunkRecord ${state.mJunkRecordTable}")
+            }
+        }
+        state.mJunkRecordTable[junkRecIdx].mId = junkRecIdx
+        state.mEditJunkRecordIndex = junkRecIdx
+
+        repaintScreen()
+    }
+
+    fun getEditJunkRecord(): Int {
+        Log.d("VIN", "getEditJunkRecord Index ${state.mEditJunkRecordIndex}")
+        return (state.mEditJunkRecordIndex) // record index
+    }
+
+    fun getJunkTableValue(recIdx: Int): String {
+        return (state.mJunkRecordTable[recIdx].mJunkName)
+    }
+
+    fun onJunkRecordChange(junkString: String) {
+        state.mJunkRecordTable[state.mEditJunkRecordIndex].mJunkName = junkString
+        repaintScreen()
+    }
+
+    private fun saveJunkDialogRecords() {
+        Log.d("VIN", "saveJunkDialogRecords ")
+//        viewModelScope.launch(Dispatchers.IO) {
+//            for (ptRecord: PointTable in state.mGamePointsTable) {
+//                val pointsRecord =
+//                    PointsRecord(ptRecord.key, ptRecord.value.toInt(), ptRecord.label)
+//                pointsRecordDoa.addUpdatePointTableRecord(pointsRecord)
+//            }
+        displayJunkDialog()   // exit dialog
+    }
+
+    private fun cancelJunkDialogRecords() {
+        Log.d("VIN", "cancelJunkDialogRecords ")
+        displayJunkDialog()   // exit dialog
     }
 
     fun displayPointsDialog() {
@@ -333,6 +392,7 @@ data class State(
     var mDisplayMenu: Boolean = false,
     var mHasDatabaseBeenRead: Boolean = false,
     var mShowJunkDialog: Boolean = false,
+    var mEditJunkRecordIndex: Int = -1,
     var mShowPointsDialog: Boolean = false,
     var mShowBackupRestoreDialog: Boolean = false,
     var mShowAboutDialog: Boolean = false,
@@ -344,6 +404,7 @@ data class State(
     var mEmailName: String = "",
     var mEmailRecords: List<EmailRecord> = emptyList(),
     var mGamePointsTable: List<PointTable> = emptyList(),
+    var mJunkRecordTable: MutableList<JunkRecord> = mutableListOf(JunkRecord("Add Record", 0)),
     val mRepaintScreen: Boolean = false,
 
     var mTotalPtQuoteFront: Float = 0f,

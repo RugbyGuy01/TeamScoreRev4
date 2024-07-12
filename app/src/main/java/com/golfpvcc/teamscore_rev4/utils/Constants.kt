@@ -65,6 +65,7 @@ const val DISPLAY_SCORE_CARD_SCREEN = 6
 const val MINIMUM_LEN_OF_PLAYER_NAME = 2
 const val MAX_EMAIL_NAME_LEN = 10
 const val MAX_EMAIL_ADDRESS_LEN = 50
+const val MAX_JUNK_TEXT_LEN = 15
 
 // text size for forms
 const val DATABASE_NAME = "TeamDatabase"

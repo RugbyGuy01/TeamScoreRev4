@@ -4,6 +4,9 @@ import android.content.Context
 
 sealed class SummaryActions {       // functions are located in summary view model file
     data object DisplayJunkDialog : SummaryActions()
+    data class UpdateJunkRecord(val junkRecIdx: Int) : SummaryActions()
+    data object SaveJunkDialog : SummaryActions()
+    data object CancelJunkDialog : SummaryActions()
     data object DisplayPointsDialog : SummaryActions()
     data object ShowEmailDialog : SummaryActions()
     data object SaveEmailRecord : SummaryActions()
@@ -11,5 +14,5 @@ sealed class SummaryActions {       // functions are located in summary view mod
     data object CancelPointsDialog : SummaryActions()
     data object DisplayBackupRestoreDialog : SummaryActions()
     data object DisplayAboutDialog : SummaryActions()
-    data class SendEmailToUser(val playerIdx:Int, val context: Context): SummaryActions()
+    data class SendEmailToUser(val playerIdx: Int, val context: Context) : SummaryActions()
 }

@@ -1,30 +1,44 @@
 package com.golfpvcc.teamscore_rev4.ui.screens.summary.utils
 
+import android.annotation.SuppressLint
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
@@ -36,20 +50,22 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.golfpvcc.teamscore_rev4.database.model.JunkRecord
 import com.golfpvcc.teamscore_rev4.ui.screens.CardButton
-import com.golfpvcc.teamscore_rev4.ui.screens.coursedetail.DisplaySaveCancelButtons
+import com.golfpvcc.teamscore_rev4.ui.screens.coursedetail.DropDownSelectHolePar
 import com.golfpvcc.teamscore_rev4.ui.screens.playersetup.GetTeeInformation
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.SummaryActions
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.SummaryViewModel
+import com.golfpvcc.teamscore_rev4.ui.theme.shape
 import com.golfpvcc.teamscore_rev4.utils.DIALOG_BUTTON_TEXT_SIZE
-import com.golfpvcc.teamscore_rev4.utils.LAST_PLAYER
-import com.golfpvcc.teamscore_rev4.utils.MAX_COURSE_YARDAGE
 import com.golfpvcc.teamscore_rev4.utils.MAX_EMAIL_ADDRESS_LEN
 import com.golfpvcc.teamscore_rev4.utils.MAX_EMAIL_NAME_LEN
-import com.golfpvcc.teamscore_rev4.utils.MAX_STARTING_HOLE
+import com.golfpvcc.teamscore_rev4.utils.MAX_JUNK_TEXT_LEN
 import com.golfpvcc.teamscore_rev4.utils.PQ_OTHER
 import com.golfpvcc.teamscore_rev4.utils.SUMMARY_DIALOG_TEXT_SIZE
 import com.golfpvcc.teamscore_rev4.utils.USER_TEXT_SAVE
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -74,7 +90,6 @@ fun ConfigureEmailDialog(onAction: (SummaryActions) -> Unit, summaryViewModel: S
                     mMaxLength = MAX_EMAIL_NAME_LEN,
                     placeHolder = "Email Name",
                     playerData = summaryViewModel.state.mEmailRecords[0].mEmailName,
-//                    playerData = summaryViewModel.state.mEmailName,
                     updatedData = summaryViewModel::onEmailNameChange,
                     keyboardType = KeyboardType.Text,
                     imeAction = ImeAction.Next,
@@ -83,8 +98,7 @@ fun ConfigureEmailDialog(onAction: (SummaryActions) -> Unit, summaryViewModel: S
                 GetTeeInformation(
                     mMaxLength = MAX_EMAIL_ADDRESS_LEN,
                     placeHolder = "Email Address",
-                    playerData =summaryViewModel.state.mEmailRecords[0].mEmailAddress,
-//                    playerData = summaryViewModel.state.mEmailAddress,
+                    playerData = summaryViewModel.state.mEmailRecords[0].mEmailAddress,
                     updatedData = summaryViewModel::onEmailAddressChange,
                     keyboardType = KeyboardType.Email,
                     imeAction = ImeAction.Done,
@@ -110,7 +124,6 @@ fun ConfigureEmailDialog(onAction: (SummaryActions) -> Unit, summaryViewModel: S
     }
 }
 
-
 @Composable
 fun ConfigurePointsDialog(onAction: (SummaryActions) -> Unit, summaryViewModel: SummaryViewModel) {
 
@@ -127,8 +140,7 @@ fun ConfigurePointsDialog(onAction: (SummaryActions) -> Unit, summaryViewModel: 
                     .padding(10.dp)
             ) {
                 for (ptTable in summaryViewModel.state.mGamePointsTable) {
-                    val keyboardType: ImeAction
-                    keyboardType = if (ptTable.key == PQ_OTHER) {
+                    val keyboardType: ImeAction = if (ptTable.key == PQ_OTHER) {
                         ImeAction.Done
                     } else {
                         ImeAction.Next
@@ -196,6 +208,173 @@ fun UpdatePointsTable(
         keyboardActions = KeyboardActions(
             onDone = {
                 focusManager.clearFocus()
+            }
+        )
+    )
+}
+
+@Composable
+fun ConfigureJunkDialog(onAction: (SummaryActions) -> Unit, summaryViewModel: SummaryViewModel) {
+    val scope = rememberCoroutineScope()
+
+    LaunchedEffect(true) {
+        scope.launch(Dispatchers.IO) {
+            summaryViewModel.getJunkRecord()
+        }
+    }
+    Dialog(properties = DialogProperties(usePlatformDefaultWidth = false),
+        onDismissRequest = { }) {   //must hit save or cancel
+        Card(
+            modifier = Modifier
+                .padding(10.dp)
+                .fillMaxHeight(),
+            shape = RoundedCornerShape(16.dp),
+        ) {
+            val recToEdit = summaryViewModel.getEditJunkRecord()
+            Column(
+                Modifier
+                    .width(200.dp)
+                    .padding(10.dp)
+            ) {
+                if (recToEdit != -1) {     // the function is called many time, if click junk record button then popup select hole will be set
+                    DisplayJunkRecordEditField(summaryViewModel, recToEdit)
+                    { onAction(SummaryActions.UpdateJunkRecord(-1)) }
+                }
+                LazyColumn(
+                    modifier = Modifier
+                        .padding(2.dp)
+                        .weight(1f)
+                ) {
+                    itemsIndexed(summaryViewModel.state.mJunkRecordTable) { index, junkRecord ->
+                        JunkRecordItem(
+                            junkRecord,
+                        )
+                        { onAction(SummaryActions.UpdateJunkRecord(index)) }
+                        Spacer(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(2.dp)
+                        )
+                    }
+                } // end of CourseItem
+                HorizontalDivider(thickness = 1.dp, color = Color.Blue)
+                Row(
+                    Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    CardButton("Save", Color.LightGray)
+                    { onAction(SummaryActions.SaveJunkDialog) }
+
+                    CardButton("Cancel", Color.Transparent)
+                    { onAction(SummaryActions.CancelJunkDialog) }
+                }
+            }
+        }
+    }
+}
+
+@Composable //Display the Junk record in a Card
+fun JunkRecordItem(
+    junkRecord: JunkRecord,
+    onClick: () -> Unit,
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(5.dp)
+            .height(50.dp)
+            .clickable { onClick() },
+        border = BorderStroke(1.dp, Color.Black),
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(5.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = junkRecord.mJunkName,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Normal
+            )
+        }
+    }
+}
+
+@SuppressLint("RememberReturnType")
+@Composable
+fun DisplayJunkRecordEditField(
+    summaryViewModel: SummaryViewModel,
+    recToEdit: Int,
+    onClick: () -> Unit,
+) {
+    Log.d("VIN", "DisplayJunkRecordEditField Index $recToEdit")
+    val focusRequester = remember { FocusRequester() }
+
+    GetJunkInformation(
+        mMaxLength = MAX_JUNK_TEXT_LEN,
+        placeHolder = "Junk Text",
+        playerData = summaryViewModel.getJunkTableValue(recToEdit),
+        updatedData = summaryViewModel::onJunkRecordChange,
+        keyboardType = KeyboardType.Text,
+        imeAction = ImeAction.Done,
+        Modifier
+            .fillMaxWidth()
+            .focusRequester(focusRequester),
+    )
+    {
+        onClick()   // set record recToEdit back to -1
+    }
+    Log.d("VIN", "done DisplayJunkRecordEditField Index $recToEdit")
+}
+
+
+@Composable
+fun GetJunkInformation(
+    mMaxLength: Int,
+    placeHolder: String,
+    playerData: String,
+    updatedData: (String) -> Unit,
+    keyboardType: KeyboardType,
+    imeAction: ImeAction,
+    modifier: Modifier,
+    onClick: () -> Unit,
+) {
+    val focusManager = LocalFocusManager.current
+    val mContext = LocalContext.current
+
+    OutlinedTextField(
+        modifier = modifier,    // clear the Tee field white, green
+        value = playerData,
+        textStyle = MaterialTheme.typography.headlineSmall,
+        singleLine = true,
+        onValueChange = { teeData ->
+            if (teeData.length <= mMaxLength) updatedData(teeData)
+            else Toast.makeText(
+                mContext,
+                "Cannot be more than $mMaxLength Characters",
+                Toast.LENGTH_SHORT
+            ).show()
+        },
+        label = { Text(text = placeHolder) },
+        placeholder = { Text(text = placeHolder) },
+        shape = shape.small,
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = Color.Red,
+            unfocusedBorderColor = Color.Blue,
+            focusedLabelColor = Color.Red,
+            unfocusedLabelColor = Color.Blue,
+        ),
+        keyboardOptions = KeyboardOptions(
+            capitalization = KeyboardCapitalization.Sentences,
+            keyboardType = keyboardType,
+            imeAction = imeAction  //.Done
+        ),
+        keyboardActions = KeyboardActions(
+            onDone = {
+                focusManager.clearFocus()
+                onClick()   // set the record back to -1
             }
         )
     )

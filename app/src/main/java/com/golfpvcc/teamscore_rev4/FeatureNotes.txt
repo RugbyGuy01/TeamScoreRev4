@@ -4,7 +4,6 @@ Features to be added to the Team Score App.
 
 . Build junk configuration database screen
 . Player’s Junk dialog screen for score card
-. Email Address database and setup dialog screen
 . Backup dialog screen - where to send backup file.
 . Restore dialog screen - where get backup file and restore
 . Add note dialog screen for hole on the course.
@@ -20,6 +19,7 @@ What's done
 . Summary Screen for the player junk
 . Sending an email from the summary screen
 . About screen, reversion and Contact information.
+. Email Address database and setup dialog screen
 
 Junk options:
 

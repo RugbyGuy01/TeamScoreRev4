@@ -55,6 +55,7 @@ import com.golfpvcc.teamscore_rev4.ui.navigation.TeamScoreScreen
 import com.golfpvcc.teamscore_rev4.ui.screens.CardButton
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.AboutDialog
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.ConfigureEmailDialog
+import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.ConfigureJunkDialog
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.ConfigurePointsDialog
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.sendPlayerEmail
 import com.golfpvcc.teamscore_rev4.utils.MENU_BUTTON_TEXT
@@ -122,9 +123,14 @@ fun DisplayMenuOptionDialogs(summaryViewModel: SummaryViewModel) {
         SetScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
 
     if (summaryViewModel.state.mShowEmailDialog) {
-        Log.d("VIN", "mShowEmailDialog")
         ConfigureEmailDialog(summaryViewModel::summaryActions, summaryViewModel)
     }
+    if (summaryViewModel.state.mShowJunkDialog) {
+        SetScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+        ConfigureJunkDialog(summaryViewModel::summaryActions, summaryViewModel)
+    } else
+        SetScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
+
 }
 
 
@@ -136,7 +142,6 @@ fun DisplayTeamTotalScore(summaryViewModel: SummaryViewModel) {
     ) {
         Column(
             Modifier
-//                .height(150.dp)
                 .padding(3.dp),
         ) {
             TeamScoreHeader()
