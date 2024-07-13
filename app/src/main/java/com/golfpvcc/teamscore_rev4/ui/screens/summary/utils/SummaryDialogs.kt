@@ -42,10 +42,13 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -217,26 +220,30 @@ fun UpdatePointsTable(
 fun ConfigureJunkDialog(onAction: (SummaryActions) -> Unit, summaryViewModel: SummaryViewModel) {
     val scope = rememberCoroutineScope()
 
-    LaunchedEffect(true) {
-        scope.launch(Dispatchers.IO) {
-            summaryViewModel.getJunkRecord()
+    if (summaryViewModel.state.mJunkDatabaseRecordRead == false) {
+        LaunchedEffect(true) {
+            scope.launch(Dispatchers.IO) {
+                summaryViewModel.getJunkRecord()
+            }
         }
+        summaryViewModel.state.mJunkDatabaseRecordRead = true  // read database once
     }
+
     Dialog(properties = DialogProperties(usePlatformDefaultWidth = false),
-        onDismissRequest = { }) {   //must hit save or cancel
+        onDismissRequest = { }) {   //must hit Exit
         Card(
             modifier = Modifier
                 .padding(10.dp)
                 .fillMaxHeight(),
             shape = RoundedCornerShape(16.dp),
         ) {
-            val recToEdit = summaryViewModel.getEditJunkRecord()
+            val recToEdit = summaryViewModel.getEditJunkRecord() // check for selected record
             Column(
                 Modifier
                     .width(200.dp)
                     .padding(10.dp)
             ) {
-                if (recToEdit != -1) {     // the function is called many time, if click junk record button then popup select hole will be set
+                if (recToEdit != -1) {     // the function is called many time, if click junk record button then recToEdit record will be set
                     DisplayJunkRecordEditField(summaryViewModel, recToEdit)
                     { onAction(SummaryActions.UpdateJunkRecord(-1)) }
                 }
@@ -262,11 +269,10 @@ fun ConfigureJunkDialog(onAction: (SummaryActions) -> Unit, summaryViewModel: Su
                     Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    CardButton("Save", Color.LightGray)
+                    CardButton("Add", Color.LightGray)
+                    { onAction(SummaryActions.AddRecordJunkDialog) }
+                    CardButton("Exit", Color.LightGray)
                     { onAction(SummaryActions.SaveJunkDialog) }
-
-                    CardButton("Cancel", Color.Transparent)
-                    { onAction(SummaryActions.CancelJunkDialog) }
                 }
             }
         }
@@ -289,14 +295,16 @@ fun JunkRecordItem(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .fillMaxHeight()
                 .padding(5.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
                 text = junkRecord.mJunkName,
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Normal
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Normal,
+                textAlign = TextAlign.Right
             )
         }
     }
@@ -309,24 +317,44 @@ fun DisplayJunkRecordEditField(
     recToEdit: Int,
     onClick: () -> Unit,
 ) {
-    Log.d("VIN", "DisplayJunkRecordEditField Index $recToEdit")
-    val focusRequester = remember { FocusRequester() }
+    Dialog(properties = DialogProperties(usePlatformDefaultWidth = false),
+        onDismissRequest = { }) {
+        Card(
+            modifier = Modifier
+                .width(400.dp)
+                .padding(10.dp),
+            shape = RoundedCornerShape(16.dp),
+        ) {
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp),
+                Arrangement.SpaceEvenly
+            ) {
+                Log.d("VIN", "DisplayJunkRecordEditField Index $recToEdit")
+                val focusRequester = remember { FocusRequester() }
+                LaunchedEffect(Unit) {
+                    focusRequester.requestFocus()
+                }
 
-    GetJunkInformation(
-        mMaxLength = MAX_JUNK_TEXT_LEN,
-        placeHolder = "Junk Text",
-        playerData = summaryViewModel.getJunkTableValue(recToEdit),
-        updatedData = summaryViewModel::onJunkRecordChange,
-        keyboardType = KeyboardType.Text,
-        imeAction = ImeAction.Done,
-        Modifier
-            .fillMaxWidth()
-            .focusRequester(focusRequester),
-    )
-    {
-        onClick()   // set record recToEdit back to -1
+                GetJunkInformation(
+                    mMaxLength = MAX_JUNK_TEXT_LEN,
+                    placeHolder = "Junk Text",
+                    playerData = summaryViewModel.getJunkTableValue(recToEdit),
+                    updatedData = summaryViewModel::onJunkRecordChange,
+                    keyboardType = KeyboardType.Text,
+                    imeAction = ImeAction.Done,
+                    Modifier
+                        .fillMaxWidth()
+                        .focusRequester(focusRequester),
+                )
+                {
+                    onClick()   // set record recToEdit back to -1
+                }
+                Log.d("VIN", "done DisplayJunkRecordEditField Index $recToEdit")
+            }
+        }
     }
-    Log.d("VIN", "done DisplayJunkRecordEditField Index $recToEdit")
 }
 
 
@@ -345,12 +373,15 @@ fun GetJunkInformation(
     val mContext = LocalContext.current
 
     OutlinedTextField(
-        modifier = modifier,    // clear the Tee field white, green
-        value = playerData,
+        modifier = modifier,    //
+        value = TextFieldValue( // set the cursor to the end of the field
+            text = playerData,
+            selection = TextRange(playerData.length)
+        ),
         textStyle = MaterialTheme.typography.headlineSmall,
         singleLine = true,
-        onValueChange = { teeData ->
-            if (teeData.length <= mMaxLength) updatedData(teeData)
+        onValueChange = { junkData ->
+            if (junkData.text.length <= mMaxLength) updatedData(junkData.text)
             else Toast.makeText(
                 mContext,
                 "Cannot be more than $mMaxLength Characters",

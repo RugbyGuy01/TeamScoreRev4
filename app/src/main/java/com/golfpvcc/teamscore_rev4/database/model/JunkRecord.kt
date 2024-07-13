@@ -7,6 +7,6 @@ import androidx.room.PrimaryKey
     @Entity(tableName = "JunkTable")
     data class JunkRecord(
         var mJunkName: String = "",
-        @PrimaryKey(autoGenerate = false)    // autoGenerate is false
-        var mId: Int = 0,
+        @PrimaryKey(autoGenerate = true)    // autoGenerate is false
+        var mId: Long = 1,
     )

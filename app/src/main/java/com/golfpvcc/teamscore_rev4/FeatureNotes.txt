@@ -1,9 +1,9 @@
-June 20, 2024
+July 13, 2024
 
 Features to be added to the Team Score App.
 
-. Build junk configuration database screen
 . Player’s Junk dialog screen for score card
+. Player's summary junk screen
 . Backup dialog screen - where to send backup file.
 . Restore dialog screen - where get backup file and restore
 . Add note dialog screen for hole on the course.
@@ -14,6 +14,7 @@ Features to be added to the Team Score App.
 
 
 What's done
+. Build junk configuration database screen
 . Build junk database
 . Point Quota configuration dialog screen
 . Summary Screen for the player junk

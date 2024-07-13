@@ -8,6 +8,6 @@ import androidx.room.PrimaryKey
     val mPlayerIdx:Int=0,
     val mHoleNumber:Int=0,
     val mJunkId:Int=0,
-    @PrimaryKey(autoGenerate = false)    // autoGenerate is false
+    @PrimaryKey(autoGenerate = true)    // autoGenerate is false
     val mId: Int = 0,
 )

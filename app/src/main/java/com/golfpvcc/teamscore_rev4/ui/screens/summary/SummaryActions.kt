@@ -6,7 +6,7 @@ sealed class SummaryActions {       // functions are located in summary view mod
     data object DisplayJunkDialog : SummaryActions()
     data class UpdateJunkRecord(val junkRecIdx: Int) : SummaryActions()
     data object SaveJunkDialog : SummaryActions()
-    data object CancelJunkDialog : SummaryActions()
+    data object AddRecordJunkDialog : SummaryActions()
     data object DisplayPointsDialog : SummaryActions()
     data object ShowEmailDialog : SummaryActions()
     data object SaveEmailRecord : SummaryActions()

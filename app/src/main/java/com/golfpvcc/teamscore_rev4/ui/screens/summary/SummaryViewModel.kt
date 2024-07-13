@@ -85,7 +85,7 @@ open class SummaryViewModel() : ViewModel() {
             SummaryActions.DisplayBackupRestoreDialog -> displayBackupRestoreDialog()
             SummaryActions.DisplayJunkDialog -> displayJunkDialog()
             is SummaryActions.UpdateJunkRecord -> updateJunkRecord(action.junkRecIdx)
-            SummaryActions.CancelJunkDialog -> cancelJunkDialogRecords()
+            SummaryActions.AddRecordJunkDialog -> addRecordJunkDialog()
             SummaryActions.SaveJunkDialog -> saveJunkDialogRecords()
             SummaryActions.DisplayPointsDialog -> displayPointsDialog()
             SummaryActions.SavePointsDialog -> savePointsDialogRecords()
@@ -141,8 +141,14 @@ open class SummaryViewModel() : ViewModel() {
 
     fun getJunkRecord() {
         if (state.mShowJunkDialog) {
-            Log.d("VIN", "getJunkRecord ")
+            Log.d("VIN", "Read getJunkRecord ")
             state.mJunkRecordTable.addAll(junkDao.getAllJunkRecords())
+
+            Log.d("VIN", "Read getJunkRecord rec cnt ${state.mJunkRecordTable.count()} ")
+
+            if (state.mJunkRecordTable.isEmpty()) {
+                addRecordJunkDialog()
+            }
         }
     }
 
@@ -154,30 +160,46 @@ open class SummaryViewModel() : ViewModel() {
 
     //MutableList<JunkRecord>
     fun updateJunkRecord(junkRecIdx: Int) {
-        Log.d(
-            "VIN",
-            "updateJunkRecord Index $junkRecIdx  current record ${state.mEditJunkRecordIndex}"
-        )
+
         if (junkRecIdx == -1) {   // just save the update record.
-            if (state.mEditJunkRecordIndex == 0) {   // modified the Add record, need to add another add record
-                val tmpJunkRecords = state.mJunkRecordTable
-
-                val addRecord = JunkRecord("Add Record", 0) // keep this record on the top of list
-                state.mJunkRecordTable.add(addRecord)
-                state.mJunkRecordTable.addAll(tmpJunkRecords)
-
-                Log.d("VIN", "updateJunkRecord ${state.mJunkRecordTable}")
+            val recordTableIndex =
+                state.mSelectJunkRecordIndex // could change before the record is add/updated
+            if (state.mJunkRecordTable[recordTableIndex].mJunkName.isEmpty()) {
+                val recId = state.mJunkRecordTable[recordTableIndex].mId    // delete record
+                viewModelScope.launch(Dispatchers.IO) {
+                    junkDao.deleteRecordById(recId)
+                }
+                state.mJunkRecordTable.removeAt(recordTableIndex)   // remove record from table
+                if (state.mJunkRecordTable.isEmpty()) {
+                    addRecordToDatabaseAndTable()
+                }
+            } else {
+                viewModelScope.launch(Dispatchers.IO) {
+                    junkDao.updateJunkTableRecord(state.mJunkRecordTable[recordTableIndex])
+                    Log.d("VIN", "Update current record ")
+                }
             }
         }
-        state.mJunkRecordTable[junkRecIdx].mId = junkRecIdx
-        state.mEditJunkRecordIndex = junkRecIdx
+        state.mSelectJunkRecordIndex = junkRecIdx
 
         repaintScreen()
     }
 
+    fun addRecordToDatabaseAndTable() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val addRecord = JunkRecord("New Record", 0) // keep this record on the top of list
+            val recId = junkDao.insertJunkTableRecord(addRecord)
+            addRecord.mId = recId
+            val tableIdx = state.mJunkRecordTable.count()   // insert add record at the end of the list
+            state.mJunkRecordTable.add(tableIdx, addRecord)   // add record to list table
+            state.mSelectJunkRecordIndex = tableIdx     // this is the index used to display record on the add record
+            repaintScreen()
+        }
+    }
+
     fun getEditJunkRecord(): Int {
-        Log.d("VIN", "getEditJunkRecord Index ${state.mEditJunkRecordIndex}")
-        return (state.mEditJunkRecordIndex) // record index
+        Log.d("VIN", "getEditJunkRecord Index ${state.mSelectJunkRecordIndex}")
+        return (state.mSelectJunkRecordIndex) // record index
     }
 
     fun getJunkTableValue(recIdx: Int): String {
@@ -185,24 +207,21 @@ open class SummaryViewModel() : ViewModel() {
     }
 
     fun onJunkRecordChange(junkString: String) {
-        state.mJunkRecordTable[state.mEditJunkRecordIndex].mJunkName = junkString
+        state.mJunkRecordTable[state.mSelectJunkRecordIndex].mJunkName = junkString
         repaintScreen()
     }
 
     private fun saveJunkDialogRecords() {
-        Log.d("VIN", "saveJunkDialogRecords ")
-//        viewModelScope.launch(Dispatchers.IO) {
-//            for (ptRecord: PointTable in state.mGamePointsTable) {
-//                val pointsRecord =
-//                    PointsRecord(ptRecord.key, ptRecord.value.toInt(), ptRecord.label)
-//                pointsRecordDoa.addUpdatePointTableRecord(pointsRecord)
-//            }
+        Log.d("VIN", "saveJunkDialogRecords before Rec Cnt ${state.mJunkRecordTable.count()}")
+        state.mJunkDatabaseRecordRead = false
+        state.mJunkRecordTable.clear()  // delete all records
+        Log.d("VIN", "saveJunkDialogRecords Rec Cnt ${state.mJunkRecordTable.count()}")
         displayJunkDialog()   // exit dialog
     }
 
-    private fun cancelJunkDialogRecords() {
-        Log.d("VIN", "cancelJunkDialogRecords ")
-        displayJunkDialog()   // exit dialog
+    private fun addRecordJunkDialog() {
+        Log.d("VIN", "addRecordJunkDialog ")
+        addRecordToDatabaseAndTable()
     }
 
     fun displayPointsDialog() {
@@ -391,8 +410,12 @@ data class State(
     var mGameABCD: IntArray = IntArray(MAX_PLAYERS) { 0 },   // A player index 0
     var mDisplayMenu: Boolean = false,
     var mHasDatabaseBeenRead: Boolean = false,
+
     var mShowJunkDialog: Boolean = false,
-    var mEditJunkRecordIndex: Int = -1,
+    var mSelectJunkRecordIndex: Int = -1,
+    var mJunkDatabaseRecordRead: Boolean = false,
+    var mJunkRecordTable: MutableList<JunkRecord> = mutableListOf(),
+
     var mShowPointsDialog: Boolean = false,
     var mShowBackupRestoreDialog: Boolean = false,
     var mShowAboutDialog: Boolean = false,
@@ -404,7 +427,6 @@ data class State(
     var mEmailName: String = "",
     var mEmailRecords: List<EmailRecord> = emptyList(),
     var mGamePointsTable: List<PointTable> = emptyList(),
-    var mJunkRecordTable: MutableList<JunkRecord> = mutableListOf(JunkRecord("Add Record", 0)),
     val mRepaintScreen: Boolean = false,
 
     var mTotalPtQuoteFront: Float = 0f,
