@@ -15,7 +15,7 @@ interface JunkDao {
     suspend fun insertJunkTableRecord(junkRecord: JunkRecord):Long   // return the rec Id
 
     @Update
-    suspend fun updateJunkTableRecord(junkRecord: JunkRecord)   // return the rec Id
+    suspend fun updateJunkTableRecord(junkRecord: JunkRecord)   //
 
     @Query("DELETE FROM JunkTable WHERE mId = :junkId")
     fun deleteRecordById(junkId: Long)

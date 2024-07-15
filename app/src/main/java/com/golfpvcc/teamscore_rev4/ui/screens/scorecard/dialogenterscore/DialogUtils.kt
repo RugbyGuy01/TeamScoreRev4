@@ -1,14 +1,27 @@
 package com.golfpvcc.teamscore_rev4.ui.screens.scorecard.dialogenterscore
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -16,8 +29,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import com.golfpvcc.teamscore_rev4.database.model.JunkRecord
+import com.golfpvcc.teamscore_rev4.ui.screens.CardButton
+import com.golfpvcc.teamscore_rev4.ui.screens.coursedetail.HoleDetail
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.JunkTableList
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.ScoreCardViewModel
+import com.golfpvcc.teamscore_rev4.ui.screens.summary.SummaryActions
+import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.DisplayJunkRecordEditField
+import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.JunkRecordItem
 import com.golfpvcc.teamscore_rev4.utils.DOUBLE_TEAM_SCORE
 import com.golfpvcc.teamscore_rev4.utils.TEAM_DOUBLE_GROSS_SCORE
 import com.golfpvcc.teamscore_rev4.utils.TEAM_DOUBLE_NET_SCORE
@@ -32,7 +57,7 @@ fun DialogButton(
     symbol: String,
     modifier: Modifier,
     myFontSize: Int,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     Box(
         contentAlignment = Alignment.Center,
@@ -58,7 +83,7 @@ fun DialogCard(
     backGround: Color,
     textColor: Color,
     onClick: () -> Unit,
-    onLongClick:() -> Unit
+    onLongClick: () -> Unit,
 ) {
     Card(
         modifier = Modifier
@@ -121,8 +146,8 @@ fun teamScoreTypeNet(teamHoleMask: Int): Boolean {        // return True if the 
 fun DisplayPlayerNames(
     playerName: String,
     backGroundColorForStrokes: Color,
-    playerHoleScore:String,
-    playerIdx:Int,
+    playerHoleScore: String,
+    playerIdx: Int,
     onAction: (DialogAction) -> Unit,
 ) {
     Text(
@@ -142,4 +167,72 @@ fun DisplayPlayerNames(
         style = TextStyle(background = backGroundColorForStrokes),
         fontSize = PLAYER_TEXT_SIZE.sp
     )
+}
+
+@Composable
+fun DisplayJunkDialog(scoreCardViewModel: ScoreCardViewModel) {
+
+    Dialog(properties = DialogProperties(usePlatformDefaultWidth = false),
+        onDismissRequest = { }) {   //must hit Exit
+        Card(
+            modifier = Modifier
+                .padding(5.dp)
+                .fillMaxHeight(),
+            shape = RoundedCornerShape(6.dp),
+        ) {
+            Column(
+                Modifier
+                    .width(100.dp)
+                    //.padding(10.dp)
+            ) {
+                LazyColumn(
+                    modifier = Modifier
+                        .padding(2.dp)
+                        .weight(.9f)
+                ) {
+                    itemsIndexed(scoreCardViewModel.state.mJunkTableSelection.mJunkTableList) { it, junkList ->
+                        JunkListItem(junkList)
+                    }
+                } // end of junk selection list
+                HorizontalDivider(thickness = 1.dp, color = Color.Blue)
+                Row(
+                    Modifier.fillMaxWidth()
+                        .weight(.1f),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    Text(text = "Done")
+                }
+            }
+        }
+    }
+}
+
+@Composable //Display the Junk record in a Card
+fun JunkListItem(
+    junkTableList: JunkTableList,
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(5.dp)
+            .height(30.dp)
+            .clickable { },
+        border = BorderStroke(1.dp, Color.Black),
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight()
+                .padding(5.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = junkTableList.mJunkName,
+                //style = MaterialTheme.typography.displaySmall,
+                fontWeight = FontWeight.Normal,
+                textAlign = TextAlign.Right
+            )
+        }
+    }
 }

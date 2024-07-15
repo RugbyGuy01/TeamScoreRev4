@@ -24,15 +24,14 @@ import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DISPLAY_MODE_POINT
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DISPLAY_MODE_STABLEFORD
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.HDCP_HEADER
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.HOLE_HEADER
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.JunkTableSelection
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.PAR_HEADER
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.ScoreCardActions
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.TEAM_HEADER
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.USED_HEADER
-import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.changeDisplayScreenMode
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.getTotalScore
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.highLiteTotalColumn
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.refreshScoreCard
-import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.screenModeText
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.setBoardColorForPlayerTeamScore
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.updatePlayersTeamScoreCells
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.updateScoreCardState
@@ -68,6 +67,7 @@ open class ScoreCardViewModel() : ViewModel() {
     private val playerRecordDoa = TeamScoreCardApp.getPlayerDao()
     private val pointsRecordDoa = TeamScoreCardApp.getPointsDao()
 
+
     class ScoreCardViewModelFactor() : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return ScoreCardViewModel() as T
@@ -87,6 +87,8 @@ open class ScoreCardViewModel() : ViewModel() {
                 Log.d("VIN1", "getScoreCardAndPlayerRecord is empty")
 
             state.mGamePointsTable = pointsRecordDoa.getAllPointRecords()
+
+            state.mJunkTableSelection.loadJunkTableRecords()
         }
     }
 
@@ -145,6 +147,7 @@ open class ScoreCardViewModel() : ViewModel() {
         val parCells = getHoleParCells()
         refreshScoreCard(parCells)
     }
+
     fun changeScreenNet() {
         state = state.copy(mDisplayScreenModeText = "Net")
 
@@ -152,6 +155,7 @@ open class ScoreCardViewModel() : ViewModel() {
         val parCells = getHoleParCells()
         refreshScoreCard(parCells)
     }
+
     fun changeScreenStableford() {
         state = state.copy(mDisplayScreenModeText = "Stableford")
 
@@ -159,6 +163,7 @@ open class ScoreCardViewModel() : ViewModel() {
         val parCells = getHoleParCells()
         refreshScoreCard(parCells)
     }
+
     fun changeScreenPtQuote() {
         state = state.copy(mDisplayScreenModeText = "Point Quote")
 
@@ -166,9 +171,10 @@ open class ScoreCardViewModel() : ViewModel() {
         val parCells = getHoleParCells()
         refreshScoreCard(parCells)
     }
+
     fun changeScreenNineGame() {
         state = state.copy(mDisplayScreenModeText = "Nines Game")
-        if(state.mGameNines) {
+        if (state.mGameNines) {
             state.mDisplayScreenMode = DISPLAY_MODE_9_GAME
             val parCells = getHoleParCells()
             refreshScoreCard(parCells)
@@ -389,13 +395,18 @@ open class ScoreCardViewModel() : ViewModel() {
             is DialogAction.NetLongClick -> setNetLongClickScore(action.playerIdx)
             is DialogAction.Number -> scoreEnter(action.score)
             is DialogAction.SetDialogCurrentPlayer -> setDialogCurrentPlayer(action.currentPlayerIdx)
-            is DialogAction.JunkClick -> displayJunkDialog()
+            is DialogAction.JunkClick -> displayJunkDialog(action.playerIdx, action.currentHole)
             DialogAction.DisplayHoleNote -> displayHoleNote()
         }
     }
 
-    fun displayJunkDialog() {   //  Dialog Enter player scores function are below
-        Log.d("VIN", "displayJunkDialog")
+    fun displayJunkDialog(playerIdx: Int, currentHole:Int) {   //  Dialog Enter player scores function are below
+        Log.d("VIN", "displayJunkDialog player Idx $playerIdx Hole $currentHole")
+        viewModelScope.launch(Dispatchers.IO) {
+            state.mJunkTableSelection.loadPlayerJunkRecords(playerIdx, currentHole)
+            state.mDialogDisplayJunkSelection = true
+            repaintScreen()
+        }
     }
 
     fun displayHoleNote() { //  Dialog Enter player scores function are below
@@ -418,7 +429,7 @@ open class ScoreCardViewModel() : ViewModel() {
 
     fun buttonEnterScore() { //  Dialog Enter player scores function are below
         Log.d("VIN", "ButtonEnterScore")
-        state = state.copy(mDialogDisplayed = true)
+        state = state.copy(mDialogEnterScores = true)
         if (state.mShowTotals) {
             advanceToTheNextHole()  //user looking at the total scores
             highLiteTotalColumn(VIN_LIGHT_GRAY)
@@ -429,7 +440,7 @@ open class ScoreCardViewModel() : ViewModel() {
 
     private fun doneScoringDialog() { //  Dialog Enter player scores function are below
         Log.d("HOLE", "doneScoringDialog current hole ${state.mCurrentHole}")
-        state = state.copy(mDialogDisplayed = false)
+        state = state.copy(mDialogEnterScores = false)
         updatePlayersTeamScoreCells( // doneScoringDialog
             state.mDisplayScreenMode,
             state.mCurrentHole,
@@ -560,11 +571,12 @@ data class ScoreCard(
     val mButtonScreenNextText: String = "Net",             // what will be display next
     val mRepaintScreen: Boolean = false,
     val mShowTotals: Boolean = false,
-    var mGameNines: Boolean  = false,    // true if we only have 3 players
+    var mGameNines: Boolean = false,    // true if we only have 3 players
     val mCourseName: String = "",    // current course name from the course list database
     val mCourseId: Int = 0,
     val mTee: String = "",                   // the tee's played or the course yardage
-    val mDialogDisplayed: Boolean = false,
+    val mDialogEnterScores: Boolean = false,
+    var mDialogDisplayJunkSelection:Boolean=false,
     var mDialogCurrentPlayer: Int = 0,
     val mCurrentHole: Int = 0,      // the current hole being played in the game
     val mWhatNineIsBeingDisplayed: Boolean = FRONT_NINE_IS_DISPLAYED,
@@ -580,6 +592,9 @@ data class ScoreCard(
         TeamUsedHeading(TEAM_HEADER, "Team"),   // total hole score for selected player
         TeamUsedHeading(USED_HEADER, "Used"),   // total players selected for this hole
     ),
+    val mJunkTableSelection: JunkTableSelection = JunkTableSelection(
+        TeamScoreCardApp.getJunkDao(),
+        TeamScoreCardApp.playerJunkDao()),
 )
 
 data class HdcpParHoleHeading(
@@ -607,5 +622,10 @@ data class TeamUsedHeading(
     var mName: String = "",
     var mHole: IntArray = IntArray(HOLE_ARRAY_SIZE) { 0 },
     var mTotal: String = "",
+)
+data class JunkTableList(
+    var mJunkName: String = "",
+    var mId: Long = 1,
+    var mSelected: Boolean = false,
 )
 

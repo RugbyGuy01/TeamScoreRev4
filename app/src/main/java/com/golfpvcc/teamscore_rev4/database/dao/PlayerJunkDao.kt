@@ -1,8 +1,12 @@
 package com.golfpvcc.teamscore_rev4.database.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Upsert
+import com.golfpvcc.teamscore_rev4.database.model.CourseRecord
+import com.golfpvcc.teamscore_rev4.database.model.JunkRecord
 import com.golfpvcc.teamscore_rev4.database.model.PlayerJunkRecord
 
 @Dao
@@ -13,8 +17,14 @@ interface PlayerJunkDao {
     @Upsert
     suspend fun addUpdatePlayerJunkTableRecord(playerJunkRecord: PlayerJunkRecord)
 
-    @Query("SELECT * FROM PlayerJunkTable WHERE mPlayerIdx = :playerIdx")
-    fun getPlayerJunkTableRecords(playerIdx: Int): List<PlayerJunkRecord>
+    @Query("SELECT * FROM PlayerJunkTable WHERE mPlayerIdx = :playerIdx AND mHoleNumber = :currentHole")
+    fun getPlayerJunkTableRecords(playerIdx: Int, currentHole:Int): List<PlayerJunkRecord>
+
+    @Insert
+    suspend fun insertJunkTableRecord(playerJunkRecord: PlayerJunkRecord):Long   // return the rec Id
+
+    @Delete
+    fun deleteJunkTableRecord(playerJunkRecord: PlayerJunkRecord)
 
     @Query("SELECT (SELECT COUNT(*) FROM PlayerJunkTable) == 0")    // check for empty database
     fun isEmpty(): Boolean

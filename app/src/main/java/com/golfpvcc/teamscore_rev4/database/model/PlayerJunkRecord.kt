@@ -9,5 +9,5 @@ import androidx.room.PrimaryKey
     val mHoleNumber:Int=0,
     val mJunkId:Int=0,
     @PrimaryKey(autoGenerate = true)    // autoGenerate is false
-    val mId: Int = 0,
+    val mId: Long = 0,
 )
