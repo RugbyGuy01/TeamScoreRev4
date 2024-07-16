@@ -23,6 +23,9 @@ interface PlayerJunkDao {
     @Insert
     suspend fun insertJunkTableRecord(playerJunkRecord: PlayerJunkRecord):Long   // return the rec Id
 
+    @Query("DELETE  FROM PlayerJunkTable")
+    fun  deleteAllPlayersJunkTableRecord()
+
     @Delete
     fun deleteJunkTableRecord(playerJunkRecord: PlayerJunkRecord)
 

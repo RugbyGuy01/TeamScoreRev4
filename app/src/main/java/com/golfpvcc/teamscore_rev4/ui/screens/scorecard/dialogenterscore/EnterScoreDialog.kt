@@ -84,7 +84,7 @@ fun EnterPlayersScores(
 
     if (state.mDialogEnterScores) {
         if (state.mDialogDisplayJunkSelection) {
-            DisplayJunkDialog(scoreCardViewModel)
+            DisplayJunkDialog(scoreCardViewModel, onAction)
         } else {
             Dialog(properties = DialogProperties(usePlatformDefaultWidth = false),
                 onDismissRequest = { onAction(DialogAction.Done) }) {
@@ -166,7 +166,7 @@ fun DisplayJunkButton(
         myFontSize = BUTTON_JUNK_FONT,
         backGround = scoreCardViewModel.state.mJunkButtonColor[idx],
         textColor = Color.Black,
-        onClick = { onAction(DialogAction.JunkClick(idx, currentHole)) }) {
+        onClick = { onAction(DialogAction.DisplayJunkDialog(idx)) }) {
     }
 }
 

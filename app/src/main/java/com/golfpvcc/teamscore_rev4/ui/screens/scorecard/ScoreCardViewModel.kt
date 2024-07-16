@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.golfpvcc.teamscore_rev4.TeamScoreCardApp
+import com.golfpvcc.teamscore_rev4.database.model.PlayerJunkRecord
 import com.golfpvcc.teamscore_rev4.database.model.PlayerRecord
 import com.golfpvcc.teamscore_rev4.database.model.PointsRecord
 import com.golfpvcc.teamscore_rev4.database.model.ScoreCardRecord
@@ -395,18 +396,48 @@ open class ScoreCardViewModel() : ViewModel() {
             is DialogAction.NetLongClick -> setNetLongClickScore(action.playerIdx)
             is DialogAction.Number -> scoreEnter(action.score)
             is DialogAction.SetDialogCurrentPlayer -> setDialogCurrentPlayer(action.currentPlayerIdx)
-            is DialogAction.JunkClick -> displayJunkDialog(action.playerIdx, action.currentHole)
+            is DialogAction.DisplayJunkDialog -> displayJunkDialog(action.playerIdx)
             DialogAction.DisplayHoleNote -> displayHoleNote()
+            is DialogAction.ToggleJunkListItem -> toggleJunkListItem(action.listIdx)
+            DialogAction.CloseJunkTableList -> closeJunkTableList()
         }
     }
 
-    fun displayJunkDialog(playerIdx: Int, currentHole:Int) {   //  Dialog Enter player scores function are below
-        Log.d("VIN", "displayJunkDialog player Idx $playerIdx Hole $currentHole")
+
+    fun displayJunkDialog(playerIdx: Int) {   //  Dialog Enter player scores function are below
+        Log.d("VIN", "displayJunkDialog player Idx $playerIdx ")
         viewModelScope.launch(Dispatchers.IO) {
-            state.mJunkTableSelection.loadPlayerJunkRecords(playerIdx, currentHole)
+                        state.mJunkTableSelection.loadPlayerJunkRecords(playerIdx, state.mCurrentHole)
             state.mDialogDisplayJunkSelection = true
+            state.mCurrentJunkPlayerIdx = playerIdx
             repaintScreen()
         }
+    }
+
+    private fun toggleJunkListItem(listIdx: Int) {
+        Log.d("VIN", "toggleJunkListItem listIdx  $listIdx")
+
+        var selection = !state.mJunkTableSelection.mJunkTableList[listIdx].mSelected
+        val playerJunkRecord = state.mJunkTableSelection.setJunkPlayerRecordToDB(
+            listIdx,
+            selection,
+            state.mCurrentJunkPlayerIdx,
+            state.mCurrentHole
+        )
+        Log.d("JUNKREC", "toggleJunkListItem selection  $selection rec $playerJunkRecord")
+        viewModelScope.launch(Dispatchers.IO) {
+            if (selection) {
+                state.mJunkTableSelection.addPlayerJunkRecord(playerJunkRecord)
+            } else {
+                state.mJunkTableSelection.deletePlayerJunkRecord(playerJunkRecord)
+            }
+        }
+        repaintScreen()
+    }
+
+    private fun closeJunkTableList() {
+        state.mDialogDisplayJunkSelection = false
+        repaintScreen()
     }
 
     fun displayHoleNote() { //  Dialog Enter player scores function are below
@@ -576,9 +607,10 @@ data class ScoreCard(
     val mCourseId: Int = 0,
     val mTee: String = "",                   // the tee's played or the course yardage
     val mDialogEnterScores: Boolean = false,
-    var mDialogDisplayJunkSelection:Boolean=false,
+    var mDialogDisplayJunkSelection: Boolean = false,
     var mDialogCurrentPlayer: Int = 0,
     val mCurrentHole: Int = 0,      // the current hole being played in the game
+    var mCurrentJunkPlayerIdx: Int = 0, // set when adding player junk records
     val mWhatNineIsBeingDisplayed: Boolean = FRONT_NINE_IS_DISPLAYED,
     val mHdcpParHoleHeading: List<HdcpParHoleHeading> = listOf(
         HdcpParHoleHeading(HDCP_HEADER, "HdCp", mTotal = "Notes"),
@@ -594,7 +626,8 @@ data class ScoreCard(
     ),
     val mJunkTableSelection: JunkTableSelection = JunkTableSelection(
         TeamScoreCardApp.getJunkDao(),
-        TeamScoreCardApp.playerJunkDao()),
+        TeamScoreCardApp.playerJunkDao()
+    ),
 )
 
 data class HdcpParHoleHeading(
@@ -623,6 +656,7 @@ data class TeamUsedHeading(
     var mHole: IntArray = IntArray(HOLE_ARRAY_SIZE) { 0 },
     var mTotal: String = "",
 )
+
 data class JunkTableList(
     var mJunkName: String = "",
     var mId: Long = 1,

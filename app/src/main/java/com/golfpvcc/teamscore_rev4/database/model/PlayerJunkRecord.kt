@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
     data class PlayerJunkRecord(
     val mPlayerIdx:Int=0,
     val mHoleNumber:Int=0,
-    val mJunkId:Int=0,
+    val mJunkId:Long=0,
     @PrimaryKey(autoGenerate = true)    // autoGenerate is false
     val mId: Long = 0,
 )

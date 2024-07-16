@@ -240,7 +240,7 @@ fun ConfigureJunkDialog(onAction: (SummaryActions) -> Unit, summaryViewModel: Su
             val recToEdit = summaryViewModel.getEditJunkRecord() // check for selected record
             Column(
                 Modifier
-                    .width(200.dp)
+                    .width(250.dp)
                     .padding(10.dp)
             ) {
                 if (recToEdit != -1) {     // the function is called many time, if click junk record button then recToEdit record will be set

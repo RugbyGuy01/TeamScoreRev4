@@ -297,7 +297,7 @@ fun DisplayPlayersTotalScore(state: State, onAction: (SummaryActions) -> Unit) {
     val playersRecord = state.playerSummary
     Column(
         Modifier
-            .height(160.dp)
+            .height(200.dp)
             .padding(1.dp),
     ) {
         LazyRow(Modifier.padding(4.dp)) {
@@ -330,6 +330,7 @@ fun DisplayPlayerScore(player: PlayerSummary, onAction: (SummaryActions) -> Unit
             DisplayPlayerScoreLine2(player)
             DisplayPlayerScoreLine3(player)
             HorizontalDivider(thickness = 2.dp, color = Color.Red)
+            DisplayPlayerScorePayouts(player)
             DisplayPlayerScorePayouts(player)
         }
     }
