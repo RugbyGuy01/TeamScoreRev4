@@ -41,9 +41,6 @@ class PlayerSetupViewModel(
         }
     }
 
-    init {
-    }
-
     suspend fun getCourseById(courseId: Int?) {
         val courseRecord: CourseRecord = courseDao.getCourseRecord(courseId)
 

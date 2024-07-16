@@ -1,8 +1,7 @@
-July 13, 2024
+July 16, 2024
 
 Features to be added to the Team Score App.
 
-. Player’s Junk dialog screen for score card
 . Player's summary junk screen
 . Backup dialog screen - where to send backup file.
 . Restore dialog screen - where get backup file and restore
@@ -21,6 +20,7 @@ What's done
 . Sending an email from the summary screen
 . About screen, reversion and Contact information.
 . Email Address database and setup dialog screen
+. Player’s Junk dialog screen for score card
 
 Junk options:
 
@@ -33,4 +33,5 @@ Chippies
 Putt made longer than the flag stick.
 Fairway bunkers
 Clouseau
+Skins
 

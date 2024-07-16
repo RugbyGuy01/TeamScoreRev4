@@ -35,14 +35,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.golfpvcc.teamscore_rev4.database.model.JunkRecord
-import com.golfpvcc.teamscore_rev4.ui.screens.CardButton
-import com.golfpvcc.teamscore_rev4.ui.screens.coursedetail.HoleDetail
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.JunkTableList
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.ScoreCardViewModel
-import com.golfpvcc.teamscore_rev4.ui.screens.summary.SummaryActions
-import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.DisplayJunkRecordEditField
-import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.JunkRecordItem
 import com.golfpvcc.teamscore_rev4.utils.DOUBLE_TEAM_SCORE
 import com.golfpvcc.teamscore_rev4.utils.TEAM_DOUBLE_GROSS_SCORE
 import com.golfpvcc.teamscore_rev4.utils.TEAM_DOUBLE_NET_SCORE
@@ -170,7 +164,10 @@ fun DisplayPlayerNames(
 }
 
 @Composable
-fun DisplayJunkDialog(scoreCardViewModel: ScoreCardViewModel) {
+fun DisplayJunkDialog(
+    scoreCardViewModel: ScoreCardViewModel,
+    onAction: (DialogAction) -> Unit,
+) {
 
     Dialog(properties = DialogProperties(usePlatformDefaultWidth = false),
         onDismissRequest = { }) {   //must hit Exit
@@ -183,21 +180,23 @@ fun DisplayJunkDialog(scoreCardViewModel: ScoreCardViewModel) {
             Column(
                 Modifier
                     .width(100.dp)
-                    //.padding(10.dp)
+                //.padding(10.dp)
             ) {
                 LazyColumn(
                     modifier = Modifier
                         .padding(2.dp)
                         .weight(.9f)
                 ) {
-                    itemsIndexed(scoreCardViewModel.state.mJunkTableSelection.mJunkTableList) { it, junkList ->
-                        JunkListItem(junkList)
+                    itemsIndexed(scoreCardViewModel.state.mJunkTableSelection.mJunkTableList) { index, junkList ->
+                        JunkListItem(junkList, index, onAction)
                     }
                 } // end of junk selection list
                 HorizontalDivider(thickness = 1.dp, color = Color.Blue)
                 Row(
-                    Modifier.fillMaxWidth()
-                        .weight(.1f),
+                    Modifier
+                        .fillMaxWidth()
+                        .weight(.1f)
+                        .clickable { onAction(DialogAction.CloseJunkTableList) },
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     Text(text = "Done")
@@ -210,14 +209,26 @@ fun DisplayJunkDialog(scoreCardViewModel: ScoreCardViewModel) {
 @Composable //Display the Junk record in a Card
 fun JunkListItem(
     junkTableList: JunkTableList,
+    listIdx: Int,
+    onAction: (DialogAction) -> Unit,
 ) {
+    val backGround = if (junkTableList.mSelected) {
+        Color.LightGray
+    } else {
+        Color.Transparent
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(5.dp)
             .height(30.dp)
-            .clickable { },
+            .clickable { onAction(DialogAction.ToggleJunkListItem(listIdx)) },
         border = BorderStroke(1.dp, Color.Black),
+        colors = CardDefaults.cardColors(
+            containerColor = backGround, //Card background color
+            contentColor = Color.Blue  //Card content color,e.g.text
+        )
     ) {
         Row(
             modifier = Modifier
