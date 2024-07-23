@@ -2,7 +2,8 @@ package com.golfpvcc.teamscore_rev4.ui.screens.summary.utils
 
 import android.content.Context
 import android.util.Log
-import com.golfpvcc.teamscore_rev4.TeamScoreCardApp
+import com.golfpvcc.teamscore_rev4.database.dao.PlayerJunkDao
+import com.golfpvcc.teamscore_rev4.database.model.JunkRecord
 import com.golfpvcc.teamscore_rev4.database.model.ScoreCardRecord
 import com.golfpvcc.teamscore_rev4.database.model.ScoreCardWithPlayers
 import com.golfpvcc.teamscore_rev4.ui.screens.getTotalPlayerPointQuota
@@ -16,15 +17,19 @@ import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.NineGame
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.PAR_HEADER
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.setPlayerStrokeHoles
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.PlayerSummary
+import com.golfpvcc.teamscore_rev4.ui.screens.summary.PlayerJunkPayoutRecord
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.SummaryViewModel
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.TeamPoints
 import com.golfpvcc.teamscore_rev4.utils.BACK_NINE_DISPLAY
+import com.golfpvcc.teamscore_rev4.utils.BIRDIES_ON_HOLE
+import com.golfpvcc.teamscore_rev4.utils.BOGGY_ON_HOLE
+import com.golfpvcc.teamscore_rev4.utils.DOUBLE_ON_HOLE
+import com.golfpvcc.teamscore_rev4.utils.EAGLE_ON_HOLE
 import com.golfpvcc.teamscore_rev4.utils.FRONT_NINE_DISPLAY
+import com.golfpvcc.teamscore_rev4.utils.PAR_ON_HOLE
 import com.golfpvcc.teamscore_rev4.utils.PQ_TARGET
 import com.golfpvcc.teamscore_rev4.utils.PointTable
 import com.golfpvcc.teamscore_rev4.utils.TOTAL_18_HOLE
-
-
 
 
 fun SummaryViewModel.updateScoreCardState(scoreCardWithPlayers: ScoreCardWithPlayers) {
@@ -51,12 +56,11 @@ fun SummaryViewModel.updateScoreCardState(scoreCardWithPlayers: ScoreCardWithPla
             mScore = scoreCardWithPlayers.playerRecords[idx].mScore,
             mTeamHole = scoreCardWithPlayers.playerRecords[idx].mTeamHole,
         ) // add the player's name to the score card
-        state.playerSummary += PlayerSummary(mPlayer = tmpPlayer)
+        state.mPlayerSummary += PlayerSummary(mPlayer = tmpPlayer)
         if (hdcpCell != null) {
-            setPlayerStrokeHoles(state.playerSummary[idx].mPlayer, hdcpCell.mHole)
+            setPlayerStrokeHoles(state.mPlayerSummary[idx].mPlayer, hdcpCell.mHole)
         }
     }
-
 }
 
 /*
@@ -85,7 +89,7 @@ fun SummaryViewModel.calculatePtQuote() {
         pointQuotaTargetValue = pointQuotaRecord.first()
     }
     if (parCell != null) {
-        for (playerSummary in state.playerSummary) {
+        for (playerSummary in state.mPlayerSummary) {
 
             var teamPoints: TeamPoints = getTotalPlayerPointQuota(
                 whatNine = FRONT_NINE_DISPLAY,
@@ -134,7 +138,7 @@ fun SummaryViewModel.calculateStableford() {
     state.mUsedStablefordFront = 0
     state.mUsedStablefordBack = 0
     if (parCell != null) {
-        for (playerSummary in state.playerSummary) {
+        for (playerSummary in state.mPlayerSummary) {
             var teamPoints = getTotalPlayerStableford(
                 whatNine = FRONT_NINE_DISPLAY,
                 playerHeading = playerSummary,
@@ -163,7 +167,7 @@ fun SummaryViewModel.calculateOverUnderScores() {
     state.mOverUnderScoreBack = 0
 
     if (parCell != null) {
-        for (playerSummary in state.playerSummary) {
+        for (playerSummary in state.mPlayerSummary) {
             Log.d(
                 "VIN",
                 "2 calculateOverUnderScores Player ${playerSummary.mPlayer.mName} qt pts ${playerSummary.mQuote}"
@@ -193,19 +197,34 @@ fun SummaryViewModel.calculateOverUnderScores() {
     }
 }
 
-fun SummaryViewModel.playerScoreSummary() {
+fun SummaryViewModel.playerScoreSummary(playerJunkDao: PlayerJunkDao) {
     val parCell: HdcpParHoleHeading? = state.hdcpParHoleHeading.find { it.vinTag == PAR_HEADER }
     val hdcpCell: HdcpParHoleHeading? = state.hdcpParHoleHeading.find { it.vinTag == HDCP_HEADER }
     if ((parCell != null) && (hdcpCell != null)) {
-        for (playerSummary in state.playerSummary) {
-            Log.d(
-                "VIN",
-                "2 playerScoreSummary Player ${playerSummary.mPlayer.mName} qt pts ${playerSummary.mQuote}"
-            )
+
+        state.mPlayerSummary.forEachIndexed { idx, playerSummary ->
+
             calculatePlayerScoreSummary(playerSummary, parCell.mHole, hdcpCell.mHole)
+            calculatePlayerJunkSummary(playerJunkDao, playerSummary, idx, state.mJunkRecordTable)
         }
-        if (state.playerSummary.count() == 3) {
+        if (state.mPlayerSummary.count() == 3) {
             calculatePlayerNineScores()     // and ABCD game
+        }
+    }
+}
+
+fun calculatePlayerJunkSummary(playerJunkDao: PlayerJunkDao, playerSummary: PlayerSummary, playerIdx:Int, junkRecords: MutableList<JunkRecord>) {
+
+    playerSummary.mPlayerJunkRecords = playerJunkDao.getAllPlayerJunkPayoutRecords(playerIdx)
+
+    for (playerJunkRecord in playerSummary.mPlayerJunkRecords) {
+        val junkTableRecordFound =
+            junkRecords.find { it.mId == playerJunkRecord.mJunkId } //check for a winner
+
+        if (junkTableRecordFound != null) {
+            addPayOutRecord(playerSummary.mJunkPayoutList, junkTableRecordFound.mId, junkTableRecordFound.mJunkName)
+        } else {    // should never happen
+            addPayOutRecord(playerSummary.mJunkPayoutList, 0, "Error Id ${playerJunkRecord.mJunkId}")
         }
     }
 }
@@ -217,7 +236,7 @@ fun SummaryViewModel.calculatePlayerNineScores() {
 
     while (currentHole < TOTAL_18_HOLE) { // holes 1 to 18
         nineGameScores.clearTotals()
-        for (playerSummary in state.playerSummary) {        // add each player score to 9' Class
+        for (playerSummary in state.mPlayerSummary) {        // add each player score to 9' Class
             if (0 < playerSummary.mPlayer.mScore[currentHole]) {
                 val playerNetScore =
                     playerSummary.mPlayer.mScore[currentHole] - playerSummary.mPlayer.mStokeHole[currentHole]
@@ -229,7 +248,7 @@ fun SummaryViewModel.calculatePlayerNineScores() {
         gameABCD.sortScores()           // sort player scores
         var idx: Int = 0
 
-        for (playerSummary in state.playerSummary) {
+        for (playerSummary in state.mPlayerSummary) {
             playerSummary.mNineTotal += nineGameScores.get9GameScore(playerSummary.mPlayer.vinTag)
 
             state.mGameABCD[idx] += gameABCD.getPlayerScore(idx)    // now get each player score
@@ -259,32 +278,56 @@ fun SummaryViewModel.calculatePlayerScoreSummary(
         }
         OverUnderScore = playerHoleScore - holePar[currentHole]
         when (OverUnderScore) {
-            -2 -> playerHeading.mEagles++
-            -1 -> playerHeading.mBirdies++
-            0 -> playerHeading.mPars++
-            1 -> playerHeading.mBogeys++
-            2 -> playerHeading.mDouble++
+            EAGLE_ON_HOLE -> {
+                playerHeading.mEagles++
+                addPayOutRecord(playerHeading.mJunkPayoutList, EAGLE_ON_HOLE.toLong(), "Eagle")
+            }
+
+            BIRDIES_ON_HOLE -> {
+                playerHeading.mBirdies++
+                addPayOutRecord(playerHeading.mJunkPayoutList, BIRDIES_ON_HOLE.toLong(), "Birdie")
+            }
+
+            PAR_ON_HOLE -> playerHeading.mPars++
+            BOGGY_ON_HOLE -> playerHeading.mBogeys++
+            DOUBLE_ON_HOLE -> playerHeading.mDouble++
             else -> playerHeading.mOthers++
         }
         currentHole++
     }
 }
 
-fun SummaryViewModel.sendPlayerEmail( playerIdx: Int, mContext: Context) {
+fun addPayOutRecord(
+    playerJunkPayoutRecords: MutableList<PlayerJunkPayoutRecord>,
+    mJunkId: Long,
+    junkName: String,
+) {
+
+    val payoutRecord = playerJunkPayoutRecords.find { it.mJunkId == mJunkId }
+    if (payoutRecord == null) playerJunkPayoutRecords += PlayerJunkPayoutRecord(
+        junkName,
+        mJunkId,
+        1,
+    ) else {
+        payoutRecord.mCount++
+    }
+}
+
+fun SummaryViewModel.sendPlayerEmail(playerIdx: Int, mContext: Context) {
     var subject = "Player's Score: "
     val myEmailApp = EmailScores(mContext)
     var emailAddress = "vgamble@golfpvcc.com"       // default address
 
-    if(state.mEmailRecords.isNotEmpty())
+    if (state.mEmailRecords.isNotEmpty())
         emailAddress = state.mEmailRecords[0].mEmailAddress
 
-    subject += state.playerSummary[playerIdx].mPlayer.mName  // subject line
+    subject += state.mPlayerSummary[playerIdx].mPlayer.mName  // subject line
     subject += "  - " + state.mCourseName // get the current score for today's game
 
     val parCell: HdcpParHoleHeading? = state.hdcpParHoleHeading.find { it.vinTag == PAR_HEADER }
     if (parCell != null) {
         var body: String =
-            getSpreadSheetScore(state.playerSummary[playerIdx].mPlayer, parCell.mHole)
+            getSpreadSheetScore(state.mPlayerSummary[playerIdx].mPlayer, parCell.mHole)
         body += state.mCourseName + "," // add course name, user will add the tee box or yardage
         body += state.mTee
 
@@ -305,8 +348,6 @@ fun clearSummaryScores(playerHeading: PlayerSummary) {
     playerHeading.mDouble = 0
     playerHeading.mOthers = 0
     playerHeading.mNineTotal = 0
-    playerHeading.mSandy = 0
-    playerHeading.mCTP = 0
-    playerHeading.mOtherJunk = 0
+    playerHeading.mJunkPayoutList.clear()
 }
 

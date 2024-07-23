@@ -106,6 +106,13 @@ fun EnterPlayersScores(
                                     Row(horizontalArrangement = Arrangement.Start) {
                                         val playerName =
                                             rowPlayerNames[idx].mHdcp + " - " + rowPlayerNames[idx].mName
+
+                                        val playerStokeHoleColor =
+                                            scoreCardViewModel.getStokeOnHolePlayerColor( //determine the stokes a player gets on hole by the color
+                                                rowPlayerNames[idx].mStokeHole[currentHole]
+                                            )
+
+
                                         val backgroundColorForStokes: Color =
                                             scoreCardViewModel.getHighLiteActivePlayerColor(idx)
                                         val playerHoleScore =
@@ -116,6 +123,7 @@ fun EnterPlayersScores(
 
                                         DisplayPlayerNames(
                                             playerName,
+                                            playerStokeHoleColor,
                                             backgroundColorForStokes,
                                             playerHoleScore,
                                             idx,

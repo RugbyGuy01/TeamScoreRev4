@@ -1,6 +1,7 @@
 package com.golfpvcc.teamscore_rev4.ui.screens.summary
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.util.Log
 import android.util.Patterns
 import androidx.compose.runtime.getValue
@@ -12,8 +13,11 @@ import androidx.lifecycle.viewModelScope
 import com.golfpvcc.teamscore_rev4.TeamScoreCardApp
 import com.golfpvcc.teamscore_rev4.database.model.EmailRecord
 import com.golfpvcc.teamscore_rev4.database.model.JunkRecord
+import com.golfpvcc.teamscore_rev4.database.model.PlayerJunkRecord
 import com.golfpvcc.teamscore_rev4.database.model.PointsRecord
 import com.golfpvcc.teamscore_rev4.database.model.ScoreCardWithPlayers
+import com.golfpvcc.teamscore_rev4.database.room.backupDatabase
+import com.golfpvcc.teamscore_rev4.database.room.restoreDatabase
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.HdcpParHoleHeading
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.PlayerHeading
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.TeamUsedHeading
@@ -43,7 +47,7 @@ open class SummaryViewModel() : ViewModel() {
     private val pointsRecordDoa = TeamScoreCardApp.getPointsDao()
     private val emailDao = TeamScoreCardApp.getEmailDao()
     private val junkDao = TeamScoreCardApp.getJunkDao()
-
+    private val playerJunkDao = TeamScoreCardApp.getPlayerJunkDao()
 
     class SummaryViewModelFactor() : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -54,6 +58,7 @@ open class SummaryViewModel() : ViewModel() {
     fun getScoreCardAndPlayerRecord() {
         if (!state.mHasDatabaseBeenRead) {
             state.mHasDatabaseBeenRead = true   // only read the database once
+            readJunkTableRecordsFromDB()
             val scoreCardWithPlayers: ScoreCardWithPlayers =
                 scoreCardDao.getScoreRecordWithPlayers(SCORE_CARD_REC_ID)
 
@@ -63,6 +68,7 @@ open class SummaryViewModel() : ViewModel() {
                 Log.d("VIN1", "getScoreCardAndPlayerRecord is empty")
             configurePointTable()
             teamAndPlayerSummary()
+
             state.mEmailRecords = emailDao.getAllEmailRecords()
         }
     }
@@ -78,11 +84,20 @@ open class SummaryViewModel() : ViewModel() {
         }
     }
 
+    fun readJunkTableRecordsFromDB() {
+        if (state.mJunkDatabaseRecordRead == false) {
+            viewModelScope.launch(Dispatchers.IO) {
+                state.mJunkRecordTable.addAll(junkDao.getAllJunkRecords())
+                Log.d("VIN", "Junk records read from db cnt ${state.mJunkRecordTable.count()}")
+            }
+            state.mJunkDatabaseRecordRead = true  // read database once
+        }
+    }
 
     fun summaryActions(action: SummaryActions) {
         when (action) {
             SummaryActions.DisplayAboutDialog -> displayAboutDialog()
-            SummaryActions.DisplayBackupRestoreDialog -> displayBackupRestoreDialog()
+            is SummaryActions.DisplayBackupRestoreDialog -> displayBackupRestoreDialog(action.context)
             SummaryActions.DisplayJunkDialog -> displayJunkDialog()
             is SummaryActions.UpdateJunkRecord -> updateJunkRecord(action.junkRecIdx)
             SummaryActions.AddRecordJunkDialog -> addRecordJunkDialog()
@@ -93,7 +108,6 @@ open class SummaryViewModel() : ViewModel() {
             SummaryActions.ShowEmailDialog -> showEmailDialog()
             SummaryActions.SaveEmailRecord -> saveEmailRecord()
             is SummaryActions.SendEmailToUser -> sendPlayerEmail(action.playerIdx, action.context)
-
         }
     }
 
@@ -129,8 +143,12 @@ open class SummaryViewModel() : ViewModel() {
         repaintScreen()
     }
 
-    fun displayBackupRestoreDialog() {
+    fun displayBackupRestoreDialog(context: Context) {
         Log.d("VIN", "displayBackupRestoreDialog")
+
+    //     backupDatabase(context)
+
+        restoreDatabase(context)
     }
 
     fun showEmailDialog() {
@@ -185,14 +203,17 @@ open class SummaryViewModel() : ViewModel() {
         repaintScreen()
     }
 
+    // user want to add new record to the database or the DB is empty
     fun addRecordToDatabaseAndTable() {
         viewModelScope.launch(Dispatchers.IO) {
-            val addRecord = JunkRecord("New Record", 0) // keep this record on the top of list
+            val addRecord = JunkRecord("New", 0) // keep this record on the top of list
             val recId = junkDao.insertJunkTableRecord(addRecord)
             addRecord.mId = recId
-            val tableIdx = state.mJunkRecordTable.count()   // insert add record at the end of the list
+            val tableIdx =
+                state.mJunkRecordTable.count()   // insert add record at the end of the list
             state.mJunkRecordTable.add(tableIdx, addRecord)   // add record to list table
-            state.mSelectJunkRecordIndex = tableIdx     // this is the index used to display record on the add record
+            state.mSelectJunkRecordIndex =
+                tableIdx     // this is the index used to display record on the add record
             repaintScreen()
         }
     }
@@ -212,9 +233,9 @@ open class SummaryViewModel() : ViewModel() {
     }
 
     private fun saveJunkDialogRecords() {
-        Log.d("VIN", "saveJunkDialogRecords before Rec Cnt ${state.mJunkRecordTable.count()}")
-        state.mJunkDatabaseRecordRead = false
-        state.mJunkRecordTable.clear()  // delete all records
+//        Log.d("VIN", "saveJunkDialogRecords before Rec Cnt ${state.mJunkRecordTable.count()}")
+//        state.mJunkDatabaseRecordRead = false
+//        state.mJunkRecordTable.clear()  // delete all records
         Log.d("VIN", "saveJunkDialogRecords Rec Cnt ${state.mJunkRecordTable.count()}")
         displayJunkDialog()   // exit dialog
     }
@@ -280,8 +301,7 @@ open class SummaryViewModel() : ViewModel() {
         calculatePtQuote()
         calculateStableford()
         calculateOverUnderScores()
-        playerScoreSummary()
-
+        playerScoreSummary(playerJunkDao)
     }
 
     suspend fun checkPointRecords() {
@@ -289,22 +309,22 @@ open class SummaryViewModel() : ViewModel() {
     }
 
     fun getNumberOfPlayer(): Int {
-        val numberOfPlayers = state.playerSummary.size
+        val numberOfPlayers = state.mPlayerSummary.size
         return (numberOfPlayers)
     }
 
     // This function will calculate the points needed by the team from the point Quote.
     fun calculatedTeamPointsNeeded(): Int {
-        val numberOfPlayers = state.playerSummary.size
+        val numberOfPlayers = state.mPlayerSummary.size
         var playersHandicap = 0
 
         for (idx in 0 until numberOfPlayers) {
-            playersHandicap += state.playerSummary[idx].mPlayer.mHdcp.toInt()
+            playersHandicap += state.mPlayerSummary[idx].mPlayer.mHdcp.toInt()
         }
         val ptQuota = state.mGamePointsTable.filter { it.key == PQ_TARGET }
         var TeamBasePointsNeeded = ptQuota.first().value.toInt()
         if (ptQuota.isNotEmpty()) {
-            TeamBasePointsNeeded *= state.playerSummary.size //if all players had a 0 handicap, this is how many point they would need
+            TeamBasePointsNeeded *= state.mPlayerSummary.size //if all players had a 0 handicap, this is how many point they would need
         }
 
         TeamBasePointsNeeded -= playersHandicap // however, subtract the total handicap of all of the players from the team bas point needed
@@ -454,7 +474,7 @@ data class State(
         HdcpParHoleHeading(PAR_HEADER, "Par"),
         HdcpParHoleHeading(HOLE_HEADER, mName = "Hole", mTotal = "Total"),
     ),
-    var playerSummary: List<PlayerSummary> = emptyList(),
+    var mPlayerSummary: List<PlayerSummary> = emptyList(),
     val teamUsedHeading: List<TeamUsedHeading> = listOf(
         TeamUsedHeading(TEAM_HEADER, "Team"),   // total hole score for selected player
         TeamUsedHeading(USED_HEADER, "Used"),   // total players selected for this hole
@@ -474,9 +494,14 @@ data class PlayerSummary(
     var mQuote: Int = 0,
     var mStableford: Int = 0,
     var mNineTotal: Int = 0,
-    var mSandy: Int = 0,
-    var mCTP: Int = 0,
-    var mOtherJunk: Int = 0,
+    var mPlayerJunkRecords: List<PlayerJunkRecord> = emptyList(),
+    var mJunkPayoutList: MutableList<PlayerJunkPayoutRecord> = mutableListOf(),
+)
+
+data class PlayerJunkPayoutRecord(
+    var mJunkName: String = "",
+    val mJunkId: Long = 0,
+    var mCount: Int = 0,
 )
 
 data class TeamPoints(

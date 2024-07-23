@@ -13,7 +13,6 @@ import com.golfpvcc.teamscore_rev4.database.model.CourseRecord
 import com.golfpvcc.teamscore_rev4.database.model.PlayerRecord
 import com.golfpvcc.teamscore_rev4.database.model.ScoreCardRecord
 import com.golfpvcc.teamscore_rev4.utils.BACK_NINE_TOTAL_DISPLAYED
-import com.golfpvcc.teamscore_rev4.utils.Constants
 import com.golfpvcc.teamscore_rev4.utils.DISPLAY_SCORE_CARD_SCREEN
 import com.golfpvcc.teamscore_rev4.utils.MINIMUM_LEN_OF_PLAYER_NAME
 import com.golfpvcc.teamscore_rev4.utils.SCORE_CARD_REC_ID
@@ -28,6 +27,7 @@ class PlayerSetupViewModel(
     private val playerDao = TeamScoreCardApp.getPlayerDao()
     private val courseDao = TeamScoreCardApp.getCourseDao()
     private val scoreCardDao = TeamScoreCardApp.getScoreCardDao()
+    private val playerJunkDao = TeamScoreCardApp.getPlayerJunkDao()
 
     var state by mutableStateOf(ScoreCardState())
         private set
@@ -157,11 +157,16 @@ class PlayerSetupViewModel(
     fun onButtonNewGame(): Int {
         viewModelScope.launch(Dispatchers.IO) {
             deleteAllPlayerRecords()
+            deletePlayerJunkTableRecord()
             savePlayersRecord()
             saveScoreCardRecord()
             state = state.copy(mNextScreen = DISPLAY_SCORE_CARD_SCREEN)
         }
         return 0
+    }
+
+    private fun deletePlayerJunkTableRecord() {
+        playerJunkDao.deleteAllPlayersJunkTableRecord()
     }
 
     fun onButtonCancel() {

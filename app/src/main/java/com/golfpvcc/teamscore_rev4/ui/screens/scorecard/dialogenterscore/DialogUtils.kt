@@ -139,6 +139,7 @@ fun teamScoreTypeNet(teamHoleMask: Int): Boolean {        // return True if the 
 @Composable
 fun DisplayPlayerNames(
     playerName: String,
+    playerStokeHoleColor:Color,
     backGroundColorForStrokes: Color,
     playerHoleScore: String,
     playerIdx: Int,
@@ -149,6 +150,7 @@ fun DisplayPlayerNames(
         modifier = Modifier
             .padding(5.dp)
             .width(PLAYER_NAME_WIDTH.dp),
+        style = TextStyle(background = playerStokeHoleColor),
         fontSize = PLAYER_TEXT_SIZE.sp
     )
 

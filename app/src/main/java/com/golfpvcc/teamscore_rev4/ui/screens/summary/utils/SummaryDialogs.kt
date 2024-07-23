@@ -218,16 +218,7 @@ fun UpdatePointsTable(
 
 @Composable
 fun ConfigureJunkDialog(onAction: (SummaryActions) -> Unit, summaryViewModel: SummaryViewModel) {
-    val scope = rememberCoroutineScope()
 
-    if (summaryViewModel.state.mJunkDatabaseRecordRead == false) {
-        LaunchedEffect(true) {
-            scope.launch(Dispatchers.IO) {
-                summaryViewModel.getJunkRecord()
-            }
-        }
-        summaryViewModel.state.mJunkDatabaseRecordRead = true  // read database once
-    }
 
     Dialog(properties = DialogProperties(usePlatformDefaultWidth = false),
         onDismissRequest = { }) {   //must hit Exit

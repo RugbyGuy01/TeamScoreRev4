@@ -18,8 +18,6 @@ class JunkTableSelection(junkDao: JunkDao, playerJunkDao: PlayerJunkDao) {
         emptyList()// hold the list of junk table record
 
     fun loadJunkTableRecords() {
-        mPlayerJunkDao.deleteAllPlayersJunkTableRecord()
-
         val junkRecordList = mJunkDao.getAllJunkRecords()
 
         for (junkRecord in junkRecordList) {
@@ -52,13 +50,15 @@ class JunkTableSelection(junkDao: JunkDao, playerJunkDao: PlayerJunkDao) {
         val playerJunkRecord = PlayerJunkRecord(playerIdx, currentHole, junkListItem.mId)
         return (playerJunkRecord)
     }
-    fun deletePlayerJunkRecord(playerJunkRecord:PlayerJunkRecord){
+
+    fun deletePlayerJunkRecord(playerJunkRecord: PlayerJunkRecord) {
         mPlayerJunkDao.deleteJunkTableRecord(playerJunkRecord)
     }
 
-    suspend fun addPlayerJunkRecord(playerJunkRecord:PlayerJunkRecord){
+    suspend fun addPlayerJunkRecord(playerJunkRecord: PlayerJunkRecord) {
         mPlayerJunkDao.insertJunkTableRecord(playerJunkRecord)
     }
+
     private fun clearJunkTableListSelections() {
         for (junkTableList in mJunkTableList) {
             junkTableList.mSelected = false

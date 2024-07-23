@@ -57,8 +57,8 @@ import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.AboutDialog
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.ConfigureEmailDialog
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.ConfigureJunkDialog
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.ConfigurePointsDialog
-import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.sendPlayerEmail
 import com.golfpvcc.teamscore_rev4.utils.MENU_BUTTON_TEXT
+import com.golfpvcc.teamscore_rev4.utils.MENU_ROW_LIGHT_GRAY
 import com.golfpvcc.teamscore_rev4.utils.SUMMARY_BUTTON_TEXT
 import com.golfpvcc.teamscore_rev4.utils.SUMMARY_NAME_TEXT_SIZE
 import com.golfpvcc.teamscore_rev4.utils.SUMMARY_PAYOUT_COLOR
@@ -113,7 +113,7 @@ fun SummaryScreen(
 
 @Composable
 fun DisplayMenuOptionDialogs(summaryViewModel: SummaryViewModel) {
-        if (summaryViewModel.state.mShowAboutDialog) {
+    if (summaryViewModel.state.mShowAboutDialog) {
         AboutDialog(summaryViewModel::summaryActions)
     }
     if (summaryViewModel.state.mShowPointsDialog) {
@@ -163,7 +163,7 @@ fun DisplayABCDGameSummary(summaryViewModel: SummaryViewModel) {
             .fillMaxWidth(),
     ) {
         Text(text = "Game ABCD", Modifier.weight(2 / 4f), fontSize = SUMMARY_TEXT_SIZE.sp)
-        for ((idx, element) in summaryViewModel.state.playerSummary.withIndex()) {
+        for ((idx, element) in summaryViewModel.state.mPlayerSummary.withIndex()) {
             Text(
                 text = "${player[idx]} - ${summaryViewModel.getABCDGameScore(idx)}",
                 Modifier.weight(.5f),
@@ -294,7 +294,7 @@ fun DisplayStablefordSummary(summaryViewModel: SummaryViewModel) {
 
 @Composable
 fun DisplayPlayersTotalScore(state: State, onAction: (SummaryActions) -> Unit) {
-    val playersRecord = state.playerSummary
+    val playersRecord = state.mPlayerSummary
     Column(
         Modifier
             .height(200.dp)
@@ -331,49 +331,59 @@ fun DisplayPlayerScore(player: PlayerSummary, onAction: (SummaryActions) -> Unit
             DisplayPlayerScoreLine3(player)
             HorizontalDivider(thickness = 2.dp, color = Color.Red)
             DisplayPlayerScorePayouts(player)
-            DisplayPlayerScorePayouts(player)
         }
     }
 }
 
 @Composable
 fun DisplayPlayerScorePayouts(player: PlayerSummary) {
+
+    var playerJunkPayoutList: List<PlayerJunkPayoutRecord> = emptyList()
+    val start = 0
+    var end = 4
+    var newStart = 0
+    var totalRecords = player.mJunkPayoutList.count()
+    if (totalRecords > 4) {
+        end = 4
+        newStart = 5
+    } else {
+        end = totalRecords
+    }
+    playerJunkPayoutList = player.mJunkPayoutList.subList(start, end)
+    DisplayPayoutRow(playerJunkPayoutList)
+    if (newStart != 0) {
+        playerJunkPayoutList = player.mJunkPayoutList.subList(newStart, totalRecords)
+        DisplayPayoutRow(playerJunkPayoutList)
+    }
+
+}
+
+fun Row(`modifier`: Modifier, horizontalArrangement: Arrangement.HorizontalOrVertical) {
+
+}
+
+@Composable
+fun DisplayPayoutRow(playerJunkPayoutList: List<PlayerJunkPayoutRecord>) {
+
     Row(
         Modifier
             .background(Color(SUMMARY_PAYOUT_COLOR))
             .padding(4.dp)
             .fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(20.dp)
     ) {
         Text(
-            text = "Payouts:",
-            Modifier.weight(1.1f),
+            text = "Payouts: ",
+           // Modifier.weight(1.1f),
             fontSize = SUMMARY_TEXT_SIZE.sp
         )
-        Text(
-            text = "Eagles: ${player.mEagles}",
-            Modifier.weight(1f),
-            fontSize = SUMMARY_TEXT_SIZE.sp
-        )
-        Text(
-            text = "Birdies: ${player.mBirdies}",
-            Modifier.weight(1f),
-            fontSize = SUMMARY_TEXT_SIZE.sp
-        )
-        Text(
-            text = "Sandy: ${player.mSandy}",
-            Modifier.weight(1f),
-            fontSize = SUMMARY_TEXT_SIZE.sp
-        )
-        Text(
-            text = "CTP: ${player.mCTP}",
-            Modifier.weight(1f),
-            fontSize = SUMMARY_TEXT_SIZE.sp
-        )
-        Text(
-            text = "Junk: ${player.mOtherJunk}",
-            Modifier.weight(1f),
-            fontSize = SUMMARY_TEXT_SIZE.sp
-        )
+        playerJunkPayoutList.forEachIndexed { idx, payout ->
+            Text(
+                text = "${payout.mJunkName} : ${payout.mCount}",
+               // Modifier.weight(1.1f),
+                fontSize = SUMMARY_TEXT_SIZE.sp
+            )
+        }
     }
 }
 
@@ -389,7 +399,14 @@ fun DisplayPlayerNameAndScore(player: PlayerSummary, onAction: (SummaryActions) 
         Icon(
             imageVector = Icons.Default.Email,
             contentDescription = "Email",
-            modifier = Modifier.clickable { onAction(SummaryActions.SendEmailToUser(player.mPlayer.vinTag, mContext))}
+            modifier = Modifier.clickable {
+                onAction(
+                    SummaryActions.SendEmailToUser(
+                        player.mPlayer.vinTag,
+                        mContext
+                    )
+                )
+            }
         )
         Spacer(modifier = Modifier.width(15.dp))
         Text(
@@ -509,29 +526,30 @@ fun BottomButtons(
     Row(
         modifier = Modifier
             .padding(10.dp)
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .background(Color(MENU_ROW_LIGHT_GRAY)),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        CardButton("Resume", Color.Transparent) {
+        CardButton(" Resume ", Color.White) {
             navController.navigate(route = TeamScoreScreen.ScreenScoreCard.route) { // back to the start of configuration
                 popUpTo(ROOT_GRAPH_ROUTE)    // clear the back stack
             }
         }
         Log.d("VIN", "Summary buttons Id $courseId")
-        CardButton("Players", Color.Transparent) {
+        CardButton(" Players ", Color.White) {
             navController.navigate(TeamScoreScreen.ScreenPlayerSetup.passId(courseId))
             { // back to the start of configuration
                 popUpTo(ROOT_GRAPH_ROUTE)    // clear the back stack
             }
         }
-        CardButton("Courses", Color.Transparent) {
+        CardButton(" Courses ", Color.White) {
             navController.navigate(TeamScoreScreen.ScreenCourses.route) {
                 popUpTo(ROOT_GRAPH_ROUTE)    // clear the back stack
             }
         }
         DisplayOptionMenuDown(summaryViewModel::summaryActions)
 
-        CardButton(" Exit ", Color.Transparent) {
+        CardButton(" Exit ", Color.White) {
             navController.navigate("exit")
         }
     } // end of row
@@ -541,6 +559,7 @@ fun BottomButtons(
 fun DisplayOptionMenuDown(onAction: (SummaryActions) -> Unit) {
 
     var expanded by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     Card(modifier = Modifier
         .wrapContentSize()
@@ -548,13 +567,13 @@ fun DisplayOptionMenuDown(onAction: (SummaryActions) -> Unit) {
         .padding(1.dp),
         border = BorderStroke(2.dp, Color.LightGray),
         colors = CardDefaults.cardColors(
-            containerColor = Color.Transparent,
+            containerColor = Color.White,
         ),
         onClick = { expanded = true }
     ) {
         Text(
             modifier = Modifier.padding(5.dp),
-            text = "Menu",
+            text = " Menu ",
             fontSize = SUMMARY_BUTTON_TEXT.sp,
         )
 
@@ -585,7 +604,7 @@ fun DisplayOptionMenuDown(onAction: (SummaryActions) -> Unit) {
                 { Text(text = "Backup/Restore", fontSize = MENU_BUTTON_TEXT.sp) },
                 onClick = {
                     expanded = false
-                    onAction(SummaryActions.DisplayBackupRestoreDialog)
+                    onAction(SummaryActions.DisplayBackupRestoreDialog(context))
                 })
             DropdownMenuItem(
                 { Text(text = "About", fontSize = MENU_BUTTON_TEXT.sp) },

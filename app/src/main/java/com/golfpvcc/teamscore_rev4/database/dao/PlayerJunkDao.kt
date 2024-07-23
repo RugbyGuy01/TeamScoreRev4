@@ -20,6 +20,9 @@ interface PlayerJunkDao {
     @Query("SELECT * FROM PlayerJunkTable WHERE mPlayerIdx = :playerIdx AND mHoleNumber = :currentHole")
     fun getPlayerJunkTableRecords(playerIdx: Int, currentHole:Int): List<PlayerJunkRecord>
 
+    @Query("SELECT * FROM PlayerJunkTable WHERE mPlayerIdx = :playerIdx")
+    fun getAllPlayerJunkPayoutRecords(playerIdx: Int): List<PlayerJunkRecord>
+
     @Insert
     suspend fun insertJunkTableRecord(playerJunkRecord: PlayerJunkRecord):Long   // return the rec Id
 

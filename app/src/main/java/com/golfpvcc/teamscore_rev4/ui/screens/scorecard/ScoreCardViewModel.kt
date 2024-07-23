@@ -9,7 +9,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.golfpvcc.teamscore_rev4.TeamScoreCardApp
-import com.golfpvcc.teamscore_rev4.database.model.PlayerJunkRecord
 import com.golfpvcc.teamscore_rev4.database.model.PlayerRecord
 import com.golfpvcc.teamscore_rev4.database.model.PointsRecord
 import com.golfpvcc.teamscore_rev4.database.model.ScoreCardRecord
@@ -626,7 +625,7 @@ data class ScoreCard(
     ),
     val mJunkTableSelection: JunkTableSelection = JunkTableSelection(
         TeamScoreCardApp.getJunkDao(),
-        TeamScoreCardApp.playerJunkDao()
+        TeamScoreCardApp.getPlayerJunkDao()
     ),
 )
 

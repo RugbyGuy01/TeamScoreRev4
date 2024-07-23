@@ -5,13 +5,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import com.golfpvcc.teamscore_rev4.database.model.CourseRecord
 
-
 const val VIN_LIGHT_GRAY = 0xFFE0E0E0
 const val DISPLAY_HOLE_NUMBER = 0xFF48EFF0
 const val YELLOW_GETS_1_STROKES = 0xFFFFFBBB
 const val ORANGE_GETS_2_STROKES = 0xFFFFE4C5
 const val RED_ONE_UNDER_PAR    = 0xFFF53526
 const val PURPLE_TWO_UNDER_PAR = 0xFF3633F6
+const val MENU_ROW_LIGHT_GRAY = 0xFFDBDBD8
 
 const val COLOR_NEXT_HOLE = 0xFF5BC23F
 const val COLOR_PREV_HOLE = 0xFFAB3654

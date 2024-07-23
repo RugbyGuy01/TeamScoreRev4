@@ -3,7 +3,9 @@ package com.golfpvcc.teamscore_rev4
 This function is called from the application Android manifest.xml
  */
 import android.app.Application
+import android.content.Context
 import androidx.room.Room
+import androidx.room.RoomDatabase
 import com.golfpvcc.teamscore_rev4.utils.DATABASE_NAME
 import com.golfpvcc.teamscore_rev4.database.dao.CourseDao
 import com.golfpvcc.teamscore_rev4.database.dao.EmailDao
@@ -13,6 +15,8 @@ import com.golfpvcc.teamscore_rev4.database.dao.PlayerJunkDao
 import com.golfpvcc.teamscore_rev4.database.dao.PointsDao
 import com.golfpvcc.teamscore_rev4.database.dao.ScoreCardDao
 import com.golfpvcc.teamscore_rev4.database.room.TeamScoreDatabase
+import java.io.File
+import java.io.IOException
 
 class TeamScoreCardApp : Application() {
 
@@ -30,6 +34,7 @@ class TeamScoreCardApp : Application() {
                 instance!!.applicationContext,
                 TeamScoreDatabase::class.java, DATABASE_NAME
             ).fallbackToDestructiveMigration()
+                .setJournalMode(RoomDatabase.JournalMode.TRUNCATE)
                 .build()
 
             return db!!
@@ -39,6 +44,9 @@ class TeamScoreCardApp : Application() {
     companion object {
         private var instance: TeamScoreCardApp? = null
 
+        fun getRoomDatabase():TeamScoreDatabase{
+            return instance!!.getDb()
+        }
         fun getCourseDao(): CourseDao {
             return instance!!.getDb().courseDao()
         }
@@ -60,9 +68,8 @@ class TeamScoreCardApp : Application() {
         fun getEmailDao(): EmailDao {
             return instance!!.getDb().emailDao()
         }
-        fun playerJunkDao(): PlayerJunkDao {
+        fun getPlayerJunkDao(): PlayerJunkDao {
             return instance!!.getDb().playerJunkDao()
         }
     }
-
 }
