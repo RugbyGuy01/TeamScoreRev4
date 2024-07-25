@@ -70,7 +70,22 @@ open class SummaryViewModel() : ViewModel() {
             teamAndPlayerSummary()
 
             state.mEmailRecords = emailDao.getAllEmailRecords()
+            if (state.mEmailRecords.isEmpty()) {
+                addDefaultEmailAddress()
+            }
         }
+    }
+
+    fun checkForScoreCardRecord(): Boolean {
+        return state.mPlayerSummary.isNotEmpty()
+    }
+
+    private fun addDefaultEmailAddress() {
+        val defaultEmailAddress = EmailRecord("Vinnie Gamble", "GoodMail@golfpvcc.com")
+        viewModelScope.launch(Dispatchers.IO) {
+            emailDao.addUpdateEmailTableRecord(defaultEmailAddress)
+        }
+        state.mEmailRecords += defaultEmailAddress
     }
 
     private fun configurePointTable() {
@@ -97,7 +112,11 @@ open class SummaryViewModel() : ViewModel() {
     fun summaryActions(action: SummaryActions) {
         when (action) {
             SummaryActions.DisplayAboutDialog -> displayAboutDialog()
-            is SummaryActions.DisplayBackupRestoreDialog -> displayBackupRestoreDialog(action.context)
+            is SummaryActions.BackupRestoreDialog -> displayBackupRestoreDialog(
+                action.context,
+                action.backup
+            )
+
             SummaryActions.DisplayJunkDialog -> displayJunkDialog()
             is SummaryActions.UpdateJunkRecord -> updateJunkRecord(action.junkRecIdx)
             SummaryActions.AddRecordJunkDialog -> addRecordJunkDialog()
@@ -108,6 +127,7 @@ open class SummaryViewModel() : ViewModel() {
             SummaryActions.ShowEmailDialog -> showEmailDialog()
             SummaryActions.SaveEmailRecord -> saveEmailRecord()
             is SummaryActions.SendEmailToUser -> sendPlayerEmail(action.playerIdx, action.context)
+            SummaryActions.ShowBackupRestoreDialog -> showBackupRestoreDialog()
         }
     }
 
@@ -143,14 +163,25 @@ open class SummaryViewModel() : ViewModel() {
         repaintScreen()
     }
 
-    fun displayBackupRestoreDialog(context: Context) {
-        Log.d("VIN", "displayBackupRestoreDialog")
-
-    //     backupDatabase(context)
-
-        restoreDatabase(context)
+    fun showBackupRestoreDialog() {
+        Log.d("VIN", "showBackupRestoreDialog ")
+        state.mShowBackupRestoreDialog = !state.mShowBackupRestoreDialog
+        state.mBackupAndRestoreResults = "" //clear the results
+        repaintScreen()
     }
 
+    fun displayBackupRestoreDialog(context: Context, backup: Boolean) {
+        Log.d("VIN", "displayBackup $backup RestoreDialog")
+
+        if (backup)
+            state.mBackupAndRestoreResults = backupDatabase(context)
+        else
+            state.mBackupAndRestoreResults = restoreDatabase(context)
+        repaintScreen()
+    }
+    fun backupAndRestoreResults():String{
+        return (state.mBackupAndRestoreResults)
+    }
     fun showEmailDialog() {
         Log.d("VIN", "displayEmailDialog ")
         state.mShowEmailDialog = !state.mShowEmailDialog
@@ -426,6 +457,7 @@ data class State(
     val mCourseName: String = "",    // current course name from the course list database
     val mTee: String = "",                   // the tee's played or the course yardage
     val mCourseId: Int = 0,      // the current course we are using for the score card
+
     var mGameNines: Boolean = false,    // true if we only have 3 players
     var mGameABCD: IntArray = IntArray(MAX_PLAYERS) { 0 },   // A player index 0
     var mDisplayMenu: Boolean = false,
@@ -438,6 +470,7 @@ data class State(
 
     var mShowPointsDialog: Boolean = false,
     var mShowBackupRestoreDialog: Boolean = false,
+    var mBackupAndRestoreResults:String = "",
     var mShowAboutDialog: Boolean = false,
     var mShowEmailDialog: Boolean = false,
     var mSendEmailToUser: Boolean = false,

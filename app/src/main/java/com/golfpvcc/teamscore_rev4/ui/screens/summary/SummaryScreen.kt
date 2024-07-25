@@ -54,6 +54,7 @@ import com.golfpvcc.teamscore_rev4.ui.navigation.ROOT_GRAPH_ROUTE
 import com.golfpvcc.teamscore_rev4.ui.navigation.TeamScoreScreen
 import com.golfpvcc.teamscore_rev4.ui.screens.CardButton
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.AboutDialog
+import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.BackupANdRestoreDialog
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.ConfigureEmailDialog
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.ConfigureJunkDialog
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.ConfigurePointsDialog
@@ -80,6 +81,7 @@ fun SummaryScreen(
     )
 
     GetScoreCardRecord(summaryViewModel)
+    Log.d("VIN", "Summary GetScoreCardRecord after Id ${summaryViewModel.state.mCourseId}, ID = $id ")
 
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.primary) {
         Scaffold()
@@ -125,6 +127,10 @@ fun DisplayMenuOptionDialogs(summaryViewModel: SummaryViewModel) {
     if (summaryViewModel.state.mShowEmailDialog) {
         ConfigureEmailDialog(summaryViewModel::summaryActions, summaryViewModel)
     }
+    if (summaryViewModel.state.mShowBackupRestoreDialog) {
+        BackupANdRestoreDialog(summaryViewModel::summaryActions, summaryViewModel)
+    }
+
     if (summaryViewModel.state.mShowJunkDialog) {
         SetScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
         ConfigureJunkDialog(summaryViewModel::summaryActions, summaryViewModel)
@@ -132,7 +138,6 @@ fun DisplayMenuOptionDialogs(summaryViewModel: SummaryViewModel) {
         SetScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
 
 }
-
 
 @Composable
 fun DisplayTeamTotalScore(summaryViewModel: SummaryViewModel) {
@@ -522,7 +527,8 @@ fun BottomButtons(
     courseId: Int,
     summaryViewModel: SummaryViewModel,
 ) {
-    Log.d("VIN", "Summary buttons Id $courseId")
+    Log.d("VIN", "Summary BottomButtons Id $courseId")
+    val enableButtons = summaryViewModel.checkForScoreCardRecord()
     Row(
         modifier = Modifier
             .padding(10.dp)
@@ -530,13 +536,13 @@ fun BottomButtons(
             .background(Color(MENU_ROW_LIGHT_GRAY)),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        CardButton(" Resume ", Color.White) {
+        CardButton(" Resume ", Color.White, enableButtons) {
             navController.navigate(route = TeamScoreScreen.ScreenScoreCard.route) { // back to the start of configuration
                 popUpTo(ROOT_GRAPH_ROUTE)    // clear the back stack
             }
         }
-        Log.d("VIN", "Summary buttons Id $courseId")
-        CardButton(" Players ", Color.White) {
+        Log.d("VIN", "Summary Players buttons Id $courseId")
+        CardButton(" Players ", Color.White, enableButtons ) {
             navController.navigate(TeamScoreScreen.ScreenPlayerSetup.passId(courseId))
             { // back to the start of configuration
                 popUpTo(ROOT_GRAPH_ROUTE)    // clear the back stack
@@ -559,7 +565,7 @@ fun BottomButtons(
 fun DisplayOptionMenuDown(onAction: (SummaryActions) -> Unit) {
 
     var expanded by remember { mutableStateOf(false) }
-    val context = LocalContext.current
+
 
     Card(modifier = Modifier
         .wrapContentSize()
@@ -604,7 +610,7 @@ fun DisplayOptionMenuDown(onAction: (SummaryActions) -> Unit) {
                 { Text(text = "Backup/Restore", fontSize = MENU_BUTTON_TEXT.sp) },
                 onClick = {
                     expanded = false
-                    onAction(SummaryActions.DisplayBackupRestoreDialog(context))
+                    onAction(SummaryActions.ShowBackupRestoreDialog)
                 })
             DropdownMenuItem(
                 { Text(text = "About", fontSize = MENU_BUTTON_TEXT.sp) },

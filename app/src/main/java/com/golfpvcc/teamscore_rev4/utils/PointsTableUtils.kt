@@ -1,11 +1,14 @@
 package com.golfpvcc.teamscore_rev4.utils
 
+import android.annotation.SuppressLint
 import android.util.Log
 import com.golfpvcc.teamscore_rev4.TeamScoreCardApp
 import com.golfpvcc.teamscore_rev4.database.dao.PointsDao
 import com.golfpvcc.teamscore_rev4.database.model.PointsRecord
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
 
 data class PointTable(
     val key: Int = 0,
@@ -53,4 +56,11 @@ suspend fun createPointTableRecords() {
     } else {
         Log.d("VIN", "Have points table")
     }
+}
+@SuppressLint("SimpleDateFormat")
+fun getDateFromMillisForBackup(currentTimeMillis: Long): String {
+    val sdf = SimpleDateFormat("dd_M_yyyy_hh_mm_ss")
+    val currentDate = sdf.format(Date())
+
+    return(currentDate.toString())
 }

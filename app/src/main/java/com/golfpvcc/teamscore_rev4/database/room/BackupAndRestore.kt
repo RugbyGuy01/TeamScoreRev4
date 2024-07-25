@@ -8,6 +8,7 @@ import android.os.Environment
 import android.os.Environment.DIRECTORY_DOWNLOADS
 import android.util.Log
 import com.golfpvcc.teamscore_rev4.TeamScoreCardApp
+import com.golfpvcc.teamscore_rev4.utils.BACKUP_FILE_NAME
 import com.golfpvcc.teamscore_rev4.utils.DATABASE_NAME
 import java.io.File
 import java.io.FileInputStream
@@ -22,14 +23,15 @@ const val SHAREDPREF = "BACKUP_PREFERENCE"
 const val MAXIMUM_DATABASE_FILE = 3
 
 // https://medium.com/dwarsoft/how-to-provide-backup-restore-feature-for-room-database-in-android-d87f111d9c64
-fun backupDatabase(context: Context) {
+fun backupDatabase(context: Context):String {
     val teamDatabase = TeamScoreCardApp.getRoomDatabase()
     teamDatabase.close()
+    var resultsFromBackup:String = ""
     val teamScoreDatabaseFile = context.getDatabasePath(DATABASE_NAME)
     val teamScoreBackupDirectory: File = buildDirectory("backupTeamScore")
-    val backupFileName: String = "VinText" + getDateFromMillisForBackup(System.currentTimeMillis())
+    val backupFileName = BACKUP_FILE_NAME
     val sfpath = teamScoreBackupDirectory.path + File.separator + backupFileName
-    Log.d("BACKUP", "Backup file stoored at $sfpath")
+    Log.d("BACKUP", "Backup file stored at $sfpath")
     if (!teamScoreBackupDirectory.exists()) {
         teamScoreBackupDirectory.mkdirs()
     } else {
@@ -58,43 +60,46 @@ fun backupDatabase(context: Context) {
             saveDb.close()
             val sharedPreferences = context.getSharedPreferences(SHAREDPREF, MODE_PRIVATE)
             sharedPreferences.edit().putString("backupFileName", backupFileName).apply()
-
-            val allValues = sharedPreferences.all
-            Log.d("BACKUP", "All name and path $allValues")
-//            updateLastBackupTime(sharedPreferences)
+            resultsFromBackup = "Save: $sfpath "
         }
     } catch (e: Exception) {
         e.printStackTrace()
         Log.d("BACKUP", "ex: $e")
+        resultsFromBackup = e.toString()
     }
+    return (resultsFromBackup)
 }
 // For copying file which is the copyFile() method, we can implement it as —
-fun restoreDatabase(context: Context) {
+fun restoreDatabase(context: Context):String {
     val teamDatabase = TeamScoreCardApp.getRoomDatabase()
     teamDatabase.close()
     val teamScoreDatabaseFile = context.getDatabasePath(DATABASE_NAME)
+    var resultsFromBackup = ""
     Log.d("BACKUP", "Destination file name and path ${teamScoreDatabaseFile.toString()}")
 
     val sharedPreferences = context.getSharedPreferences(SHAREDPREF, MODE_PRIVATE)
-
     val backupSaveFile = sharedPreferences.getString("backupFileName", DATABASE_NAME)
-    val allValues = sharedPreferences.all
-    Log.d("BACKUP", "All name and path $allValues")
-
-    val teamScoreBackupDirectory: File = buildDirectory("backupTeamScore")
-    val sourceFile = teamScoreBackupDirectory.path + File.separator + backupSaveFile
-    Log.d("BACKUP", "Source file name and path $sourceFile")
-
-    File(sourceFile).copyTo(File(teamScoreDatabaseFile.toString()), true);
+    if (backupSaveFile != null) {
+        if(backupSaveFile.isNotEmpty()) {
+            val teamScoreBackupDirectory: File = buildDirectory("backupTeamScore")
+            val sourceFile = teamScoreBackupDirectory.path + File.separator + backupSaveFile
+            Log.d("BACKUP", "Source file name and path $sourceFile")
+            val srcFile = File(sourceFile)
+            if (srcFile.exists()) {
+                File(sourceFile).copyTo(File(teamScoreDatabaseFile.toString()), true);
+                resultsFromBackup = "Database restored."
+            } else {
+                resultsFromBackup = "1. File not found or name changed! File $BACKUP_FILE_NAME"
+            }
+        } else {
+            resultsFromBackup = "2. File not found or name changed! File $BACKUP_FILE_NAME"
+        }
+    } else {
+        resultsFromBackup = "3. File name not found or backup! File $BACKUP_FILE_NAME"
+    }
+    return (resultsFromBackup)
 }
 
-@SuppressLint("SimpleDateFormat")
-fun getDateFromMillisForBackup(currentTimeMillis: Long): String {
-    val sdf = SimpleDateFormat("dd_M_yyyy_hh_mm_ss")
-    val currentDate = sdf.format(Date())
-
-    return(currentDate.toString())
-}
 
 //Make sure don't forget to ask runtime permission of read/write file
 private fun buildDirectory(dirName: String):File {

@@ -63,7 +63,7 @@ const val MAX_STARTING_HOLE = 2
 const val LAST_PLAYER = MAX_PLAYERS - 1
 const val DISPLAY_SCORE_CARD_SCREEN = 6
 const val MINIMUM_LEN_OF_PLAYER_NAME = 2
-const val MAX_EMAIL_NAME_LEN = 10
+const val MAX_EMAIL_NAME_LEN = 25
 const val MAX_EMAIL_ADDRESS_LEN = 50
 const val MAX_JUNK_TEXT_LEN = 15
 
@@ -78,10 +78,13 @@ const val SUMMARY_TEXT_SIZE = 18
 const val SUMMARY_NAME_TEXT_SIZE = 22
 const val SUMMARY_DIALOG_TEXT_SIZE = 20
 const val DIALOG_BUTTON_TEXT_SIZE = 20
+const val DIALOG_BACKUP_RESTORE_TEXT_SIZE = 20
 const val USER_CANCEL = 100
 const val USER_SAVE = 101
 const val USER_TEXT_SAVE = 102
 const val USER_TEXT_UPDATE = 103
+
+const val BACKUP_FILE_NAME = "TeamScore.bkp"
 
 object Constants {
         val courseDetailPlaceHolder = CourseRecord(

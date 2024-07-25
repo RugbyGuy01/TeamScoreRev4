@@ -8,9 +8,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -68,12 +71,19 @@ fun PlayerSetupScreen(
         ) {
             DisplayCourseNameAndTeeSelection(modifier, viewModel)
             Spacer(modifier = Modifier.size(20.dp))
-            scoreRecState.value.mPlayerRecords.forEachIndexed { index, playerRecord ->
-                EnterPlayerInfo(modifier, viewModel, index)
+            Column(
+                modifier = Modifier
+                    .padding(5.dp)
+                    .height(500.dp)
+            ) {
+                scoreRecState.value.mPlayerRecords.forEachIndexed { index, playerRecord ->
+                    EnterPlayerInfo(modifier, viewModel, index)
+                }
+
+                Spacer(modifier = Modifier.size(20.dp))
+                DisplayBottomButtons(modifier, viewModel, navController)
+                moveToNextScreen(viewModel, navController, scoreCardId = SCORE_CARD_REC_ID)
             }
-            Spacer(modifier = Modifier.size(20.dp))
-            DisplayBottomButtons(modifier, viewModel, navController)
-            moveToNextScreen(viewModel, navController, scoreCardId = SCORE_CARD_REC_ID)
         }
     }
 }
@@ -107,7 +117,7 @@ fun DisplayCourseNameAndTeeSelection(
         }
         Spacer(modifier = Modifier.size(10.dp))
 
-        Row(){
+        Row() {
             GetTeeInformation(
                 mMaxLength = MAX_STARTING_HOLE,
                 placeHolder = "Starting Hole",

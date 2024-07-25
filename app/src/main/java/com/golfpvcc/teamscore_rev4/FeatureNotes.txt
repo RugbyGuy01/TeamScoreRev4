@@ -1,8 +1,7 @@
 July 16, 2024
 
 Features to be added to the Team Score App.
-. Backup dialog screen - where to send backup file.
-. Restore dialog screen - where get backup file and restore
+
 . Add cancel button to the golf course screen
 . Add note dialog screen for hole on the course.
 . Add score card with 6 holes per screen. 6-6-6 game
@@ -12,6 +11,8 @@ Features to be added to the Team Score App.
 
 
 What's done
+. Backup dialog screen - where to send backup file.
+. Restore dialog screen - where get backup file and restore
 . Player's summary junk screen
 . Build junk configuration database screen
 . Build junk database

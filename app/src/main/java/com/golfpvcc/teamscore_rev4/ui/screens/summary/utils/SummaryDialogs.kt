@@ -60,6 +60,7 @@ import com.golfpvcc.teamscore_rev4.ui.screens.playersetup.GetTeeInformation
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.SummaryActions
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.SummaryViewModel
 import com.golfpvcc.teamscore_rev4.ui.theme.shape
+import com.golfpvcc.teamscore_rev4.utils.DIALOG_BACKUP_RESTORE_TEXT_SIZE
 import com.golfpvcc.teamscore_rev4.utils.DIALOG_BUTTON_TEXT_SIZE
 import com.golfpvcc.teamscore_rev4.utils.MAX_EMAIL_ADDRESS_LEN
 import com.golfpvcc.teamscore_rev4.utils.MAX_EMAIL_NAME_LEN
@@ -218,7 +219,6 @@ fun UpdatePointsTable(
 
 @Composable
 fun ConfigureJunkDialog(onAction: (SummaryActions) -> Unit, summaryViewModel: SummaryViewModel) {
-
 
     Dialog(properties = DialogProperties(usePlatformDefaultWidth = false),
         onDismissRequest = { }) {   //must hit Exit
@@ -434,4 +434,53 @@ fun AboutDialog(onAction: (SummaryActions) -> Unit) {
             }
         }
     )
+}
+@Composable
+fun BackupANdRestoreDialog(onAction: (SummaryActions) -> Unit, summaryViewModel: SummaryViewModel) {
+    val context = LocalContext.current
+
+    Dialog(properties = DialogProperties(usePlatformDefaultWidth = false),
+        onDismissRequest = { }
+    ) {
+        Card(
+            modifier = Modifier
+                .width(400.dp)
+                .padding(10.dp),
+            shape = RoundedCornerShape(16.dp),
+        ) {
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp),
+                Arrangement.SpaceEvenly
+            ) {
+                Text(text = "Backup And Restore Database",
+                        fontSize = DIALOG_BACKUP_RESTORE_TEXT_SIZE.sp,)
+                HorizontalDivider(thickness = 3.dp, color = Color.Blue)
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp),
+                    Arrangement.SpaceEvenly
+                ) {
+                    CardButton(
+                        "Backup",
+                        Color.LightGray,
+                    )
+                    { onAction(SummaryActions.BackupRestoreDialog(context, true)) }
+
+                    CardButton("Cancel", Color.Transparent)
+                    { onAction(SummaryActions.ShowBackupRestoreDialog) }
+
+                    CardButton(
+                        "Restore",
+                        Color.LightGray,
+                    )
+                    { onAction(SummaryActions.BackupRestoreDialog(context, false)) }
+                }
+                Text(text = "Results: ${summaryViewModel.backupAndRestoreResults()}",
+                    fontSize = DIALOG_BACKUP_RESTORE_TEXT_SIZE.sp,)
+            }
+        }
+    }
 }
