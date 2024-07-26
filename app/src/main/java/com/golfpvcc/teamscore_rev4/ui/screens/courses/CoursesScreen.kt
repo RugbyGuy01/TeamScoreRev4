@@ -44,13 +44,15 @@ import androidx.navigation.NavHostController
 
 
 import com.golfpvcc.teamscore_rev4.database.model.CourseRecord
+import com.golfpvcc.teamscore_rev4.ui.navigation.ROOT_GRAPH_ROUTE
 import com.golfpvcc.teamscore_rev4.ui.navigation.TeamScoreScreen
+import com.golfpvcc.teamscore_rev4.ui.screens.GenericAppBar
 import com.golfpvcc.teamscore_rev4.utils.Constants.orCourseRecHolderList
 import com.golfpvcc.teamscore_rev4.utils.SetScreenOrientation
 
 @Composable
 fun CoursesScreen(
-    navController: NavHostController
+    navController: NavHostController,
 ) {
     val courseViewModel = viewModel<CoursesViewModel>(
         factory = CoursesViewModel.CoursesViewModelFactor()
@@ -65,6 +67,14 @@ fun CoursesScreen(
 
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.primary) {
         Scaffold(
+            topBar = {
+                GenericAppBar("Team Summary")
+                {
+                    navController.navigate(route = TeamScoreScreen.ScreenSummary.route) {
+                        popUpTo(ROOT_GRAPH_ROUTE)
+                    }
+                }
+            },
             floatingActionButton = {
                 FloatingActionButton(onClick = {
                     navController.navigate(route = "CourseDetail?id={-1}")
@@ -159,7 +169,7 @@ fun CourseItem(
     openDialog: MutableState<Boolean>,
     deleteText: MutableState<String>,
     navController: NavController,
-    courseToDelete: MutableState<List<CourseRecord>>
+    courseToDelete: MutableState<List<CourseRecord>>,
 ) {
     Card(
         modifier = Modifier
@@ -191,7 +201,11 @@ fun CourseItem(
                 onClick = {
                     Log.d("VIN", "CourseDetail?id={${course.mId}}")
                     if (course.mId != 0) {
-                        navController.navigate(route = TeamScoreScreen.ScreenDetailCourse.passId(course.mId))  // goto detail screen
+                        navController.navigate(
+                            route = TeamScoreScreen.ScreenDetailCourse.passId(
+                                course.mId
+                            )
+                        )  // goto detail screen
                     }
                 }
             ) {

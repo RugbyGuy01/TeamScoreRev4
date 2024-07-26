@@ -63,6 +63,7 @@ fun ScoreCardViewModel.updateScoreCardState(scoreCardWithPlayers: ScoreCardWithP
             mHdcp = scoreCardWithPlayers.playerRecords[idx].mHandicap,
             mScore = scoreCardWithPlayers.playerRecords[idx].mScore,
             mTeamHole = scoreCardWithPlayers.playerRecords[idx].mTeamHole,
+            mDatePlayed = scoreCardWithPlayers.scoreCardRecord.mDatePlayed
         ) /* add the player's name to the score card */
 
         if (hdcpCells != null) {

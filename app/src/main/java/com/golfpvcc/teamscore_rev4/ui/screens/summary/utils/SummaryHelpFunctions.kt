@@ -38,6 +38,7 @@ fun SummaryViewModel.updateScoreCardState(scoreCardWithPlayers: ScoreCardWithPla
     state = state.copy(mCourseName = scoreCardRecord.mCourseName)
     state = state.copy(mTee = scoreCardRecord.mTee)
     state = state.copy(mCourseId = scoreCardRecord.mCourseId)
+    state.mDatePlayed = scoreCardRecord.mDatePlayed
 
     Log.d("VIN", "updateScoreCardState Id ${scoreCardRecord.mCourseId}")
 
@@ -51,6 +52,7 @@ fun SummaryViewModel.updateScoreCardState(scoreCardWithPlayers: ScoreCardWithPla
     scoreCardWithPlayers.playerRecords.forEachIndexed { idx, player ->
         val tmpPlayer = PlayerHeading(
             idx,
+            mDatePlayed = scoreCardRecord.mDatePlayed,
             mName = scoreCardWithPlayers.playerRecords[idx].mName,
             mHdcp = scoreCardWithPlayers.playerRecords[idx].mHandicap,
             mScore = scoreCardWithPlayers.playerRecords[idx].mScore,

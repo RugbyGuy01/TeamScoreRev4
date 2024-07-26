@@ -462,7 +462,7 @@ data class State(
     var mGameABCD: IntArray = IntArray(MAX_PLAYERS) { 0 },   // A player index 0
     var mDisplayMenu: Boolean = false,
     var mHasDatabaseBeenRead: Boolean = false,
-
+    var mDatePlayed:String = "",
     var mShowJunkDialog: Boolean = false,
     var mSelectJunkRecordIndex: Int = -1,
     var mJunkDatabaseRecordRead: Boolean = false,

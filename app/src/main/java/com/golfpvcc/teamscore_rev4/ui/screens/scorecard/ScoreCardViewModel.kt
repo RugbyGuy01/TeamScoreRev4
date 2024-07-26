@@ -35,6 +35,7 @@ import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.refreshScoreCard
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.setBoardColorForPlayerTeamScore
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.updatePlayersTeamScoreCells
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.updateScoreCardState
+import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.getLocalDate
 import com.golfpvcc.teamscore_rev4.utils.BACK_NINE_DISPLAY
 import com.golfpvcc.teamscore_rev4.utils.BACK_NINE_IS_DISPLAYED
 import com.golfpvcc.teamscore_rev4.utils.BACK_NINE_TOTAL_DISPLAYED
@@ -82,7 +83,7 @@ open class ScoreCardViewModel() : ViewModel() {
                 scoreCardDao.getScoreRecordWithPlayers(SCORE_CARD_REC_ID)
 
             if (null != scoreCardWithPlayers) {     // found score record with players
-                updateScoreCardState(scoreCardWithPlayers)       // located in helper function file
+                updateScoreCardState(scoreCardWithPlayers, )       // located in helper function file
             } else
                 Log.d("VIN1", "getScoreCardAndPlayerRecord is empty")
 
@@ -116,6 +117,7 @@ open class ScoreCardViewModel() : ViewModel() {
         val scoreCardRecord: ScoreCardRecord = ScoreCardRecord(
             mCourseName = state.mCourseName,
             mTee = state.mTee,
+            mDatePlayed = getLocalDate(),
             mCurrentHole = state.mCurrentHole,
             mCourseId = state.mCourseId,
             mPar = parCells,
@@ -641,6 +643,7 @@ data class PlayerHeading(
     val vinTag: Int = 0,
     var mHdcp: String = "",     // not used on the screen
     var mName: String = "",
+    var mDatePlayed:String = "",
     var mScore: IntArray = IntArray(HOLE_ARRAY_SIZE),   // gross scores
     var mDisplayScore: IntArray = IntArray(HOLE_ARRAY_SIZE) { 0 },
     var mStokeHole: IntArray = IntArray(HOLE_ARRAY_SIZE) { 0 },

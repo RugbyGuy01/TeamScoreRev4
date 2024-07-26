@@ -91,6 +91,7 @@ fun SummaryScreen(
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
             ) {
+                DisplayCourseName(summaryViewModel)
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -111,6 +112,17 @@ fun SummaryScreen(
             }
         }
     } // end of Scaffold
+}
+
+@Composable
+fun DisplayCourseName(summaryViewModel: SummaryViewModel) {
+    Row(
+        Modifier
+            .background(Color.White)
+            .fillMaxWidth(),
+    ) {
+        Text("Course Played: ${summaryViewModel.state.mCourseName} Played on ${summaryViewModel.state.mDatePlayed}")
+    }
 }
 
 @Composable

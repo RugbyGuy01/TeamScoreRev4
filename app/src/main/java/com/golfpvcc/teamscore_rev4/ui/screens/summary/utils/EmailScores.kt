@@ -1,5 +1,6 @@
 package com.golfpvcc.teamscore_rev4.ui.screens.summary.utils
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -17,6 +18,7 @@ class EmailScores(private val mContext: Context) {
     private var mSubject = "Team Score"
     private var mBody = "my scores"
 
+    @SuppressLint("QueryPermissionsNeeded")
     fun toPostOffice() {
         val intent = Intent(Intent.ACTION_SENDTO).apply {
             data = Uri.parse("mailto:") // Only email apps handle this.
@@ -55,11 +57,9 @@ fun getSpreadSheetScore(player: PlayerHeading, holePar: IntArray): String {
     var score: Int = 0
     var total: Int = 0
     var parForHole: Int
-    val today = Date()
 
-    val myDate = getLocalDate()
 
-    playersScore = "$myDate,"
+    playersScore = "${player.mDatePlayed},"
 
     for (holeNumber in 0..<TOTAL_18_HOLE) {
         if (holeNumber == FRONT_NINE_DISPLAY) {

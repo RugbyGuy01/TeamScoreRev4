@@ -12,6 +12,7 @@ import com.golfpvcc.teamscore_rev4.database.model.CourseRecord
 
 import com.golfpvcc.teamscore_rev4.database.model.PlayerRecord
 import com.golfpvcc.teamscore_rev4.database.model.ScoreCardRecord
+import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.getLocalDate
 import com.golfpvcc.teamscore_rev4.utils.BACK_NINE_TOTAL_DISPLAYED
 import com.golfpvcc.teamscore_rev4.utils.DISPLAY_SCORE_CARD_SCREEN
 import com.golfpvcc.teamscore_rev4.utils.MINIMUM_LEN_OF_PLAYER_NAME
@@ -84,6 +85,7 @@ class PlayerSetupViewModel(
         val scoreCardRecord: ScoreCardRecord = ScoreCardRecord(
             mCourseName = state.mCourseName,
             mTee = state.mTee,
+            mDatePlayed = getLocalDate(),
             mCourseId = state.mCourseId,
             mCurrentHole = state.mStartingHole.toInt() - 1, // zero based
             mPar = state.mPar,
@@ -132,6 +134,7 @@ class PlayerSetupViewModel(
             mCourseName = state.mCourseName,
             mTee = state.mTee,
             mCourseId = state.mCourseId,
+            mDatePlayed = getLocalDate(),
             mCurrentHole = state.mStartingHole.toInt() - 1,  // the value is 1 make it zero base
             mPar = state.mPar,
             mHandicap = state.mHandicap,
