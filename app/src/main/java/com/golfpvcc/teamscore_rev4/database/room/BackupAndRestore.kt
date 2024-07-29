@@ -23,10 +23,10 @@ const val SHAREDPREF = "BACKUP_PREFERENCE"
 const val MAXIMUM_DATABASE_FILE = 3
 
 // https://medium.com/dwarsoft/how-to-provide-backup-restore-feature-for-room-database-in-android-d87f111d9c64
-fun backupDatabase(context: Context):String {
+fun backupDatabase(context: Context): String {
     val teamDatabase = TeamScoreCardApp.getRoomDatabase()
     teamDatabase.close()
-    var resultsFromBackup:String = ""
+    var resultsFromBackup: String = ""
     val teamScoreDatabaseFile = context.getDatabasePath(DATABASE_NAME)
     val teamScoreBackupDirectory: File = buildDirectory("backupTeamScore")
     val backupFileName = BACKUP_FILE_NAME
@@ -69,8 +69,9 @@ fun backupDatabase(context: Context):String {
     }
     return (resultsFromBackup)
 }
+
 // For copying file which is the copyFile() method, we can implement it as —
-fun restoreDatabase(context: Context):String {
+fun restoreDatabase(context: Context): String {
     val teamDatabase = TeamScoreCardApp.getRoomDatabase()
     teamDatabase.close()
     val teamScoreDatabaseFile = context.getDatabasePath(DATABASE_NAME)
@@ -78,31 +79,32 @@ fun restoreDatabase(context: Context):String {
     Log.d("BACKUP", "Destination file name and path ${teamScoreDatabaseFile.toString()}")
 
     val sharedPreferences = context.getSharedPreferences(SHAREDPREF, MODE_PRIVATE)
-    val backupSaveFile = sharedPreferences.getString("backupFileName", DATABASE_NAME)
-    if (backupSaveFile != null) {
-        if(backupSaveFile.isNotEmpty()) {
-            val teamScoreBackupDirectory: File = buildDirectory("backupTeamScore")
-            val sourceFile = teamScoreBackupDirectory.path + File.separator + backupSaveFile
-            Log.d("BACKUP", "Source file name and path $sourceFile")
-            val srcFile = File(sourceFile)
-            if (srcFile.exists()) {
-                File(sourceFile).copyTo(File(teamScoreDatabaseFile.toString()), true);
-                resultsFromBackup = "Database restored."
-            } else {
-                resultsFromBackup = "1. File not found or name changed! File $BACKUP_FILE_NAME"
-            }
+    var backupSaveFile = sharedPreferences.getString("backupFileName", DATABASE_NAME)
+    if (backupSaveFile == null) {
+        backupSaveFile = DATABASE_NAME
+    }
+
+    if (backupSaveFile.isNotEmpty()) {
+        val teamScoreBackupDirectory: File = buildDirectory("backupTeamScore")
+        val sourceFile = teamScoreBackupDirectory.path + File.separator + backupSaveFile
+        Log.d("BACKUP", "Source file name and path $sourceFile")
+        val srcFile = File(sourceFile)
+        if (srcFile.exists()) {
+            File(sourceFile).copyTo(File(teamScoreDatabaseFile.toString()), true);
+            resultsFromBackup = "Database restored."
         } else {
-            resultsFromBackup = "2. File not found or name changed! File $BACKUP_FILE_NAME"
+            resultsFromBackup = "1. File not found or name changed! File $BACKUP_FILE_NAME"
         }
     } else {
-        resultsFromBackup = "3. File name not found or backup! File $BACKUP_FILE_NAME"
+        resultsFromBackup = "2. File not found or name changed! File $BACKUP_FILE_NAME"
     }
+
     return (resultsFromBackup)
 }
 
 
 //Make sure don't forget to ask runtime permission of read/write file
-private fun buildDirectory(dirName: String):File {
+private fun buildDirectory(dirName: String): File {
     val dir = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
         File(
             Environment.getExternalStoragePublicDirectory(DIRECTORY_DOWNLOADS)
@@ -116,6 +118,7 @@ private fun buildDirectory(dirName: String):File {
     }
     return (dir)
 }
+
 fun checkAndDeleteBackupFile(directory: File, path: String?) {
     //This is to prevent deleting extra file being deleted which is mentioned in previous comment lines.
     val currentDateFile = path?.let { File(it) }

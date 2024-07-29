@@ -95,15 +95,14 @@ fun DisplayScoreCardHeader(
             }
             Column {    // the DISPLAY_HOLE_NUMBER is flag to high lite the current hole being scored
                 for (idx in hdcpParHoleHeading.indices) { // here's how the current hole played is high lighted
-                    val holeNumberColor: Long =
+                    val holeNumberColor: Long = getDisplayScoreCardHeaderColor(hdcpParHoleHeading[idx].vinTag)
                         // Vin hole played is a flag to high light the hole being played
-                        if (hdcpParHoleHeading[idx].vinTag == HOLE_HEADER) DISPLAY_HOLE_NUMBER else VIN_LIGHT_GRAY
 
                     DisplayScoreCardCell(
                         // the cell function will display the 9 cell data - ie hdcp, par, and hole number
                         Modifier,
                         hdcpParHoleHeading[idx].mHole,
-                        Color(holeNumberColor),
+                        holeNumberColor,
                         scoreCardViewModel,
                     )
                 }
@@ -192,7 +191,7 @@ fun DisplayScoreCardTeams(
                     DisplayScoreCardCell(
                         Modifier,
                         rowTeamCell.mHole,
-                        Color(VIN_LIGHT_GRAY),
+                        VIN_LIGHT_GRAY,
                         scoreCardViewModel,
                     )
                 }
@@ -217,7 +216,7 @@ fun DisplayScoreCardTeams(
 fun DisplayScoreCardCell(
     modifier: Modifier,
     cellData: IntArray,
-    color: Color,
+    color: Long,
     scoreCardViewModel: ScoreCardViewModel,
 ) {
     Row()
@@ -228,7 +227,7 @@ fun DisplayScoreCardCell(
             Surface(
                 modifier = modifier.width(45.dp),
                 border = BorderStroke(Dp.Hairline, color = Color.Blue),
-                color = scoreCardViewModel.setHighLightCurrentHole(idx, color),
+                color = Color(scoreCardViewModel.setHighLightCurrentHole(idx, color)),
                 contentColor = contentColorFor(Color.Transparent),
             ) {
 

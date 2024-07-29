@@ -44,6 +44,7 @@ fun ScoreCardViewModel.updateScoreCardState(scoreCardWithPlayers: ScoreCardWithP
     state = state.copy(mCourseName = scoreCardRecord.mCourseName)
     state = state.copy(mCourseId = scoreCardRecord.mCourseId)
     state = state.copy(mCurrentHole = (scoreCardRecord.mCurrentHole))   // zero based
+    displayFrontOrBackOfScoreCard()
     state = state.copy(mTee = scoreCardRecord.mTee)
     Log.d("VIN1", "updateScoreCardState read records - mDisplayScore")
 

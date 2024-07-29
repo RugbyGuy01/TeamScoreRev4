@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.golfpvcc.teamscore_rev4.TeamScoreCardApp
+import com.golfpvcc.teamscore_rev4.database.model.CourseRecord
 import com.golfpvcc.teamscore_rev4.database.model.PlayerRecord
 import com.golfpvcc.teamscore_rev4.database.model.PointsRecord
 import com.golfpvcc.teamscore_rev4.database.model.ScoreCardRecord
@@ -55,6 +56,7 @@ import com.golfpvcc.teamscore_rev4.utils.TEAM_NET_SCORE
 import com.golfpvcc.teamscore_rev4.utils.TOTAL_18_HOLE
 import com.golfpvcc.teamscore_rev4.utils.VIN_LIGHT_GRAY
 import com.golfpvcc.teamscore_rev4.utils.DISPLAY_HOLE_NUMBER
+import com.golfpvcc.teamscore_rev4.utils.DISPLAY_NOTE_ON_HOLE
 import com.golfpvcc.teamscore_rev4.utils.EAGLE_ON_HOLE
 import com.golfpvcc.teamscore_rev4.utils.HOLE_ARRAY_SIZE
 import com.golfpvcc.teamscore_rev4.utils.PQ_TARGET
@@ -67,6 +69,7 @@ open class ScoreCardViewModel() : ViewModel() {
     private val scoreCardDao = TeamScoreCardApp.getScoreCardDao()
     private val playerRecordDoa = TeamScoreCardApp.getPlayerDao()
     private val pointsRecordDoa = TeamScoreCardApp.getPointsDao()
+    private val courseRecordDoa = TeamScoreCardApp.getCourseDao()
 
 
     class ScoreCardViewModelFactor() : ViewModelProvider.Factory {
@@ -83,13 +86,14 @@ open class ScoreCardViewModel() : ViewModel() {
                 scoreCardDao.getScoreRecordWithPlayers(SCORE_CARD_REC_ID)
 
             if (null != scoreCardWithPlayers) {     // found score record with players
-                updateScoreCardState(scoreCardWithPlayers, )       // located in helper function file
+                updateScoreCardState(scoreCardWithPlayers)       // located in helper function file
             } else
                 Log.d("VIN1", "getScoreCardAndPlayerRecord is empty")
 
             state.mGamePointsTable = pointsRecordDoa.getAllPointRecords()
 
             state.mJunkTableSelection.loadJunkTableRecords()
+            state.mCourseRecord = courseRecordDoa.getCourseRecord(state.mCourseId)
         }
     }
 
@@ -361,23 +365,27 @@ open class ScoreCardViewModel() : ViewModel() {
         displayFrontOrBackOfScoreCard()
     }
 
-    fun setHighLightCurrentHole(holeIdx: Int, displayHoleColor: Color): Color {
-        if (displayHoleColor == Color(DISPLAY_HOLE_NUMBER)) { // the only row to high light on the score card
-            return if (holeIdx == state.mCurrentHole && !state.mShowTotals) Color(
+    fun setHighLightCurrentHole(holeIdx: Int, displayHoleColor: Long): Long {
+
+        if (displayHoleColor == DISPLAY_HOLE_NUMBER) {
+            return if (holeIdx == state.mCurrentHole && !state.mShowTotals)
                 DISPLAY_HOLE_NUMBER
-            ) else Color(
+            else
                 VIN_LIGHT_GRAY
-            )
-        } else {
-            return displayHoleColor
+        } else if (displayHoleColor == DISPLAY_NOTE_ON_HOLE) {
+            if( 3 < state.mCourseRecord.mNotes[holeIdx].length)
+                return (DISPLAY_NOTE_ON_HOLE)
+            else
+                return (VIN_LIGHT_GRAY)
         }
+        return (displayHoleColor)
     }
 
     private fun setHoleScore(playerIdx: Int, idx: Int, score: Int) {
         state.mPlayerHeading[playerIdx].mScore[idx] = score
     }
 
-    private fun displayFrontOrBackOfScoreCard() {
+    fun displayFrontOrBackOfScoreCard() {
         if (state.mCurrentHole < FRONT_NINE_DISPLAY) {
             state = state.copy(mWhatNineIsBeingDisplayed = FRONT_NINE_IS_DISPLAYED)
         } else
@@ -398,9 +406,10 @@ open class ScoreCardViewModel() : ViewModel() {
             is DialogAction.Number -> scoreEnter(action.score)
             is DialogAction.SetDialogCurrentPlayer -> setDialogCurrentPlayer(action.currentPlayerIdx)
             is DialogAction.DisplayJunkDialog -> displayJunkDialog(action.playerIdx)
-            DialogAction.DisplayHoleNote -> displayHoleNote()
             is DialogAction.ToggleJunkListItem -> toggleJunkListItem(action.listIdx)
             DialogAction.CloseJunkTableList -> closeJunkTableList()
+            DialogAction.DisplayHoleNote -> displayHoleNote()
+            is DialogAction.CloseHoleNoteFile -> closeHoleNoteFile(action.saveNote)
         }
     }
 
@@ -408,7 +417,7 @@ open class ScoreCardViewModel() : ViewModel() {
     fun displayJunkDialog(playerIdx: Int) {   //  Dialog Enter player scores function are below
         Log.d("VIN", "displayJunkDialog player Idx $playerIdx ")
         viewModelScope.launch(Dispatchers.IO) {
-                        state.mJunkTableSelection.loadPlayerJunkRecords(playerIdx, state.mCurrentHole)
+            state.mJunkTableSelection.loadPlayerJunkRecords(playerIdx, state.mCurrentHole)
             state.mDialogDisplayJunkSelection = true
             state.mCurrentJunkPlayerIdx = playerIdx
             repaintScreen()
@@ -442,7 +451,39 @@ open class ScoreCardViewModel() : ViewModel() {
     }
 
     fun displayHoleNote() { //  Dialog Enter player scores function are below
-        Log.d("VIN", "displayHoleNotee")
+        Log.d("VIN", "displayHoleNote Current Hole ${state.mCurrentHole + 1}")
+        state.mDialogEnterNote = !state.mDialogEnterNote
+        state.mHoleNoteTmp = state.mCourseRecord.mNotes[state.mCurrentHole]
+        repaintScreen()
+    }
+
+    fun getHoleNoteHoleHeader(): String {
+        val holeNumberHeader = "Enter Notes for Hole Number ${state.mCurrentHole + 1}"
+
+        return (holeNumberHeader)
+    }
+
+    fun getHoleNote(): String {
+        var holeNote = state.mHoleNoteTmp
+        Log.d("NOTE", "getHoleNote My note $holeNote")
+        return (holeNote)
+    }
+
+    fun onHoleNoteChange(holeNote: String) {
+        state.mHoleNoteTmp = holeNote
+
+        Log.d("NOTE", "onHoleNoteChange My note ${state.mHoleNoteTmp}")
+        repaintScreen()
+    }
+
+    private fun closeHoleNoteFile(saveNote: Boolean) {
+        if (saveNote) {
+            state.mCourseRecord.mNotes[state.mCurrentHole] = state.mHoleNoteTmp
+        }
+        viewModelScope.launch(Dispatchers.IO) {
+            courseRecordDoa.addUpdateCourseRecord(state.mCourseRecord)
+            displayHoleNote()   // exit dialog
+        }
     }
 
     fun getDialogPlayerHoleScore(
@@ -461,7 +502,7 @@ open class ScoreCardViewModel() : ViewModel() {
 
     fun buttonEnterScore() { //  Dialog Enter player scores function are below
         Log.d("VIN", "ButtonEnterScore")
-        state = state.copy(mDialogEnterScores = true)
+        state = state.copy(mDisplayEnterScoresDialog = true)
         if (state.mShowTotals) {
             advanceToTheNextHole()  //user looking at the total scores
             highLiteTotalColumn(VIN_LIGHT_GRAY)
@@ -472,7 +513,7 @@ open class ScoreCardViewModel() : ViewModel() {
 
     private fun doneScoringDialog() { //  Dialog Enter player scores function are below
         Log.d("HOLE", "doneScoringDialog current hole ${state.mCurrentHole}")
-        state = state.copy(mDialogEnterScores = false)
+        state = state.copy(mDisplayEnterScoresDialog = false)
         updatePlayersTeamScoreCells( // doneScoringDialog
             state.mDisplayScreenMode,
             state.mCurrentHole,
@@ -607,9 +648,12 @@ data class ScoreCard(
     val mCourseName: String = "",    // current course name from the course list database
     val mCourseId: Int = 0,
     val mTee: String = "",                   // the tee's played or the course yardage
-    val mDialogEnterScores: Boolean = false,
+    val mDisplayEnterScoresDialog: Boolean = false,
     var mDialogDisplayJunkSelection: Boolean = false,
     var mDialogCurrentPlayer: Int = 0,
+    var mDialogEnterNote: Boolean = false,
+    var mHoleNoteTmp: String = "",
+    var mCourseRecord: CourseRecord = CourseRecord(),
     val mCurrentHole: Int = 0,      // the current hole being played in the game
     var mCurrentJunkPlayerIdx: Int = 0, // set when adding player junk records
     val mWhatNineIsBeingDisplayed: Boolean = FRONT_NINE_IS_DISPLAYED,
@@ -643,7 +687,7 @@ data class PlayerHeading(
     val vinTag: Int = 0,
     var mHdcp: String = "",     // not used on the screen
     var mName: String = "",
-    var mDatePlayed:String = "",
+    var mDatePlayed: String = "",
     var mScore: IntArray = IntArray(HOLE_ARRAY_SIZE),   // gross scores
     var mDisplayScore: IntArray = IntArray(HOLE_ARRAY_SIZE) { 0 },
     var mStokeHole: IntArray = IntArray(HOLE_ARRAY_SIZE) { 0 },

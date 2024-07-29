@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface CourseDao {
     @Query("SELECT * FROM CourseTable WHERE mId = :courseId ")
-    suspend fun getCourseRecord(courseId: Int?): CourseRecord
+     fun getCourseRecord(courseId: Int?): CourseRecord
 
     @Query("Select * FROM CourseTable ORDER BY mCoursename ASC")
     fun getAllCoursesRecordAsc(): LiveData<List<CourseRecord>>

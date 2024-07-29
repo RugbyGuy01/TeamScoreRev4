@@ -7,6 +7,7 @@ import com.golfpvcc.teamscore_rev4.database.model.CourseRecord
 
 const val VIN_LIGHT_GRAY = 0xFFE0E0E0
 const val DISPLAY_HOLE_NUMBER = 0xFF48EFF0
+const val DISPLAY_NOTE_ON_HOLE = 0xFFFDAFFF
 const val YELLOW_GETS_1_STROKES = 0xFFFFFBBB
 const val ORANGE_GETS_2_STROKES = 0xFFFFE4C5
 const val RED_ONE_UNDER_PAR    = 0xFFF53526
@@ -79,6 +80,9 @@ const val SUMMARY_NAME_TEXT_SIZE = 22
 const val SUMMARY_DIALOG_TEXT_SIZE = 20
 const val DIALOG_BUTTON_TEXT_SIZE = 20
 const val DIALOG_BACKUP_RESTORE_TEXT_SIZE = 20
+const val DIALOG_NOTE_HEADER_SIZE = 20
+
+
 const val USER_CANCEL = 100
 const val USER_SAVE = 101
 const val USER_TEXT_SAVE = 102

@@ -26,7 +26,7 @@ class CoursesViewModel(
 
 
     fun deleteCourse(courseRecord: CourseRecord) {
-        Log.d("VIN", "Deleted cours ${courseRecord.mId}")
+        Log.d("VIN", "Deleted course ${courseRecord.mId}")
         viewModelScope.launch(Dispatchers.IO) {
             courseDao.deleteCourseRecord(courseRecord)
         }

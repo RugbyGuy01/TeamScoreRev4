@@ -1,6 +1,7 @@
 package com.golfpvcc.teamscore_rev4.ui.screens.scorecard.dialogenterscore
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,20 +15,39 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.room.util.TableInfo
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.ScoreCardViewModel
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.ScoreCardActions
+import com.golfpvcc.teamscore_rev4.ui.theme.shape
+import com.golfpvcc.teamscore_rev4.utils.DIALOG_NOTE_HEADER_SIZE
 import com.golfpvcc.teamscore_rev4.utils.MAX_PLAYERS
 
 const val TEXT_WIDTH = 65
@@ -48,17 +68,16 @@ const val BUTTON_ENTER_SCORE_TEXT = "Enter Scores"
 fun ButtonEnterScore(
     scoreCardViewModel: ScoreCardViewModel,
     onAction: (DialogAction) -> Unit,
-    onScoreCardAction: (ScoreCardActions) -> Unit
+    onScoreCardAction: (ScoreCardActions) -> Unit,
 ) {
 
-    if (scoreCardViewModel.state.mDialogEnterScores) {
+    if (scoreCardViewModel.state.mDisplayEnterScoresDialog) {
         EnterPlayersScores(scoreCardViewModel, onAction)
     }
 
     Button(
         // onDismissRequest = { onAction(DialogAction.Done) }
         onClick = {
-            Log.d("VIN", "Click ButtonEnterScore")
             onScoreCardAction(ScoreCardActions.ButtonEnterScore)
             onScoreCardAction(ScoreCardActions.SetDialogCurrentPlayer)
         },
@@ -82,7 +101,7 @@ fun EnterPlayersScores(
     val holeHandicap: Int = scoreCardViewModel.getHoleHandicap(currentHole)
 
 
-    if (state.mDialogEnterScores) {
+    if (state.mDisplayEnterScoresDialog) {
         if (state.mDialogDisplayJunkSelection) {
             DisplayJunkDialog(scoreCardViewModel, onAction)
         } else {
@@ -165,7 +184,7 @@ fun DisplayJunkButton(
     scoreCardViewModel: ScoreCardViewModel,
     idx: Int,
     currentHole: Int,
-    onAction: (DialogAction) -> Unit
+    onAction: (DialogAction) -> Unit,
 ) {
 
     DialogCard(
@@ -180,7 +199,7 @@ fun DisplayJunkButton(
 
 @Composable
 fun DisplayTeamGrossNetButton(
-    scoreCardViewModel: ScoreCardViewModel, idx: Int, onAction: (DialogAction) -> Unit
+    scoreCardViewModel: ScoreCardViewModel, idx: Int, onAction: (DialogAction) -> Unit,
 ) {
 
     DialogCard(symbol = "Net",
@@ -270,7 +289,7 @@ fun DisplayEnterScoreHeading() {
 @Composable
 fun DisplayActionButtons(
     onAction: (DialogAction) -> Unit,
-    modifier: Modifier
+    modifier: Modifier,
 ) {
 
     Row(
@@ -299,7 +318,7 @@ fun DisplayActionButtons(
 
 @Composable
 fun DisplayKeyPad(
-    onAction: (DialogAction) -> Unit, modifier: Modifier
+    onAction: (DialogAction) -> Unit, modifier: Modifier,
 ) {
     Row(
         modifier = Modifier
@@ -340,4 +359,132 @@ fun DisplayKeyPad(
                 onClick = { onAction(DialogAction.Number(idx)) })
         }
     }
+}
+
+@Composable
+fun EnterHoleNote(
+    viewModel: ScoreCardViewModel,
+    onAction: (DialogAction) -> Unit,
+) {
+    Log.d("VIN", "EnterHoleNote")
+    Dialog(properties = DialogProperties(usePlatformDefaultWidth = false),
+        onDismissRequest = { onAction(DialogAction.DisplayHoleNote) }) {
+        Card(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(2.dp),
+            shape = RoundedCornerShape(16.dp),
+        ) {
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp),
+            ) {
+                Text(
+                    text = viewModel.getHoleNoteHoleHeader(),
+                    fontSize = DIALOG_NOTE_HEADER_SIZE.sp,
+                )
+            }
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp),
+            ) {
+                val focusRequester = remember { FocusRequester() }
+                LaunchedEffect(Unit) {
+                    focusRequester.requestFocus()
+                }
+
+                GetNoteInformation(
+                    128,
+                    "Enter Note",
+                    viewModel.getHoleNote(),
+                    viewModel::onHoleNoteChange,
+                    KeyboardType.Ascii, //   Text,
+                    ImeAction.Done,
+                    Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
+                        .focusRequester(focusRequester),
+                )
+            }
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp),
+            ) {
+                DialogCard(symbol = "Cancel",
+                    modifier = Modifier.padding(
+                        start = 10.dp,
+                        top = 2.dp,
+                        bottom = 2.dp,
+                        end = 10.dp
+                    ),
+                    myFontSize = BUTTON_ACTION_FONT,
+                    backGround = Color.DarkGray,
+                    textColor = Color.White,
+                    onClick = { onAction(DialogAction.CloseHoleNoteFile(false)) },
+                    onLongClick = {})
+                Spacer(modifier = Modifier.width(30.dp))
+                DialogCard(symbol = "Save",
+                    modifier = Modifier.width(80.dp),
+                    myFontSize = BUTTON_ACTION_FONT,
+                    backGround = Color.DarkGray,
+                    textColor = Color.White,
+                    onClick = { onAction(DialogAction.CloseHoleNoteFile(true)) },
+                    onLongClick = {})
+            }
+        }
+    }
+}
+
+@Composable
+fun GetNoteInformation(
+    mMaxLength: Int,
+    placeHolder: String,
+    playerData: String,
+    updatedData: (String) -> Unit,
+    keyboardType: KeyboardType,
+    imeAction: ImeAction,
+    modifier: Modifier,
+) {
+    val focusManager = LocalFocusManager.current
+    val mContext = LocalContext.current
+
+    OutlinedTextField(
+        modifier = modifier,    // clear the Tee field white, green
+        value = TextFieldValue( // set the cursor to the end of the field
+            text = playerData,
+            selection = TextRange(playerData.length)
+        ),
+        textStyle = MaterialTheme.typography.headlineSmall,
+        singleLine = false,
+        onValueChange = { holeNote ->
+            if (holeNote.text.length <= mMaxLength) updatedData(holeNote.text)
+            else Toast.makeText(
+                mContext,
+                "Cannot be more than $mMaxLength Characters",
+                Toast.LENGTH_SHORT
+            ).show()
+        },
+        label = { Text(text = placeHolder) },
+        placeholder = { Text(text = placeHolder) },
+        shape = shape.small,
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = Color.Red,
+            unfocusedBorderColor = Color.Blue,
+            focusedLabelColor = Color.Red,
+            unfocusedLabelColor = Color.Blue,
+        ),
+        keyboardOptions = KeyboardOptions(
+            capitalization = KeyboardCapitalization.Sentences,
+            keyboardType = keyboardType,
+            imeAction = imeAction  //.Done
+        ),
+        keyboardActions = KeyboardActions(
+            onDone = {
+                focusManager.clearFocus()
+            }
+        )
+    )
 }

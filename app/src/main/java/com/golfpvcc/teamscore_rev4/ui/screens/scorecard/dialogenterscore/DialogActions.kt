@@ -8,7 +8,7 @@ sealed class DialogAction {
     data class Gross(val playerIdx: Int) : DialogAction()
     data class GrossLongClick(val playerIdx: Int) : DialogAction()
 
-
+    data class CloseHoleNoteFile(val saveNote:Boolean): DialogAction()
     data class DisplayJunkDialog(val playerIdx: Int) : DialogAction()
     data class ToggleJunkListItem(val listIdx: Int) : DialogAction()
     data object CloseJunkTableList : DialogAction()

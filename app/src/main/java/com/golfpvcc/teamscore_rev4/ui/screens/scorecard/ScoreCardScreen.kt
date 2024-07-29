@@ -1,6 +1,7 @@
 package com.golfpvcc.teamscore_rev4.ui.screens.scorecard
 
 import android.annotation.SuppressLint
+import android.content.pm.ActivityInfo
 import android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
 import android.util.Log
 import androidx.compose.foundation.layout.Column
@@ -11,19 +12,27 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.dialogenterscore.ButtonEnterScore
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.dialogenterscore.DialogAction
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.dialogenterscore.EnterHoleNote
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.dialogenterscore.EnterPlayersScores
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.displayoptions.DisplayModeDropDown
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DisplayCourseName
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DisplaySummaryButton
@@ -32,6 +41,7 @@ import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DisplayScoreCardHe
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DisplayScoreCardNames
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DisplayScoreCardTeams
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.FlipFrontAndBackNine
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.ScoreCardActions
 import com.golfpvcc.teamscore_rev4.utils.SetScreenOrientation
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -57,7 +67,7 @@ fun ScoreCardScreen(
                 Column(
                     modifier = Modifier
                         .padding(5.dp)
-                       // .weight(.8f)   // size of score card with
+                        // .weight(.8f)   // size of score card with
                         .fillMaxHeight()
                 ) {
                     DisplayMainScoreCard(scoreCardViewModel)
@@ -67,7 +77,7 @@ fun ScoreCardScreen(
                     modifier = Modifier
                         .padding(5.dp)
                         .fillMaxHeight(),
-                       // .weight(.2f),  // size of score card with
+                    // .weight(.2f),  // size of score card with
                     horizontalAlignment = Alignment.End
                 ) {
                     DisplayControlButtons(
@@ -82,7 +92,7 @@ fun ScoreCardScreen(
 
 @Composable
 fun GetScoreCardRecord(
-    scoreCardViewModel: ScoreCardViewModel
+    scoreCardViewModel: ScoreCardViewModel,
 ) {
     val scope = rememberCoroutineScope()
     Log.d("VIN1", "GetScoreCardRecord screen calling function")
@@ -98,7 +108,7 @@ fun GetScoreCardRecord(
 
 @Composable
 fun DisplayMainScoreCard(
-    scoreCardViewModel: ScoreCardViewModel
+    scoreCardViewModel: ScoreCardViewModel,
 ) {
     Column {
         DisplayCourseName(scoreCardViewModel)
@@ -121,11 +131,31 @@ fun DisplayControlButtons(scoreCardViewModel: ScoreCardViewModel, navController:
         scoreCardViewModel::dialogAction,
         scoreCardViewModel::scoreCardActions
     )
+    DisplayHoleNoteDialog(
+        scoreCardViewModel,
+        scoreCardViewModel::dialogAction,
+    )
+
     Spacer(modifier = Modifier.size(20.dp))
     DisplayPrevNextHoleButton(scoreCardViewModel::scoreCardActions)
     Spacer(modifier = Modifier.size(25.dp))
     DisplaySummaryButton(navController)
     Spacer(modifier = Modifier.size(20.dp))
-    DisplayModeDropDown( scoreCardViewModel::scoreCardActions, scoreCardViewModel.state.mGameNines)
+    DisplayModeDropDown(scoreCardViewModel::scoreCardActions, scoreCardViewModel.state.mGameNines)
 
 }
+
+@Composable
+fun DisplayHoleNoteDialog(
+    scoreCardViewModel: ScoreCardViewModel,
+    onAction: (DialogAction) -> Unit,
+) {
+    Log.d("VIN", "DisplayHoleNoteDialog State ${scoreCardViewModel.state.mDialogEnterNote}")
+    if (scoreCardViewModel.state.mDialogEnterNote) {
+        SetScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+        EnterHoleNote(scoreCardViewModel, onAction)
+    } else {
+        SetScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
+    }
+}
+
