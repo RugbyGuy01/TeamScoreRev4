@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.ScoreCardActions
 
 @Composable
-fun DisplayModeDropDown(onAction: (ScoreCardActions) -> Unit, gameNines:Boolean) {
+fun DisplayModeDropDown(onAction: (ScoreCardActions) -> Unit, gameNines: Boolean) {
 
     var expanded by remember { mutableStateOf(false) }
 
@@ -40,11 +40,36 @@ fun DisplayModeDropDown(onAction: (ScoreCardActions) -> Unit, gameNines:Boolean)
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
-            DropdownMenuItem({ Text(text = "Gross") }, onClick = {onAction(ScoreCardActions.ScreenModeGross)})
-            DropdownMenuItem({ Text(text = "Net") }, onClick = {onAction(ScoreCardActions.ScreenModeNet)})
-            DropdownMenuItem({ Text(text = "Standford") }, onClick = {onAction(ScoreCardActions.ScreenModeStableford)})
-            DropdownMenuItem({ Text(text = "Pt Quote") }, onClick = {onAction(ScoreCardActions.ScreenModePtQuote)})
-            if(gameNines) {
+            DropdownMenuItem(
+                { Text(text = "Gross") },
+                onClick = {
+                    onAction(ScoreCardActions.ScreenModeGross)
+                    expanded = false
+                })
+            DropdownMenuItem(
+                { Text(text = "Net") },
+                onClick = {
+                    onAction(ScoreCardActions.ScreenModeNet)
+                    expanded = false
+                })
+            DropdownMenuItem(
+                { Text(text = "Standford") },
+                onClick = {
+                    onAction(ScoreCardActions.ScreenModeStableford)
+                    expanded = false
+                })
+            DropdownMenuItem(
+                { Text(text = "Pt Quote") },
+                onClick = {
+                    onAction(ScoreCardActions.ScreenModePtQuote)
+                    expanded = false
+                })
+            DropdownMenuItem({ Text(text = "6 - 6 - 6") }, onClick = {
+                onAction(ScoreCardActions.Screen6_6_6_Mode)
+                expanded = false
+            }
+            )
+            if (gameNines) {
                 DropdownMenuItem(
                     { Text(text = "Nine Game") },
                     onClick = { onAction(ScoreCardActions.ScreenModeNineGame) })

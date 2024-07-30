@@ -9,30 +9,23 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.dialogenterscore.ButtonEnterScore
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.dialogenterscore.DialogAction
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.dialogenterscore.EnterHoleNote
-import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.dialogenterscore.EnterPlayersScores
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.displayoptions.DisplayModeDropDown
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DisplayCourseName
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DisplaySummaryButton
@@ -41,7 +34,6 @@ import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DisplayScoreCardHe
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DisplayScoreCardNames
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DisplayScoreCardTeams
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.FlipFrontAndBackNine
-import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.ScoreCardActions
 import com.golfpvcc.teamscore_rev4.utils.SetScreenOrientation
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -122,7 +114,7 @@ fun DisplayMainScoreCard(
 fun DisplayControlButtons(scoreCardViewModel: ScoreCardViewModel, navController: NavController) {
 
     FlipFrontAndBackNine(
-        scoreCardViewModel.state.mWhatNineIsBeingDisplayed,
+        scoreCardViewModel.getDisplayHoleText(),
         scoreCardViewModel::scoreCardActions
     )
     Spacer(modifier = Modifier.size(12.dp))

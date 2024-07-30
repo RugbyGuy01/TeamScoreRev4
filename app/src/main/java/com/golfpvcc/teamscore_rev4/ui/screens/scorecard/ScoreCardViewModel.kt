@@ -18,11 +18,16 @@ import com.golfpvcc.teamscore_rev4.ui.screens.playerStokes
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.dialogenterscore.DialogAction
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.dialogenterscore.getTeamButtonColor
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.dialogenterscore.teamScoreTypeNet
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.BACK_NINE_IS_DISPLAYED
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DISPLAY_MODE_6_6_X
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DISPLAY_MODE_6_X_6
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DISPLAY_MODE_9_GAME
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DISPLAY_MODE_GROSS
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DISPLAY_MODE_NET
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DISPLAY_MODE_POINT_QUOTA
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DISPLAY_MODE_STABLEFORD
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DISPLAY_MODE_X_6_6
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.FRONT_NINE_IS_DISPLAYED
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.HDCP_HEADER
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.HOLE_HEADER
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.JunkTableSelection
@@ -34,18 +39,19 @@ import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.getTotalScore
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.highLiteTotalColumn
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.refreshScoreCard
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.setBoardColorForPlayerTeamScore
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.setShowTotalsFlag
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.setWhatIsBeingDisplayed
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.updatePlayersTeamScoreCells
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.updateScoreCardState
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.getLocalDate
+import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.toggle_6_ScoreCard
 import com.golfpvcc.teamscore_rev4.utils.BACK_NINE_DISPLAY
-import com.golfpvcc.teamscore_rev4.utils.BACK_NINE_IS_DISPLAYED
 import com.golfpvcc.teamscore_rev4.utils.BACK_NINE_TOTAL_DISPLAYED
 import com.golfpvcc.teamscore_rev4.utils.BIRDIES_ON_HOLE
 
 import com.golfpvcc.teamscore_rev4.utils.SCORE_CARD_REC_ID
 import com.golfpvcc.teamscore_rev4.utils.DOUBLE_TEAM_SCORE
 import com.golfpvcc.teamscore_rev4.utils.FRONT_NINE_DISPLAY
-import com.golfpvcc.teamscore_rev4.utils.FRONT_NINE_IS_DISPLAYED
 import com.golfpvcc.teamscore_rev4.utils.FRONT_NINE_TOTAL_DISPLAYED
 import com.golfpvcc.teamscore_rev4.utils.YELLOW_GETS_1_STROKES
 import com.golfpvcc.teamscore_rev4.utils.ORANGE_GETS_2_STROKES
@@ -139,12 +145,14 @@ open class ScoreCardViewModel() : ViewModel() {
             ScoreCardActions.ScreenModeNet -> changeScreenNet()
             ScoreCardActions.ScreenModeStableford -> changeScreenStableford()
             ScoreCardActions.ScreenModePtQuote -> changeScreenPtQuote()
+            ScoreCardActions.Screen6_6_6_Mode -> changeScreen6_6_6_Mode()
             ScoreCardActions.ScreenModeNineGame -> changeScreenNineGame()
             ScoreCardActions.ButtonEnterScore -> buttonEnterScore()
             ScoreCardActions.SetDialogCurrentPlayer -> setDialogCurrentPlayer(0)
             ScoreCardActions.FlipFrontBackNine -> flipFrontNineBackNine()
         }
     }
+
 
     fun changeScreenGross() {
         state = state.copy(mDisplayScreenModeText = "Gross")
@@ -176,6 +184,12 @@ open class ScoreCardViewModel() : ViewModel() {
         state.mDisplayScreenMode = DISPLAY_MODE_POINT_QUOTA
         val parCells = getHoleParCells()
         refreshScoreCard(parCells)
+    }
+
+    fun changeScreen6_6_6_Mode() {
+        state = state.copy(mDisplayScreenModeText = "6 - 6 - 6")
+        state.mWhatHoleIsBeingDisplayed = toggle_6_ScoreCard(state.mWhatHoleIsBeingDisplayed)
+        repaintScreen()
     }
 
     fun changeScreenNineGame() {
@@ -250,11 +264,44 @@ open class ScoreCardViewModel() : ViewModel() {
     }
 
     fun getStartingHole(): Int {    // true for front nine being displayed
-        return if (state.mWhatNineIsBeingDisplayed) 0 else FRONT_NINE_DISPLAY
+        val startingHole: Int
+
+        startingHole = when (state.mWhatHoleIsBeingDisplayed) {
+            FRONT_NINE_IS_DISPLAYED -> 0
+            BACK_NINE_IS_DISPLAYED -> FRONT_NINE_DISPLAY
+            DISPLAY_MODE_X_6_6 -> 0
+            DISPLAY_MODE_6_X_6 -> 6
+            DISPLAY_MODE_6_6_X -> 12
+            else -> 0
+        }
+        return (startingHole)
     }
 
     fun getEndingHole(): Int {
-        return if (state.mWhatNineIsBeingDisplayed) FRONT_NINE_DISPLAY else BACK_NINE_DISPLAY
+        val endingHole: Int
+
+        endingHole = when (state.mWhatHoleIsBeingDisplayed) {
+            FRONT_NINE_IS_DISPLAYED -> FRONT_NINE_DISPLAY
+            BACK_NINE_IS_DISPLAYED -> BACK_NINE_DISPLAY
+            DISPLAY_MODE_X_6_6 -> 6
+            DISPLAY_MODE_6_X_6 -> 12
+            DISPLAY_MODE_6_6_X -> 18
+            else -> 0
+        }
+        return (endingHole)
+    }
+
+    fun getDisplayHoleText(): String {
+
+        val displayHoleText: String = when (state.mWhatHoleIsBeingDisplayed) {
+            FRONT_NINE_IS_DISPLAYED -> "Back Nine"
+            BACK_NINE_IS_DISPLAYED -> "Front Nine"
+            DISPLAY_MODE_X_6_6 -> "2nd Six"
+            DISPLAY_MODE_6_X_6 -> "3rd Six"
+            DISPLAY_MODE_6_6_X -> "1st Six"
+            else -> "Error"
+        }
+        return (displayHoleText)
     }
 
     fun getStokeOnHolePlayerColor(playerDisplayHole: Int): Color {
@@ -334,19 +381,47 @@ open class ScoreCardViewModel() : ViewModel() {
     }
 
     fun flipFrontNineBackNine() {
-        state = state.copy(mWhatNineIsBeingDisplayed = !state.mWhatNineIsBeingDisplayed)
+
+        when (state.mWhatHoleIsBeingDisplayed) {
+            FRONT_NINE_IS_DISPLAYED -> {
+                state.mWhatHoleIsBeingDisplayed = BACK_NINE_IS_DISPLAYED
+            }
+
+            BACK_NINE_IS_DISPLAYED -> {
+                state.mWhatHoleIsBeingDisplayed = FRONT_NINE_IS_DISPLAYED
+            }
+
+            DISPLAY_MODE_X_6_6 -> {
+                state.mWhatHoleIsBeingDisplayed = DISPLAY_MODE_6_X_6
+            }
+
+            DISPLAY_MODE_6_X_6 -> {
+                state.mWhatHoleIsBeingDisplayed = DISPLAY_MODE_6_6_X
+            }
+
+            DISPLAY_MODE_6_6_X -> {
+                state.mWhatHoleIsBeingDisplayed = DISPLAY_MODE_X_6_6
+            }
+
+            else -> {
+                state.mWhatHoleIsBeingDisplayed = FRONT_NINE_IS_DISPLAYED
+            }
+        }
+        repaintScreen()
     }
 
     fun advanceToTheNextHole() { // zero base, user is one the 9 nine hole
-        state = if ((state.mCurrentHole + 1) < TOTAL_18_HOLE) {
-            state.copy(mCurrentHole = (state.mCurrentHole + 1))
+        Log.d("VIN", "advanceToTheNextHole  current hole ${state.mCurrentHole}")
+         if ((state.mCurrentHole + 1) < TOTAL_18_HOLE) {
+            state = state.copy(mCurrentHole = (state.mCurrentHole + 1))
         } else {
-            state.copy(mCurrentHole = 0)
+             state = state.copy(mCurrentHole = 0)
         }
         if (state.mShowTotals) {
             state = state.copy(mShowTotals = false)
             highLiteTotalColumn(VIN_LIGHT_GRAY)
         }
+        Log.d("VIN", "advanceToTheNextHole  current hole ${state.mCurrentHole}")
         displayFrontOrBackOfScoreCard()
     }
 
@@ -373,7 +448,7 @@ open class ScoreCardViewModel() : ViewModel() {
             else
                 VIN_LIGHT_GRAY
         } else if (displayHoleColor == DISPLAY_NOTE_ON_HOLE) {
-            if( 3 < state.mCourseRecord.mNotes[holeIdx].length)
+            if (3 < state.mCourseRecord.mNotes[holeIdx].length)
                 return (DISPLAY_NOTE_ON_HOLE)
             else
                 return (VIN_LIGHT_GRAY)
@@ -386,10 +461,8 @@ open class ScoreCardViewModel() : ViewModel() {
     }
 
     fun displayFrontOrBackOfScoreCard() {
-        if (state.mCurrentHole < FRONT_NINE_DISPLAY) {
-            state = state.copy(mWhatNineIsBeingDisplayed = FRONT_NINE_IS_DISPLAYED)
-        } else
-            state = state.copy(mWhatNineIsBeingDisplayed = BACK_NINE_IS_DISPLAYED)
+        setWhatIsBeingDisplayed()
+        repaintScreen()
     }
 
     // *******************************************************
@@ -522,13 +595,7 @@ open class ScoreCardViewModel() : ViewModel() {
         )
         clearGrossAndNetButtons()   // clear the color button array
         savePlayersScoresRecord()
-        if (FRONT_NINE_TOTAL_DISPLAYED == state.mCurrentHole || BACK_NINE_TOTAL_DISPLAYED == state.mCurrentHole) {     // let the user see the totals scores
-            state = state.copy(mShowTotals = true)
-            highLiteTotalColumn(DISPLAY_HOLE_NUMBER)
-        } else {
-            state = state.copy(mShowTotals = false)
-            advanceToTheNextHole()
-        }
+        setShowTotalsFlag()
     }
 
     private fun configureDialogGrossAndNetButtonColors() { //  Dialog Enter player scores function are below
@@ -656,7 +723,7 @@ data class ScoreCard(
     var mCourseRecord: CourseRecord = CourseRecord(),
     val mCurrentHole: Int = 0,      // the current hole being played in the game
     var mCurrentJunkPlayerIdx: Int = 0, // set when adding player junk records
-    val mWhatNineIsBeingDisplayed: Boolean = FRONT_NINE_IS_DISPLAYED,
+    var mWhatHoleIsBeingDisplayed: Int = FRONT_NINE_IS_DISPLAYED,
     val mHdcpParHoleHeading: List<HdcpParHoleHeading> = listOf(
         HdcpParHoleHeading(HDCP_HEADER, "HdCp", mTotal = "Notes"),
         HdcpParHoleHeading(PAR_HEADER, "Par"),

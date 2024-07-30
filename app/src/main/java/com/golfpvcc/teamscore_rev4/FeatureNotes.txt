@@ -2,12 +2,13 @@ July 16, 2024
 
 Features to be added to the Team Score App.
 
-. Add score card with 6 holes per screen. 6-6-6 game
+
 . Add update summary screen with 6-6-6 game
 . 9 Payout dialog screen
 
 
 What's done
+. Add score card with 6 holes per screen. 6-6-6 game
 . Add note dialog screen for hole on the course.
 . Add cancel button to the golf course screen
 . Backup dialog screen - where to send backup file.

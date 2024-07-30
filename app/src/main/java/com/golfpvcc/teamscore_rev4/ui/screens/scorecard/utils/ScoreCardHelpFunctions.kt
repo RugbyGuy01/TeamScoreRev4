@@ -8,11 +8,15 @@ import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.HdcpParHoleHeading
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.PlayerHeading
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.ScoreCardViewModel
 import com.golfpvcc.teamscore_rev4.utils.ALBATROSS_ON_HOLE
+import com.golfpvcc.teamscore_rev4.utils.BACK_NINE_TOTAL_DISPLAYED
 import com.golfpvcc.teamscore_rev4.utils.BIRDIES_ON_HOLE
 import com.golfpvcc.teamscore_rev4.utils.BOGGY_ON_HOLE
+import com.golfpvcc.teamscore_rev4.utils.DISPLAY_HOLE_NUMBER
 import com.golfpvcc.teamscore_rev4.utils.DOUBLE_ON_HOLE
 import com.golfpvcc.teamscore_rev4.utils.DOUBLE_TEAM_SCORE
 import com.golfpvcc.teamscore_rev4.utils.EAGLE_ON_HOLE
+import com.golfpvcc.teamscore_rev4.utils.FRONT_NINE_DISPLAY
+import com.golfpvcc.teamscore_rev4.utils.FRONT_NINE_TOTAL_DISPLAYED
 import com.golfpvcc.teamscore_rev4.utils.OTHER_ON_HOLE
 import com.golfpvcc.teamscore_rev4.utils.PAR_ON_HOLE
 import com.golfpvcc.teamscore_rev4.utils.PQ_ALBATROSS
@@ -180,12 +184,97 @@ fun updateTeamDisplayScore(
                 }
             }
         }
-
-//        DISPLAY_MODE_9_GAME -> {
-//        }
     }
 }
+//End of score card 9 hole score card
+//current hole 8 Set total = true
+//current hole 17 Set total = true
+//
+//End of score card 6 hole score card
+//current hole 5 Set total = true
+//current hole 11 Set total = true
+//current hole 17 Set total = true
+fun ScoreCardViewModel.setShowTotalsFlag(){
+    when (state.mWhatHoleIsBeingDisplayed) {
 
+        FRONT_NINE_IS_DISPLAYED, BACK_NINE_IS_DISPLAYED -> {
+            if (FRONT_NINE_TOTAL_DISPLAYED == state.mCurrentHole || BACK_NINE_TOTAL_DISPLAYED == state.mCurrentHole) {     // let the user see the totals scores
+                state = state.copy(mShowTotals = true)
+                highLiteTotalColumn(DISPLAY_HOLE_NUMBER)
+            } else {
+                state = state.copy(mShowTotals = false)
+                advanceToTheNextHole()
+            }
+        }
+
+
+        DISPLAY_MODE_X_6_6 -> {
+            if (5 == state.mCurrentHole) {     // let the user see the totals scores
+                state = state.copy(mShowTotals = true)
+                highLiteTotalColumn(DISPLAY_HOLE_NUMBER)
+            } else {
+                state = state.copy(mShowTotals = false)
+                advanceToTheNextHole()
+            }
+        }
+
+        DISPLAY_MODE_6_X_6 -> {
+            if (11 == state.mCurrentHole) {     // let the user see the totals scores
+                state = state.copy(mShowTotals = true)
+                highLiteTotalColumn(DISPLAY_HOLE_NUMBER)
+            } else {
+                state = state.copy(mShowTotals = false)
+                advanceToTheNextHole()
+            }
+        }
+
+        DISPLAY_MODE_6_6_X -> {
+            if (17 == state.mCurrentHole) {     // let the user see the totals scores
+                state = state.copy(mShowTotals = true)
+                highLiteTotalColumn(DISPLAY_HOLE_NUMBER)
+            } else {
+                state = state.copy(mShowTotals = false)
+                advanceToTheNextHole()
+            }
+        }
+
+        else -> {
+            state.mWhatHoleIsBeingDisplayed = FRONT_NINE_IS_DISPLAYED
+        }
+    }
+}
+//End of score card 9 hole score card
+//current hole 8 Set total = true
+//current hole 17 Set total = true
+//
+//End of score card 6 hole score card
+//current hole 5 Set total = true
+//current hole 11 Set total = true
+//current hole 17 Set total = true
+fun ScoreCardViewModel.setWhatIsBeingDisplayed(){
+
+    when (state.mWhatHoleIsBeingDisplayed) {
+        FRONT_NINE_IS_DISPLAYED, BACK_NINE_IS_DISPLAYED -> {
+            if (state.mCurrentHole < FRONT_NINE_DISPLAY) {
+                state.mWhatHoleIsBeingDisplayed = FRONT_NINE_IS_DISPLAYED
+            } else
+                state.mWhatHoleIsBeingDisplayed  = BACK_NINE_IS_DISPLAYED
+        }
+
+        DISPLAY_MODE_X_6_6, DISPLAY_MODE_6_X_6, DISPLAY_MODE_6_6_X -> {
+            if (state.mCurrentHole < 6) {
+                state.mWhatHoleIsBeingDisplayed  = DISPLAY_MODE_X_6_6
+            } else if (state.mCurrentHole < 12) {
+                state.mWhatHoleIsBeingDisplayed  = DISPLAY_MODE_6_X_6
+            } else {
+                state.mWhatHoleIsBeingDisplayed  = DISPLAY_MODE_6_6_X
+            }
+        }
+        else -> {
+            state.mWhatHoleIsBeingDisplayed = FRONT_NINE_IS_DISPLAYED
+        }
+    }
+}
 fun displayTeamGrossScore(
     teamPlayerScoreCells: IntArray,
     teamUsedCells: IntArray,
@@ -301,7 +390,6 @@ fun ScoreCardViewModel.updatePlayerDisplayScore(
                 playerHeading.mScore[currentHole] - playerHeading.mStokeHole[currentHole]
             nineGameScores.addPlayerGrossScore(playerHeading.vinTag, playerNetScore)
         }
-
     }
 }
 

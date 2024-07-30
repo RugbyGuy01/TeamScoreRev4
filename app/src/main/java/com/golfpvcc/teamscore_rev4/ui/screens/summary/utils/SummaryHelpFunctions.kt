@@ -11,6 +11,10 @@ import com.golfpvcc.teamscore_rev4.ui.screens.getTotalPlayerScore
 import com.golfpvcc.teamscore_rev4.ui.screens.getTotalPlayerStableford
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.HdcpParHoleHeading
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.PlayerHeading
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.BACK_NINE_IS_DISPLAYED
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DISPLAY_MODE_6_X_6
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DISPLAY_MODE_X_6_6
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.FRONT_NINE_IS_DISPLAYED
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.GameABCD
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.HDCP_HEADER
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.NineGame
@@ -259,6 +263,17 @@ fun SummaryViewModel.calculatePlayerNineScores() {
         currentHole++       // do the next hole
     }
 }
+fun toggle_6_ScoreCard(currentDisplayMode:Int) : Int{
+    val newScreenMode:Int
+    newScreenMode = if( currentDisplayMode == FRONT_NINE_IS_DISPLAYED || currentDisplayMode == BACK_NINE_IS_DISPLAYED)
+        DISPLAY_MODE_X_6_6
+    else
+        FRONT_NINE_IS_DISPLAYED
+
+    return (newScreenMode)
+}
+
+
 
 // This function will calculate the summary of the player's round used by the summary page functions
 fun SummaryViewModel.calculatePlayerScoreSummary(

@@ -49,6 +49,7 @@ sealed class ScoreCardActions {
     data object ScreenModeNet : ScoreCardActions()
     data object ScreenModeStableford : ScoreCardActions()
     data object ScreenModePtQuote : ScoreCardActions()
+    data object Screen6_6_6_Mode : ScoreCardActions()
     data object ScreenModeNineGame : ScoreCardActions()
     data object SetDialogCurrentPlayer : ScoreCardActions()
     data object FlipFrontBackNine : ScoreCardActions()
@@ -352,11 +353,10 @@ fun DisplayRowHeadingOnClick(
 }
 
 @Composable
-fun FlipFrontAndBackNine(FlipText: Boolean, onAction: (ScoreCardActions) -> Unit) {
-    val displayFlipFrontBackText: String = if (FlipText) "Back Nine" else "Front Nine"
+fun FlipFrontAndBackNine(buttonDisplayHoleText: String, onAction: (ScoreCardActions) -> Unit) {
 
     RightSidePanelButton(
-        displayFlipFrontBackText,
+        buttonDisplayHoleText,
         Color(COLOR_PREV_HOLE),
         onClick = { onAction(ScoreCardActions.FlipFrontBackNine) })
 }

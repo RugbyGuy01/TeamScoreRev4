@@ -36,8 +36,6 @@ const val TOTAL_18_HOLE = 18
 
 const val FRONT_NINE_TOTAL_DISPLAYED = 8    //zero base, user is one the 9 nine hole
 const val BACK_NINE_TOTAL_DISPLAYED = 17      //zero base, user is one the 18 nine hole
-const val FRONT_NINE_IS_DISPLAYED = true      //zero base, user is one the 18 nine hole
-const val BACK_NINE_IS_DISPLAYED = false      //zero base, user is one the 18 nine hole
 
 const val TEAM_CLEAR_SCORE = 0
 const val TEAM_GROSS_SCORE = 1

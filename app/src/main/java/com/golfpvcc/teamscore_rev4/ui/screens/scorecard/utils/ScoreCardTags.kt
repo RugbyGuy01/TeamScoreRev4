@@ -21,23 +21,32 @@ const val DISPLAY_MODE_NET: Int = 128
 const val DISPLAY_MODE_POINT_QUOTA: Int = 129
 const val DISPLAY_MODE_9_GAME: Int = 130
 const val DISPLAY_MODE_STABLEFORD: Int = 131
+// const val DISPLAY_MODE_6_6_6: Int = 132
+
+const val FRONT_NINE_IS_DISPLAYED = 0      //zero base, user is one the 18 nine hole
+const val BACK_NINE_IS_DISPLAYED = 1      //zero base, user is one the 18 nine hole
+const val DISPLAY_MODE_X_6_6: Int = 2   // first siz holes
+const val DISPLAY_MODE_6_X_6: Int = 3   // Second 6 holes
+const val DISPLAY_MODE_6_6_X: Int = 4   // Third 6 holes
 
 const val NINE_PLAYERS = 3
 const val PLAYER_1_INX: Int = 0
 const val PLAYER_2_INX: Int = 1
 const val PLAYER_3_INX: Int = 2
-// Vin hole played is a flag to high light the hole being played
-fun getDisplayScoreCardHeaderColor(vinTag:Int): Long {
-    var headerColor:Long = VIN_LIGHT_GRAY
 
-    when(vinTag){
+// Vin hole played is a flag to high light the hole being played
+fun getDisplayScoreCardHeaderColor(vinTag: Int): Long {
+    var headerColor: Long = VIN_LIGHT_GRAY
+
+    when (vinTag) {
         HDCP_HEADER -> headerColor = DISPLAY_NOTE_ON_HOLE
-        PAR_HEADER ->  headerColor = VIN_LIGHT_GRAY
+        PAR_HEADER -> headerColor = VIN_LIGHT_GRAY
         HOLE_HEADER -> headerColor = DISPLAY_HOLE_NUMBER
     }
 
     return (headerColor)
 }
+
 /*
       This function will be used to classify the player's score for the hole. how did the user classify the player's score Gross or net
        */
