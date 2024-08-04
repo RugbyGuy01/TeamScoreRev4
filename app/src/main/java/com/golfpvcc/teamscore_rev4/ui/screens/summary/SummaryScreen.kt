@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -33,6 +34,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -53,6 +55,7 @@ import androidx.navigation.NavHostController
 import com.golfpvcc.teamscore_rev4.ui.navigation.ROOT_GRAPH_ROUTE
 import com.golfpvcc.teamscore_rev4.ui.navigation.TeamScoreScreen
 import com.golfpvcc.teamscore_rev4.ui.screens.CardButton
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.NINE_PLAYERS
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.AboutDialog
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.BackupANdRestoreDialog
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.ConfigureEmailDialog
@@ -61,6 +64,7 @@ import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.ConfigurePointsDialo
 import com.golfpvcc.teamscore_rev4.utils.MENU_BUTTON_TEXT
 import com.golfpvcc.teamscore_rev4.utils.MENU_ROW_LIGHT_GRAY
 import com.golfpvcc.teamscore_rev4.utils.SUMMARY_BUTTON_TEXT
+import com.golfpvcc.teamscore_rev4.utils.SUMMARY_CARD_WIDTH
 import com.golfpvcc.teamscore_rev4.utils.SUMMARY_NAME_TEXT_SIZE
 import com.golfpvcc.teamscore_rev4.utils.SUMMARY_PAYOUT_COLOR
 import com.golfpvcc.teamscore_rev4.utils.SUMMARY_TEXT_SIZE
@@ -81,7 +85,10 @@ fun SummaryScreen(
     )
 
     GetScoreCardRecord(summaryViewModel)
-    Log.d("VIN", "Summary GetScoreCardRecord after Id ${summaryViewModel.state.mCourseId}, ID = $id ")
+    Log.d(
+        "VIN",
+        "Summary GetScoreCardRecord after Id ${summaryViewModel.state.mCourseId}, ID = $id "
+    )
 
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.primary) {
         Scaffold()
@@ -89,15 +96,17 @@ fun SummaryScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
+                    .padding(it)
                     .verticalScroll(rememberScrollState())
             ) {
                 DisplayCourseName(summaryViewModel)
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(it)
+                        //.height(175.dp)
+                        .padding(5.dp)
                 ) {
-                    DisplayTeamTotalScore(summaryViewModel)
+                    DisplayTeam18HolesScores(summaryViewModel)
                 }
                 Row() {
                     BottomButtons(navController, summaryViewModel.state.mCourseId, summaryViewModel)
@@ -121,7 +130,8 @@ fun DisplayCourseName(summaryViewModel: SummaryViewModel) {
             .background(Color.White)
             .fillMaxWidth(),
     ) {
-        Text("Course Played: ${summaryViewModel.state.mCourseName} Played on ${summaryViewModel.state.mDatePlayed}")
+        Text("Course Played: ${summaryViewModel.state.mCourseName} Played on ${summaryViewModel.state.mDatePlayed}",
+            fontSize = SUMMARY_TEXT_SIZE.sp)
     }
 }
 
@@ -146,13 +156,12 @@ fun DisplayMenuOptionDialogs(summaryViewModel: SummaryViewModel) {
     if (summaryViewModel.state.mShowJunkDialog) {
         SetScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
         ConfigureJunkDialog(summaryViewModel::summaryActions, summaryViewModel)
-    } else
+    } else if (!summaryViewModel.state.mShowPointsDialog)
         SetScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
-
 }
 
 @Composable
-fun DisplayTeamTotalScore(summaryViewModel: SummaryViewModel) {
+fun DisplayTeam18HolesScores(summaryViewModel: SummaryViewModel) {
     Card(
         shape = RoundedCornerShape(8.dp),
         colors = CardDefaults.cardColors(containerColor = Color.LightGray)
@@ -161,13 +170,40 @@ fun DisplayTeamTotalScore(summaryViewModel: SummaryViewModel) {
             Modifier
                 .padding(3.dp),
         ) {
-            TeamScoreHeader()
-            DisplayTeamPointQuoteSummary(summaryViewModel)
-            DisplayTeamPointsSummary(summaryViewModel)
-            DisplayScoreOverUnderSummary(summaryViewModel)
-            DisplayStablefordSummary(summaryViewModel)
+            TeamScore18HoleHeader()
+            DisplayTeam18HolePointQuoteSummary(summaryViewModel)
+            DisplayTeam18HolePointsSummary(summaryViewModel)
+            DisplayTeam18HoleOverUnderSummary(summaryViewModel)
+            Display18HoleStablefordSummary(summaryViewModel)
+            Display6HolesSummary(summaryViewModel)
             DisplayABCDGameSummary(summaryViewModel)
         }
+    }
+}
+
+@Composable
+fun Display6HolesSummary(summaryViewModel: SummaryViewModel) {
+    Row(
+        Modifier
+            .background(Color.White)
+            .width(SUMMARY_CARD_WIDTH.dp),
+    ) {
+        Text(text = "Six Six Six", Modifier.weight(2 / 4f), fontSize = SUMMARY_TEXT_SIZE.sp)
+        Text(
+            text = summaryViewModel.frontScoreOverUnder(),
+            Modifier.weight(.5f),
+            fontSize = SUMMARY_TEXT_SIZE.sp
+        )
+        Text(
+            text = summaryViewModel.backScoreOverUnder(),
+            Modifier.weight(.5f),
+            fontSize = SUMMARY_TEXT_SIZE.sp
+        )
+        Text(
+            text = summaryViewModel.totalScoreOverUnder(),
+            Modifier.weight(.5f),
+            fontSize = SUMMARY_TEXT_SIZE.sp
+        )
     }
 }
 
@@ -177,7 +213,7 @@ fun DisplayABCDGameSummary(summaryViewModel: SummaryViewModel) {
     Row(
         Modifier
             .background(Color.White)
-            .fillMaxWidth(),
+            .width(SUMMARY_CARD_WIDTH.dp),
     ) {
         Text(text = "Game ABCD", Modifier.weight(2 / 4f), fontSize = SUMMARY_TEXT_SIZE.sp)
         for ((idx, element) in summaryViewModel.state.mPlayerSummary.withIndex()) {
@@ -192,11 +228,12 @@ fun DisplayABCDGameSummary(summaryViewModel: SummaryViewModel) {
 
 
 @Composable
-fun TeamScoreHeader(modifier: Modifier = Modifier) {
+fun TeamScore18HoleHeader(modifier: Modifier = Modifier) {
     Row(
         Modifier
             .background(Color.LightGray)
-            .fillMaxWidth(),
+            //.fillMaxWidth()
+            .width(SUMMARY_CARD_WIDTH.dp),
     ) {
         Text(text = "Team Summary", Modifier.weight(2 / 4f), fontSize = SUMMARY_TEXT_SIZE.sp)
         Text(text = "Front", Modifier.weight(.5f), fontSize = SUMMARY_TEXT_SIZE.sp)
@@ -206,11 +243,11 @@ fun TeamScoreHeader(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun DisplayTeamPointQuoteSummary(summaryViewModel: SummaryViewModel) {
+fun DisplayTeam18HolePointQuoteSummary(summaryViewModel: SummaryViewModel) {
     Row(
         Modifier
             .background(Color.White)
-            .fillMaxWidth(),
+            .width(SUMMARY_CARD_WIDTH.dp),
     ) {
         Text(text = "Pt. Quote (used)", Modifier.weight(2 / 4f), fontSize = SUMMARY_TEXT_SIZE.sp)
         Text(
@@ -232,11 +269,11 @@ fun DisplayTeamPointQuoteSummary(summaryViewModel: SummaryViewModel) {
 }
 
 @Composable
-fun DisplayTeamPointsSummary(summaryViewModel: SummaryViewModel) {
+fun DisplayTeam18HolePointsSummary(summaryViewModel: SummaryViewModel) {
     Row(
         Modifier
             .background(Color.White)
-            .fillMaxWidth(),
+            .width(SUMMARY_CARD_WIDTH.dp),
     ) {
         Text(text = "Points  (Quota)", Modifier.weight(2 / 4f), fontSize = SUMMARY_TEXT_SIZE.sp)
         Text(
@@ -258,11 +295,11 @@ fun DisplayTeamPointsSummary(summaryViewModel: SummaryViewModel) {
 }
 
 @Composable
-fun DisplayScoreOverUnderSummary(summaryViewModel: SummaryViewModel) {
+fun DisplayTeam18HoleOverUnderSummary(summaryViewModel: SummaryViewModel) {
     Row(
         Modifier
             .background(Color.White)
-            .fillMaxWidth(),
+            .width(SUMMARY_CARD_WIDTH.dp),
     ) {
         Text(text = "Score (O/U)", Modifier.weight(2 / 4f), fontSize = SUMMARY_TEXT_SIZE.sp)
         Text(
@@ -284,11 +321,11 @@ fun DisplayScoreOverUnderSummary(summaryViewModel: SummaryViewModel) {
 }
 
 @Composable
-fun DisplayStablefordSummary(summaryViewModel: SummaryViewModel) {
+fun Display18HoleStablefordSummary(summaryViewModel: SummaryViewModel) {
     Row(
         Modifier
             .background(Color.White)
-            .fillMaxWidth(),
+            .width(SUMMARY_CARD_WIDTH.dp),
     ) {
         Text(text = "Stableford (Used)", Modifier.weight(2 / 4f), fontSize = SUMMARY_TEXT_SIZE.sp)
         Text(
@@ -319,7 +356,7 @@ fun DisplayPlayersTotalScore(state: State, onAction: (SummaryActions) -> Unit) {
     ) {
         LazyRow(Modifier.padding(4.dp)) {
             items(playersRecord) { player ->
-                DisplayPlayerScore(player, onAction)
+                DisplayPlayerScore(player, playersRecord.count(), onAction)
                 Spacer(modifier = Modifier.size(10.dp))
             }
         }
@@ -327,7 +364,7 @@ fun DisplayPlayersTotalScore(state: State, onAction: (SummaryActions) -> Unit) {
 }
 
 @Composable
-fun DisplayPlayerScore(player: PlayerSummary, onAction: (SummaryActions) -> Unit) {
+fun DisplayPlayerScore(player: PlayerSummary, playerCount:Int, onAction: (SummaryActions) -> Unit) {
     Card(
         Modifier.fillMaxWidth(),
         border = BorderStroke(1.dp, Color.Black),
@@ -345,7 +382,7 @@ fun DisplayPlayerScore(player: PlayerSummary, onAction: (SummaryActions) -> Unit
             HorizontalDivider(thickness = 2.dp)
             DisplayPlayerScoreLine1(player)
             DisplayPlayerScoreLine2(player)
-            DisplayPlayerScoreLine3(player)
+            DisplayPlayerScoreLine3(player, playerCount)
             HorizontalDivider(thickness = 2.dp, color = Color.Red)
             DisplayPlayerScorePayouts(player)
         }
@@ -391,13 +428,13 @@ fun DisplayPayoutRow(playerJunkPayoutList: List<PlayerJunkPayoutRecord>) {
     ) {
         Text(
             text = "Payouts: ",
-           // Modifier.weight(1.1f),
+            // Modifier.weight(1.1f),
             fontSize = SUMMARY_TEXT_SIZE.sp
         )
         playerJunkPayoutList.forEachIndexed { idx, payout ->
             Text(
                 text = "${payout.mJunkName} : ${payout.mCount}",
-               // Modifier.weight(1.1f),
+                // Modifier.weight(1.1f),
                 fontSize = SUMMARY_TEXT_SIZE.sp
             )
         }
@@ -495,7 +532,7 @@ fun DisplayPlayerScoreLine2(player: PlayerSummary) {
 }
 
 @Composable
-fun DisplayPlayerScoreLine3(player: PlayerSummary) {
+fun DisplayPlayerScoreLine3(player: PlayerSummary, playerCount:Int) {
     Row(
         Modifier
             .background(Color.White)
@@ -510,11 +547,13 @@ fun DisplayPlayerScoreLine3(player: PlayerSummary) {
             text = "Quote: ${player.mQuote}",
             Modifier.weight(.5f), fontSize = SUMMARY_TEXT_SIZE.sp
         )
-        Text(
-            text = "Nine Pts: ${player.mNineTotal}",
-            Modifier.weight(.5f),
-            fontSize = SUMMARY_TEXT_SIZE.sp
-        )
+        if(playerCount == NINE_PLAYERS) {
+            Text(
+                text = "Nine Pts: ${player.mNineTotal}",
+                Modifier.weight(.5f),
+                fontSize = SUMMARY_TEXT_SIZE.sp
+            )
+        }
     }
 
 }
@@ -543,10 +582,10 @@ fun BottomButtons(
     val enableButtons = summaryViewModel.checkForScoreCardRecord()
     Row(
         modifier = Modifier
-            .padding(10.dp)
+            .padding(start = 10.dp, end = 10.dp)
             .fillMaxWidth()
             .background(Color(MENU_ROW_LIGHT_GRAY)),
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceAround
     ) {
         CardButton(" Resume ", Color.White, enableButtons) {
             navController.navigate(route = TeamScoreScreen.ScreenScoreCard.route) { // back to the start of configuration
@@ -554,7 +593,7 @@ fun BottomButtons(
             }
         }
         Log.d("VIN", "Summary Players buttons Id $courseId")
-        CardButton(" Players ", Color.White, enableButtons ) {
+        CardButton(" Players ", Color.White, enableButtons) {
             navController.navigate(TeamScoreScreen.ScreenPlayerSetup.passId(courseId))
             { // back to the start of configuration
                 popUpTo(ROOT_GRAPH_ROUTE)    // clear the back stack

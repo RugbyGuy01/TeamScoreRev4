@@ -65,6 +65,7 @@ const val MINIMUM_LEN_OF_PLAYER_NAME = 2
 const val MAX_EMAIL_NAME_LEN = 25
 const val MAX_EMAIL_ADDRESS_LEN = 50
 const val MAX_JUNK_TEXT_LEN = 15
+const val SUMMARY_CARD_WIDTH = 650
 
 // text size for forms
 const val DATABASE_NAME = "TeamDatabase"
@@ -73,7 +74,7 @@ const val SCORE_CARD_COURSE_NAME_TEXT = 15
 const val SUMMARY_BUTTON_TEXT = 20
 const val MENU_BUTTON_TEXT = 20
 const val COLUMN_TOTAL_WIDTH = 65
-const val SUMMARY_TEXT_SIZE = 18
+const val SUMMARY_TEXT_SIZE = 20
 const val SUMMARY_NAME_TEXT_SIZE = 22
 const val SUMMARY_DIALOG_TEXT_SIZE = 20
 const val DIALOG_BUTTON_TEXT_SIZE = 20
@@ -85,7 +86,7 @@ const val USER_CANCEL = 100
 const val USER_SAVE = 101
 const val USER_TEXT_SAVE = 102
 const val USER_TEXT_UPDATE = 103
-
+const val NINE_GAME_PLAYERS = 3
 const val BACKUP_FILE_NAME = "TeamScore.bkp"
 
 object Constants {

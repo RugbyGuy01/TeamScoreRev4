@@ -12,11 +12,10 @@ import com.golfpvcc.teamscore_rev4.ui.screens.getTotalPlayerStableford
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.HdcpParHoleHeading
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.PlayerHeading
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.BACK_NINE_IS_DISPLAYED
-import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DISPLAY_MODE_6_X_6
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DISPLAY_MODE_X_6_6
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.FRONT_NINE_IS_DISPLAYED
-import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.GameABCD
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.HDCP_HEADER
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.NINE_PLAYERS
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.NineGame
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.PAR_HEADER
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.setPlayerStrokeHoles
@@ -180,7 +179,7 @@ fun SummaryViewModel.calculateOverUnderScores() {
             )
 
             var teamPoints = getTotalPlayerScore(
-                whatNine = FRONT_NINE_DISPLAY,
+                whatHoles = FRONT_NINE_DISPLAY,
                 playerHeading = playerSummary,
                 holePar = parCell.mHole,
             )
@@ -188,7 +187,7 @@ fun SummaryViewModel.calculateOverUnderScores() {
             state.mOverUnderScoreFront += teamPoints.teamUsedPoints // over/under score
 
             teamPoints = getTotalPlayerScore(
-                whatNine = BACK_NINE_DISPLAY,
+                whatHoles = BACK_NINE_DISPLAY,
                 playerHeading = playerSummary,
                 holePar = parCell.mHole,
             )
@@ -213,9 +212,10 @@ fun SummaryViewModel.playerScoreSummary(playerJunkDao: PlayerJunkDao) {
             calculatePlayerScoreSummary(playerSummary, parCell.mHole, hdcpCell.mHole)
             calculatePlayerJunkSummary(playerJunkDao, playerSummary, idx, state.mJunkRecordTable)
         }
-        if (state.mPlayerSummary.count() == 3) {
+        if (state.mPlayerSummary.count() == NINE_PLAYERS) {
             calculatePlayerNineScores()     // and ABCD game
         }
+        calculateABCD_Scores()
     }
 }
 
@@ -237,7 +237,7 @@ fun calculatePlayerJunkSummary(playerJunkDao: PlayerJunkDao, playerSummary: Play
 
 fun SummaryViewModel.calculatePlayerNineScores() {
     var nineGameScores = NineGame()
-    var gameABCD = GameABCD()
+
     var currentHole: Int = 0
 
     while (currentHole < TOTAL_18_HOLE) { // holes 1 to 18
@@ -247,19 +247,37 @@ fun SummaryViewModel.calculatePlayerNineScores() {
                 val playerNetScore =
                     playerSummary.mPlayer.mScore[currentHole] - playerSummary.mPlayer.mStokeHole[currentHole]
                 nineGameScores.addPlayerGrossScore(playerSummary.mPlayer.vinTag, playerNetScore)
-                gameABCD.addPlayer(playerNetScore)          // add each player score to  ABCD Class
             }
         }
         nineGameScores.sort9Scores()    // calculate player's scores
-        gameABCD.sortScores()           // sort player scores
         var idx: Int = 0
 
         for (playerSummary in state.mPlayerSummary) {
             playerSummary.mNineTotal += nineGameScores.get9GameScore(playerSummary.mPlayer.vinTag)
-
-            state.mGameABCD[idx] += gameABCD.getPlayerScore(idx)    // now get each player score
             idx++
         }
+        currentHole++       // do the next hole
+    }
+}
+fun SummaryViewModel.calculateABCD_Scores(){
+    var gameABCD = GameABCD()
+    var currentHole: Int = 0
+
+    while (currentHole < TOTAL_18_HOLE) { // holes 1 to 18
+        gameABCD.clear()
+        for ((idx, playerSummary) in state.mPlayerSummary.withIndex()) {       // add each player score to 9' Class
+            if (0 < playerSummary.mPlayer.mScore[currentHole]) {
+                val playerNetScore =
+                    playerSummary.mPlayer.mScore[currentHole] - playerSummary.mPlayer.mStokeHole[currentHole]
+                gameABCD.addPlayer(idx, playerNetScore)          // add each player score to  ABCD Class
+            }
+        }
+        gameABCD.sortScores()           // sort player scores
+
+        for ((idx, playerSummary) in state.mPlayerSummary.withIndex()) {
+            state.mGameABCD[idx] += gameABCD.getPlayerScore(idx)    // now get each player score
+        }
+        Log.d("SORT", "Hole $currentHole Score 0 ${state.mGameABCD[0]}" )
         currentHole++       // do the next hole
     }
 }

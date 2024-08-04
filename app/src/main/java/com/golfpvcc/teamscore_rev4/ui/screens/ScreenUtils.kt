@@ -21,6 +21,7 @@ import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.displayTeamNetScor
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.getPointQuoteKey
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.PlayerSummary
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.TeamPoints
+import com.golfpvcc.teamscore_rev4.utils.BACK_NINE_DISPLAY
 import com.golfpvcc.teamscore_rev4.utils.BACK_NINE_TOTAL_DISPLAYED
 import com.golfpvcc.teamscore_rev4.utils.DOUBLE_TEAM_SCORE
 import com.golfpvcc.teamscore_rev4.utils.FRONT_NINE_DISPLAY
@@ -56,44 +57,6 @@ fun CardButton(buttonText: String, backGroundColor:Color,enableButton:Boolean = 
         )
     }
 }
-/*
-                team Score              Used Score
-gross Score     gross - Par             Count
-Net Score       gross - strokes         Count
-Stableford      net score               add flagged pts
-                table Lookup
-Pt Quote        gross score             add flagged pts
-                table Lookup
-
- */
-
-fun getTeamScore(grossScore: Int, strokes: Int, teamScoreMask: Int): Int {
-    val teamScoreResults: Int
-
-    when (teamScoreMask) {
-        TEAM_GROSS_SCORE -> {
-            teamScoreResults = grossScore
-        }
-
-        TEAM_NET_SCORE -> {
-            teamScoreResults = grossScore - strokes
-        }
-
-        TEAM_GROSS_SCORE + DOUBLE_TEAM_SCORE -> {
-            teamScoreResults = grossScore * 2
-        }
-
-        TEAM_NET_SCORE + DOUBLE_TEAM_SCORE -> {
-            teamScoreResults = (grossScore - strokes) * 2
-        }
-
-        else -> {
-            teamScoreResults = 0
-        }
-    }
-    return (teamScoreResults)
-}
-
 fun playerStokes(playerStrokes: Int): Int {
     val strokeResult: Int
 
@@ -212,20 +175,29 @@ fun getTotalPlayerStableford(
 }
 
 fun getTotalPlayerScore(
-    whatNine: Int,
+    whatHoles: Int,
     playerHeading: PlayerSummary,
     holePar: IntArray,
 ): TeamPoints {
     val teamOverUnderScore = TeamPoints(0, 0)
-    var start: Int = 0
-    var stop: Int = FRONT_NINE_TOTAL_DISPLAYED
+    var start: Int
+    var stop: Int
 
-    if (whatNine == FRONT_NINE_DISPLAY) {
-        stop = FRONT_NINE_TOTAL_DISPLAYED
-    } else {
-        start = FRONT_NINE_DISPLAY
-        stop = BACK_NINE_TOTAL_DISPLAYED
+    when(whatHoles){
+        FRONT_NINE_DISPLAY -> {
+            start = 0
+            stop = FRONT_NINE_TOTAL_DISPLAYED
+        }
+        BACK_NINE_DISPLAY -> {
+            start = FRONT_NINE_DISPLAY
+            stop = BACK_NINE_TOTAL_DISPLAYED
+        }
+        else -> {
+            start = 0
+            stop = FRONT_NINE_TOTAL_DISPLAYED
+        }
     }
+
     for (currentHole in start..stop) {
         if (0 < playerHeading.mPlayer.mScore[currentHole]) {    // only if have a score
             if (0 < playerHeading.mPlayer.mTeamHole[currentHole]) {
@@ -243,7 +215,6 @@ fun getTotalPlayerScore(
             }
         }
     }
-
     return (teamOverUnderScore)
 }
 fun getUnderOverScore(player: PlayerHeading, currentHole: Int, holePar: Int): Int {

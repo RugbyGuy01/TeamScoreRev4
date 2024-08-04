@@ -1,6 +1,5 @@
 package com.golfpvcc.teamscore_rev4.ui.screens.coursedetail
 
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -43,7 +42,7 @@ fun DisplayFlipHdcpsButtons(recDetail: CourseDetailViewModel) {
 @Composable  // holeIdx is zero base index
 fun DropDownSelectHolePar(
     recDetail: CourseDetailViewModel,
-    holeIdx: Int
+    holeIdx: Int,
 ) {
     var expanded = if (recDetail.getPopupSelectHolePar() < 0) false else true
     val currentHolePar = recDetail.getHolePar(holeIdx)
@@ -98,15 +97,16 @@ fun DropDownSelectHolePar(
 @Composable     // holeIdx is zero base index
 fun DropDownSelectHoleHandicap(
     courseDetailViewModel: CourseDetailViewModel,
-    holeIdx: Int
+    holeIdx: Int,
 ) {
     var expanded = if (courseDetailViewModel.getPopupSelectHoleHandicap() < 0) false else true
     val currentHoleHdcp = courseDetailViewModel.getHoleHandicap(holeIdx)
     val courseHdcp = courseDetailViewModel.state.availableHandicap
-    val FlipHdcps = courseDetailViewModel.getFlipHdcps()
+    val flipHdcps = courseDetailViewModel.getFlipHdcps()
     val displayFrontNineHdcp: Int
+    var selectedHdcp: Int = -1
 
-    if (FlipHdcps) {
+    if (flipHdcps) {
         displayFrontNineHdcp =
             if (holeIdx < 9) 0 else 1 // used to display the handicap holes to select
     } else {
@@ -163,20 +163,39 @@ fun DropDownSelectHoleHandicap(
                                             if (returnHdcpToPool != null) {
                                                 returnHdcpToPool.available = true
                                             }
-                                        }
+                                        } else
+                                            selectedHdcp = inx  // selected handicap hole
 
                                         courseDetailViewModel.onHandicapChange(
                                             holeIdx,
                                             courseHdcp[inx].holeHandicap
                                         )
-                                        courseHdcp[inx].available = false        // this handicap has been selected
+                                        courseHdcp[inx].available =
+                                            false        // this handicap has been selected
                                         courseDetailViewModel.checkForAvailableHandicaps()  // will set the course save button
                                         courseDetailViewModel.setPopupSelectHoleHdcp(-1)
-                                    } // rnd of clickable
+                                    } // end of clickable
                             )
                         }
                     }
                 }
+                Text(
+                    text = " Clear  ",
+                    fontSize = 20.sp,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .padding(5.dp)
+                        .clickable {
+                            val returnHdcpToPool =
+                                courseHdcp.find { it.holeHandicap == selectedHdcp }
+                            if (returnHdcpToPool != null) {
+                                returnHdcpToPool.available = true
+                            }
+
+                            courseDetailViewModel.checkForAvailableHandicaps()  // will set the course save button
+                            courseDetailViewModel.setPopupSelectHoleHdcp(-1)
+                        } // end of clickable
+                )
             }
         }
     }

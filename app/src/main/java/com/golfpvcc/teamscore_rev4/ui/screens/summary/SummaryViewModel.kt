@@ -179,9 +179,11 @@ open class SummaryViewModel() : ViewModel() {
             state.mBackupAndRestoreResults = restoreDatabase(context)
         repaintScreen()
     }
-    fun backupAndRestoreResults():String{
+
+    fun backupAndRestoreResults(): String {
         return (state.mBackupAndRestoreResults)
     }
+
     fun showEmailDialog() {
         Log.d("VIN", "displayEmailDialog ")
         state.mShowEmailDialog = !state.mShowEmailDialog
@@ -462,7 +464,7 @@ data class State(
     var mGameABCD: IntArray = IntArray(MAX_PLAYERS) { 0 },   // A player index 0
     var mDisplayMenu: Boolean = false,
     var mHasDatabaseBeenRead: Boolean = false,
-    var mDatePlayed:String = "",
+    var mDatePlayed: String = "",
     var mShowJunkDialog: Boolean = false,
     var mSelectJunkRecordIndex: Int = -1,
     var mJunkDatabaseRecordRead: Boolean = false,
@@ -470,7 +472,7 @@ data class State(
 
     var mShowPointsDialog: Boolean = false,
     var mShowBackupRestoreDialog: Boolean = false,
-    var mBackupAndRestoreResults:String = "",
+    var mBackupAndRestoreResults: String = "",
     var mShowAboutDialog: Boolean = false,
     var mShowEmailDialog: Boolean = false,
     var mSendEmailToUser: Boolean = false,
