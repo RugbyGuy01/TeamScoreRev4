@@ -69,6 +69,8 @@ import com.golfpvcc.teamscore_rev4.utils.MAX_EMAIL_ADDRESS_LEN
 import com.golfpvcc.teamscore_rev4.utils.MAX_EMAIL_NAME_LEN
 import com.golfpvcc.teamscore_rev4.utils.MAX_JUNK_TEXT_LEN
 import com.golfpvcc.teamscore_rev4.utils.PQ_OTHER
+import com.golfpvcc.teamscore_rev4.utils.REVISION
+import com.golfpvcc.teamscore_rev4.utils.REV_DATE
 import com.golfpvcc.teamscore_rev4.utils.SUMMARY_DIALOG_TEXT_SIZE
 import com.golfpvcc.teamscore_rev4.utils.USER_TEXT_SAVE
 import kotlinx.coroutines.Dispatchers
@@ -422,7 +424,8 @@ fun AboutDialog(onAction: (SummaryActions) -> Unit) {
             Text(
                 text = "Team Score App.\n" +
                         " Written by Vinnie Gamble\n\n" +
-                        "Contact: Vgamble@golfpvcc.com",
+                        "Contact: Vgamble@golfpvcc.com\n\n" +
+                        "Revision: $REVISION $REV_DATE",
                 fontSize = SUMMARY_DIALOG_TEXT_SIZE.sp,
             )
         },
@@ -474,16 +477,17 @@ fun BackupANdRestoreDialog(onAction: (SummaryActions) -> Unit, summaryViewModel:
                         .padding(10.dp),
                     Arrangement.SpaceEvenly
                 ) {
-                    CardButton("Backup", Color.LightGray)
-                    {
-                        Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-                            type = "db/*"
-                            putExtra(Intent.EXTRA_TITLE, DATABASE_NAME)
-                        }.also {
-                            backupResultLauncher.launch(it)
+                    CardButton("Backup",
+                        Color.LightGray,
+                        onClick = {
+                            Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                                type = "*/*"
+                                putExtra(Intent.EXTRA_TITLE, DATABASE_NAME)
+                            }.also {
+                                backupResultLauncher.launch(it)
+                            }
                         }
-                        onAction(SummaryActions.ShowBackupRestoreDialog) // close dialog
-                    } //onclick
+                    )
 
                     CardButton("Cancel", Color.Transparent)
                     { onAction(SummaryActions.ShowBackupRestoreDialog) }  //onclick
@@ -496,7 +500,6 @@ fun BackupANdRestoreDialog(onAction: (SummaryActions) -> Unit, summaryViewModel:
                         }.also {
                             restoreResultLauncher.launch(it)
                         }
-                        onAction(SummaryActions.ShowBackupRestoreDialog) // close dialog
                     }
                 }
             }

@@ -51,9 +51,6 @@ open class SummaryViewModel() : ViewModel() {
     private val emailDao = TeamScoreCardApp.getEmailDao()
     private val junkDao = TeamScoreCardApp.getJunkDao()
     private val playerJunkDao = TeamScoreCardApp.getPlayerJunkDao()
-    val visiblePermissionDialogQueue = mutableStateListOf<String>()
-
-
 
     class SummaryViewModelFactor() : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -480,7 +477,6 @@ data class State(
     val mCourseName: String = "",    // current course name from the course list database
     val mTee: String = "",                   // the tee's played or the course yardage
     val mCourseId: Int = 0,      // the current course we are using for the score card
-
     var mGameNines: Boolean = false,    // true if we only have 3 players
     var mGameABCD: IntArray = IntArray(MAX_PLAYERS) { 0 },   // A player index 0
     var mDisplayMenu: Boolean = false,

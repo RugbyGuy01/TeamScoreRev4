@@ -2,11 +2,6 @@ July 16, 2024
 
 Features to be added to the Team Score App.
 
-
-. Add update summary screen with 6-6-6 game
-. 9 Payout dialog screen
-
-
 What's done
 . Add score card with 6 holes per screen. 6-6-6 game
 . Add note dialog screen for hole on the course.
@@ -22,17 +17,16 @@ What's done
 . About screen, reversion and Contact information.
 . Email Address database and setup dialog screen
 . Player’s Junk dialog screen for score card
+. Add update summary screen with 6-6-6 game
+. 9 Payout dialog screen
+. Backup & Restore of database
 
 Junk options:
-
 Closest to Pin
 Polies
-Green side sandy
+sandy
 Sandy
-Birdies
-Chippies
 Putt made longer than the flag stick.
-Fairway bunkers
 Clouseau
 Skins
 Fat Shot

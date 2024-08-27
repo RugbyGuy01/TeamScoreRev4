@@ -4,7 +4,8 @@ import android.app.Activity
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import com.golfpvcc.teamscore_rev4.database.model.CourseRecord
-const val REVISION = 1.0
+const val REVISION = 2.0
+const val REV_DATE = "Aug 27, 2024"
 const val VIN_LIGHT_GRAY = 0xFFE0E0E0
 const val DISPLAY_HOLE_NUMBER = 0xFF48EFF0
 const val DISPLAY_NOTE_ON_HOLE = 0xFFFDAFFF
