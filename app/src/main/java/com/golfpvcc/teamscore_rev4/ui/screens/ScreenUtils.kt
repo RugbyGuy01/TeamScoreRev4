@@ -17,6 +17,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.PlayerHeading
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.BACK_NINE_IS_DISPLAYED
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DISPLAY_MODE_6_6_X
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DISPLAY_MODE_6_X_6
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DISPLAY_MODE_X_6_6
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.FRONT_NINE_IS_DISPLAYED
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.displayTeamNetScore
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.getPointQuoteKey
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.PlayerSummary
@@ -37,7 +42,12 @@ import com.golfpvcc.teamscore_rev4.utils.TEAM_NET_SCORE
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CardButton(buttonText: String, backGroundColor:Color,enableButton:Boolean = true,  onClick: () -> Unit) {
+fun CardButton(
+    buttonText: String,
+    backGroundColor: Color,
+    enableButton: Boolean = true,
+    onClick: () -> Unit,
+) {
 
     Card(modifier = Modifier
         .wrapContentSize()
@@ -57,6 +67,7 @@ fun CardButton(buttonText: String, backGroundColor:Color,enableButton:Boolean = 
         )
     }
 }
+
 fun playerStokes(playerStrokes: Int): Int {
     val strokeResult: Int
 
@@ -183,15 +194,33 @@ fun getTotalPlayerScore(
     var start: Int
     var stop: Int
 
-    when(whatHoles){
+    when (whatHoles) {
         FRONT_NINE_DISPLAY -> {
             start = 0
             stop = FRONT_NINE_TOTAL_DISPLAYED
         }
+
         BACK_NINE_DISPLAY -> {
             start = FRONT_NINE_DISPLAY
             stop = BACK_NINE_TOTAL_DISPLAYED
         }
+
+        DISPLAY_MODE_X_6_6 -> {
+            start = 0
+            stop = 5
+        }
+
+        DISPLAY_MODE_6_X_6 -> {
+            start = 6
+            stop = 11
+        }
+
+        DISPLAY_MODE_6_6_X -> {
+            start = 12
+            stop = 17
+
+        }
+
         else -> {
             start = 0
             stop = FRONT_NINE_TOTAL_DISPLAYED
@@ -217,6 +246,7 @@ fun getTotalPlayerScore(
     }
     return (teamOverUnderScore)
 }
+
 fun getUnderOverScore(player: PlayerHeading, currentHole: Int, holePar: Int): Int {
     var teamScore: Int = player.mScore[currentHole] - holePar
 

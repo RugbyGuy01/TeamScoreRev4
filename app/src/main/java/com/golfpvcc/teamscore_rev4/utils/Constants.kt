@@ -4,7 +4,7 @@ import android.app.Activity
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import com.golfpvcc.teamscore_rev4.database.model.CourseRecord
-
+const val REVISION = 1.0
 const val VIN_LIGHT_GRAY = 0xFFE0E0E0
 const val DISPLAY_HOLE_NUMBER = 0xFF48EFF0
 const val DISPLAY_NOTE_ON_HOLE = 0xFFFDAFFF
@@ -68,9 +68,10 @@ const val MAX_JUNK_TEXT_LEN = 15
 const val SUMMARY_CARD_WIDTH = 650
 
 // text size for forms
-const val DATABASE_NAME = "TeamDatabase"
+const val DATABASE_NAME = "TeamDatabase.db"
 const val SCORE_CARD_TEXT = 18
 const val SCORE_CARD_COURSE_NAME_TEXT = 15
+const val COURSE_NAME_MINIMUM =5
 const val SUMMARY_BUTTON_TEXT = 20
 const val MENU_BUTTON_TEXT = 20
 const val COLUMN_TOTAL_WIDTH = 65

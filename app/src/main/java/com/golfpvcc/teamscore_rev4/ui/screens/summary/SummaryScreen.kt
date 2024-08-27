@@ -55,6 +55,9 @@ import androidx.navigation.NavHostController
 import com.golfpvcc.teamscore_rev4.ui.navigation.ROOT_GRAPH_ROUTE
 import com.golfpvcc.teamscore_rev4.ui.navigation.TeamScoreScreen
 import com.golfpvcc.teamscore_rev4.ui.screens.CardButton
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DISPLAY_MODE_6_6_X
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DISPLAY_MODE_6_X_6
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DISPLAY_MODE_X_6_6
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.NINE_PLAYERS
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.AboutDialog
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.BackupANdRestoreDialog
@@ -63,6 +66,7 @@ import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.ConfigureJunkDialog
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.ConfigurePointsDialog
 import com.golfpvcc.teamscore_rev4.utils.MENU_BUTTON_TEXT
 import com.golfpvcc.teamscore_rev4.utils.MENU_ROW_LIGHT_GRAY
+import com.golfpvcc.teamscore_rev4.utils.REVISION
 import com.golfpvcc.teamscore_rev4.utils.SUMMARY_BUTTON_TEXT
 import com.golfpvcc.teamscore_rev4.utils.SUMMARY_CARD_WIDTH
 import com.golfpvcc.teamscore_rev4.utils.SUMMARY_NAME_TEXT_SIZE
@@ -104,7 +108,8 @@ fun SummaryScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         //.height(175.dp)
-                        .padding(5.dp)
+                        .padding(5.dp),
+                    horizontalArrangement = Arrangement.Center
                 ) {
                     DisplayTeam18HolesScores(summaryViewModel)
                 }
@@ -130,7 +135,7 @@ fun DisplayCourseName(summaryViewModel: SummaryViewModel) {
             .background(Color.White)
             .fillMaxWidth(),
     ) {
-        Text("Course Played: ${summaryViewModel.state.mCourseName} Played on ${summaryViewModel.state.mDatePlayed}",
+        Text("Rev $REVISION Course Played: ${summaryViewModel.state.mCourseName} Played on ${summaryViewModel.state.mDatePlayed}",
             fontSize = SUMMARY_TEXT_SIZE.sp)
     }
 }
@@ -190,17 +195,17 @@ fun Display6HolesSummary(summaryViewModel: SummaryViewModel) {
     ) {
         Text(text = "Six Six Six", Modifier.weight(2 / 4f), fontSize = SUMMARY_TEXT_SIZE.sp)
         Text(
-            text = summaryViewModel.frontScoreOverUnder(),
+            text = summaryViewModel.GetSixHoleSummary(DISPLAY_MODE_X_6_6),
             Modifier.weight(.5f),
             fontSize = SUMMARY_TEXT_SIZE.sp
         )
         Text(
-            text = summaryViewModel.backScoreOverUnder(),
+            text = summaryViewModel.GetSixHoleSummary(DISPLAY_MODE_6_X_6),
             Modifier.weight(.5f),
             fontSize = SUMMARY_TEXT_SIZE.sp
         )
         Text(
-            text = summaryViewModel.totalScoreOverUnder(),
+            text = summaryViewModel.GetSixHoleSummary(DISPLAY_MODE_6_6_X),
             Modifier.weight(.5f),
             fontSize = SUMMARY_TEXT_SIZE.sp
         )
@@ -617,7 +622,6 @@ fun DisplayOptionMenuDown(onAction: (SummaryActions) -> Unit) {
 
     var expanded by remember { mutableStateOf(false) }
 
-
     Card(modifier = Modifier
         .wrapContentSize()
         .clip(RoundedCornerShape(4.dp))
@@ -630,7 +634,7 @@ fun DisplayOptionMenuDown(onAction: (SummaryActions) -> Unit) {
     ) {
         Text(
             modifier = Modifier.padding(5.dp),
-            text = " Menu ",
+            text = " Options ",
             fontSize = SUMMARY_BUTTON_TEXT.sp,
         )
 

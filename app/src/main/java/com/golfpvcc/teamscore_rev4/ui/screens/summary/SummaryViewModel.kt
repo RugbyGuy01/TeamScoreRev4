@@ -5,6 +5,7 @@ import android.content.Context
 import android.util.Log
 import android.util.Patterns
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
@@ -16,11 +17,12 @@ import com.golfpvcc.teamscore_rev4.database.model.JunkRecord
 import com.golfpvcc.teamscore_rev4.database.model.PlayerJunkRecord
 import com.golfpvcc.teamscore_rev4.database.model.PointsRecord
 import com.golfpvcc.teamscore_rev4.database.model.ScoreCardWithPlayers
-import com.golfpvcc.teamscore_rev4.database.room.backupDatabase
-import com.golfpvcc.teamscore_rev4.database.room.restoreDatabase
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.HdcpParHoleHeading
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.PlayerHeading
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.TeamUsedHeading
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DISPLAY_MODE_6_6_X
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DISPLAY_MODE_6_X_6
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DISPLAY_MODE_X_6_6
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.HDCP_HEADER
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.HOLE_HEADER
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.PAR_HEADER
@@ -29,6 +31,7 @@ import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.USED_HEADER
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.calculateOverUnderScores
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.calculatePtQuote
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.calculateStableford
+import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.calculate_6_6_6_Scores
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.playerScoreSummary
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.sendPlayerEmail
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.updateScoreCardState
@@ -48,6 +51,9 @@ open class SummaryViewModel() : ViewModel() {
     private val emailDao = TeamScoreCardApp.getEmailDao()
     private val junkDao = TeamScoreCardApp.getJunkDao()
     private val playerJunkDao = TeamScoreCardApp.getPlayerJunkDao()
+    val visiblePermissionDialogQueue = mutableStateListOf<String>()
+
+
 
     class SummaryViewModelFactor() : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -112,11 +118,6 @@ open class SummaryViewModel() : ViewModel() {
     fun summaryActions(action: SummaryActions) {
         when (action) {
             SummaryActions.DisplayAboutDialog -> displayAboutDialog()
-            is SummaryActions.BackupRestoreDialog -> displayBackupRestoreDialog(
-                action.context,
-                action.backup
-            )
-
             SummaryActions.DisplayJunkDialog -> displayJunkDialog()
             is SummaryActions.UpdateJunkRecord -> updateJunkRecord(action.junkRecIdx)
             SummaryActions.AddRecordJunkDialog -> addRecordJunkDialog()
@@ -168,20 +169,6 @@ open class SummaryViewModel() : ViewModel() {
         state.mShowBackupRestoreDialog = !state.mShowBackupRestoreDialog
         state.mBackupAndRestoreResults = "" //clear the results
         repaintScreen()
-    }
-
-    fun displayBackupRestoreDialog(context: Context, backup: Boolean) {
-        Log.d("VIN", "displayBackup $backup RestoreDialog")
-
-        if (backup)
-            state.mBackupAndRestoreResults = backupDatabase(context)
-        else
-            state.mBackupAndRestoreResults = restoreDatabase(context)
-        repaintScreen()
-    }
-
-    fun backupAndRestoreResults(): String {
-        return (state.mBackupAndRestoreResults)
     }
 
     fun showEmailDialog() {
@@ -239,7 +226,7 @@ open class SummaryViewModel() : ViewModel() {
     // user want to add new record to the database or the DB is empty
     fun addRecordToDatabaseAndTable() {
         viewModelScope.launch(Dispatchers.IO) {
-            val addRecord = JunkRecord("New", 0) // keep this record on the top of list
+            val addRecord = JunkRecord("", 0) // keep this record on the top of list
             val recId = junkDao.insertJunkTableRecord(addRecord)
             addRecord.mId = recId
             val tableIdx =
@@ -266,9 +253,6 @@ open class SummaryViewModel() : ViewModel() {
     }
 
     private fun saveJunkDialogRecords() {
-//        Log.d("VIN", "saveJunkDialogRecords before Rec Cnt ${state.mJunkRecordTable.count()}")
-//        state.mJunkDatabaseRecordRead = false
-//        state.mJunkRecordTable.clear()  // delete all records
         Log.d("VIN", "saveJunkDialogRecords Rec Cnt ${state.mJunkRecordTable.count()}")
         displayJunkDialog()   // exit dialog
     }
@@ -330,11 +314,14 @@ open class SummaryViewModel() : ViewModel() {
         displayPointsDialog()   // exit dialog
     }
 
+    // function  is called after reading the files
     private fun teamAndPlayerSummary() {
         calculatePtQuote()
         calculateStableford()
         calculateOverUnderScores()
+        calculate_6_6_6_Scores()
         playerScoreSummary(playerJunkDao)
+        repaintScreen()
     }
 
     suspend fun checkPointRecords() {
@@ -414,6 +401,40 @@ open class SummaryViewModel() : ViewModel() {
         val usedPoints: Float = state.mQuotaPointsFront + state.mQuotaPointsBack
         pointsTotal = "$totalPoints ($usedPoints)"
         return (pointsTotal)
+    }
+
+    fun GetSixHoleSummary(whatSixHole: Int): String {
+        val sixHole: String
+
+        when (whatSixHole) {
+            DISPLAY_MODE_X_6_6 -> {
+                sixHole = state.mFirst_6_Holes.toString()
+                Log.d(
+                    "666",
+                    "GetSixHoleSummary first 6 ${state.mFirst_6_Holes} sixHoleSummary $sixHole"
+                )
+            }
+
+            DISPLAY_MODE_6_X_6 -> {
+                sixHole = state.mSecond_6_Holes.toString()
+                Log.d(
+                    "666",
+                    "GetSixHoleSummary Second 6 ${state.mSecond_6_Holes} sixHoleSummary $sixHole"
+                )
+            }
+
+            DISPLAY_MODE_6_6_X -> {
+                sixHole = state.mThird_6_Holes.toString()
+                Log.d(
+                    "666",
+                    "GetSixHoleSummary Third 6 ${state.mThird_6_Holes} sixHoleSummary $sixHole"
+                )
+            }
+
+            else -> sixHole = "Error"
+        }
+
+        return (sixHole)
     }
 
     fun frontScoreOverUnder(): String {
@@ -503,6 +524,10 @@ data class State(
     var mTotalStablefordBack: Int = 0,
     var mUsedStablefordFront: Int = 0,
     var mUsedStablefordBack: Int = 0,
+
+    var mFirst_6_Holes: Int = 0,
+    var mSecond_6_Holes: Int = 0,
+    var mThird_6_Holes: Int = 0,
 
     val hdcpParHoleHeading: List<HdcpParHoleHeading> = listOf(
         HdcpParHoleHeading(HDCP_HEADER, "HdCp"),

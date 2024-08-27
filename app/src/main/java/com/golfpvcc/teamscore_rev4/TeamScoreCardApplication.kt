@@ -26,6 +26,11 @@ class TeamScoreCardApp : Application() {
         instance = this
     }
 
+    fun closeDB(){
+        db = null
+    }
+
+
     private fun getDb(): TeamScoreDatabase {
         if (db != null) {
             return db!!
@@ -43,6 +48,10 @@ class TeamScoreCardApp : Application() {
 
     companion object {
         private var instance: TeamScoreCardApp? = null
+        fun closeTeamScoreDatabase() {
+            instance!!.getDb().close()
+            instance!!.closeDB()
+        }
 
         fun getRoomDatabase():TeamScoreDatabase{
             return instance!!.getDb()

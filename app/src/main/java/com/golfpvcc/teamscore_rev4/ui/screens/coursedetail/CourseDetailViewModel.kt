@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.golfpvcc.teamscore_rev4.utils.COURSE_NAME_MINIMUM
 import com.golfpvcc.teamscore_rev4.utils.HoleParList
 class CourseDetailViewModel (){
     var state by mutableStateOf(CourseDetailState())
@@ -11,6 +12,8 @@ class CourseDetailViewModel (){
 
     fun onCourseNameChange(newValue: String) {
         state = state.copy(mCoursename = newValue)
+        if(state.mCoursename.length > COURSE_NAME_MINIMUM)
+            checkForAvailableHandicaps()  // will set the course save button
     }
     fun setHandicap(Handicap: IntArray) {
         state = state.copy(mHandicap = Handicap)
@@ -69,7 +72,7 @@ class CourseDetailViewModel (){
     fun checkForAvailableHandicaps(){
         val allHandicapsUsed: HoleHandicap? = state.availableHandicap.find { it.available == true }
 
-        state = if (allHandicapsUsed == null){
+        state = if (allHandicapsUsed == null && state.mCoursename.isNotEmpty()){
             state.copy(mEnableSaveButton = true)
         } else {
             state.copy(mEnableSaveButton = false)

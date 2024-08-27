@@ -149,9 +149,10 @@ fun DropDownSelectHoleHandicap(
                                 fontSize = 20.sp,
                                 textAlign = TextAlign.Center,
                                 color = if (currentHoleHdcp == courseHdcp[inx].holeHandicap) Color.White else Color.Unspecified,
-                                style = if (currentHoleHdcp == courseHdcp[inx].holeHandicap) TextStyle(
-                                    background = Color.Black
-                                ) else TextStyle(
+                                style = if (currentHoleHdcp == courseHdcp[inx].holeHandicap)
+                                    TextStyle(
+                                        background = Color.Black
+                                    ) else TextStyle(
                                     background = Color.Yellow
                                 ),
                                 modifier = Modifier
@@ -163,19 +164,20 @@ fun DropDownSelectHoleHandicap(
                                             if (returnHdcpToPool != null) {
                                                 returnHdcpToPool.available = true
                                             }
-                                        } else
-                                            selectedHdcp = inx  // selected handicap hole
+                                        }
 
                                         courseDetailViewModel.onHandicapChange(
                                             holeIdx,
                                             courseHdcp[inx].holeHandicap
-                                        )
-                                        courseHdcp[inx].available =
-                                            false        // this handicap has been selected
+                                        )                       // this handicap has been selected
+                                        courseHdcp[inx].available = false
                                         courseDetailViewModel.checkForAvailableHandicaps()  // will set the course save button
                                         courseDetailViewModel.setPopupSelectHoleHdcp(-1)
                                     } // end of clickable
                             )
+                        }
+                        if (currentHoleHdcp == courseHdcp[inx].holeHandicap) {
+                            selectedHdcp = currentHoleHdcp  // handicap for this hole
                         }
                     }
                 }
@@ -190,6 +192,8 @@ fun DropDownSelectHoleHandicap(
                                 courseHdcp.find { it.holeHandicap == selectedHdcp }
                             if (returnHdcpToPool != null) {
                                 returnHdcpToPool.available = true
+                                returnHdcpToPool.holeHandicap = selectedHdcp // hole being display
+                                courseDetailViewModel.state.mHandicap[holeIdx] = 0
                             }
 
                             courseDetailViewModel.checkForAvailableHandicaps()  // will set the course save button

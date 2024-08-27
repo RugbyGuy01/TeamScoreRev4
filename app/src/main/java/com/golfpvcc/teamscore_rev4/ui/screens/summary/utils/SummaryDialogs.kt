@@ -1,6 +1,7 @@
 package com.golfpvcc.teamscore_rev4.ui.screens.summary.utils
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
@@ -54,12 +55,14 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.golfpvcc.teamscore_rev4.database.model.JunkRecord
+import com.golfpvcc.teamscore_rev4.database.room.buildRestoreLauncher
 import com.golfpvcc.teamscore_rev4.ui.screens.CardButton
 import com.golfpvcc.teamscore_rev4.ui.screens.coursedetail.DropDownSelectHolePar
 import com.golfpvcc.teamscore_rev4.ui.screens.playersetup.GetTeeInformation
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.SummaryActions
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.SummaryViewModel
 import com.golfpvcc.teamscore_rev4.ui.theme.shape
+import com.golfpvcc.teamscore_rev4.utils.DATABASE_NAME
 import com.golfpvcc.teamscore_rev4.utils.DIALOG_BACKUP_RESTORE_TEXT_SIZE
 import com.golfpvcc.teamscore_rev4.utils.DIALOG_BUTTON_TEXT_SIZE
 import com.golfpvcc.teamscore_rev4.utils.MAX_EMAIL_ADDRESS_LEN
@@ -70,6 +73,7 @@ import com.golfpvcc.teamscore_rev4.utils.SUMMARY_DIALOG_TEXT_SIZE
 import com.golfpvcc.teamscore_rev4.utils.USER_TEXT_SAVE
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import com.golfpvcc.teamscore_rev4.database.room.buildBackupLauncher as buildBackupLauncher1
 
 
 @Composable
@@ -330,7 +334,8 @@ fun DisplayJunkRecordEditField(
 
                 GetJunkInformation(
                     mMaxLength = MAX_JUNK_TEXT_LEN,
-                    placeHolder = "Junk Text",
+                    placeHolder = "New Junk Text",
+                    label = "Junk Text",
                     playerData = summaryViewModel.getJunkTableValue(recToEdit),
                     updatedData = summaryViewModel::onJunkRecordChange,
                     keyboardType = KeyboardType.Text,
@@ -353,6 +358,7 @@ fun DisplayJunkRecordEditField(
 fun GetJunkInformation(
     mMaxLength: Int,
     placeHolder: String,
+    label: String,
     playerData: String,
     updatedData: (String) -> Unit,
     keyboardType: KeyboardType,
@@ -379,7 +385,7 @@ fun GetJunkInformation(
                 Toast.LENGTH_SHORT
             ).show()
         },
-        label = { Text(text = placeHolder) },
+        label = { Text(text = label) },
         placeholder = { Text(text = placeHolder) },
         shape = shape.small,
         colors = OutlinedTextFieldDefaults.colors(
@@ -435,9 +441,12 @@ fun AboutDialog(onAction: (SummaryActions) -> Unit) {
         }
     )
 }
+
 @Composable
 fun BackupANdRestoreDialog(onAction: (SummaryActions) -> Unit, summaryViewModel: SummaryViewModel) {
     val context = LocalContext.current
+    val backupResultLauncher = buildBackupLauncher1()
+    val restoreResultLauncher = buildRestoreLauncher()
 
     Dialog(properties = DialogProperties(usePlatformDefaultWidth = false),
         onDismissRequest = { }
@@ -454,8 +463,10 @@ fun BackupANdRestoreDialog(onAction: (SummaryActions) -> Unit, summaryViewModel:
                     .padding(10.dp),
                 Arrangement.SpaceEvenly
             ) {
-                Text(text = "Backup And Restore Database",
-                        fontSize = DIALOG_BACKUP_RESTORE_TEXT_SIZE.sp,)
+                Text(
+                    text = "Backup And Restore Database",
+                    fontSize = DIALOG_BACKUP_RESTORE_TEXT_SIZE.sp,
+                )
                 HorizontalDivider(thickness = 3.dp, color = Color.Blue)
                 Row(
                     Modifier
@@ -463,23 +474,31 @@ fun BackupANdRestoreDialog(onAction: (SummaryActions) -> Unit, summaryViewModel:
                         .padding(10.dp),
                     Arrangement.SpaceEvenly
                 ) {
-                    CardButton(
-                        "Backup",
-                        Color.LightGray,
-                    )
-                    { onAction(SummaryActions.BackupRestoreDialog(context, true)) }
+                    CardButton("Backup", Color.LightGray)
+                    {
+                        Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                            type = "db/*"
+                            putExtra(Intent.EXTRA_TITLE, DATABASE_NAME)
+                        }.also {
+                            backupResultLauncher.launch(it)
+                        }
+                        onAction(SummaryActions.ShowBackupRestoreDialog) // close dialog
+                    } //onclick
 
                     CardButton("Cancel", Color.Transparent)
-                    { onAction(SummaryActions.ShowBackupRestoreDialog) }
+                    { onAction(SummaryActions.ShowBackupRestoreDialog) }  //onclick
 
-                    CardButton(
-                        "Restore",
-                        Color.LightGray,
-                    )
-                    { onAction(SummaryActions.BackupRestoreDialog(context, false)) }
+                    CardButton("Restore", Color.LightGray)
+                    {
+                        Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                            type = "*/*"
+                            putExtra(Intent.EXTRA_TITLE, DATABASE_NAME)
+                        }.also {
+                            restoreResultLauncher.launch(it)
+                        }
+                        onAction(SummaryActions.ShowBackupRestoreDialog) // close dialog
+                    }
                 }
-                Text(text = "Results: ${summaryViewModel.backupAndRestoreResults()}",
-                    fontSize = DIALOG_BACKUP_RESTORE_TEXT_SIZE.sp,)
             }
         }
     }
