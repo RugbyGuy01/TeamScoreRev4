@@ -1,0 +1,5 @@
+Revision 2.01 - 8/29/2024
+Fixed
+- Removing player from player setup does not remove the player from the score card.
+- Add course screen doesn't clear handicaps values when cancelled.
+- Starting hole always set to 1 when selecting new game.

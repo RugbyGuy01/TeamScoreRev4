@@ -1,8 +1,10 @@
 package com.golfpvcc.teamscore_rev4.database.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Query
 import androidx.room.Upsert
+import com.golfpvcc.teamscore_rev4.database.model.CourseRecord
 import com.golfpvcc.teamscore_rev4.database.model.PlayerRecord
 import kotlinx.coroutines.flow.Flow
 @Dao
@@ -22,4 +24,7 @@ interface PlayerDao {
 
     @Query("UPDATE PlayerRecord SET mName = :name, mHandicap = :handicap WHERE mId =:index")
     fun updatePlayer(index: Int, name: String, handicap: Int):Unit
+
+    @Delete
+    suspend fun deleteDeletePlayerRecord(playerRecord: PlayerRecord)
 }

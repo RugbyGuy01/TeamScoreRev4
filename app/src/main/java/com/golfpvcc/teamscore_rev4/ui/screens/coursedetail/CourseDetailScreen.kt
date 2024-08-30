@@ -138,6 +138,11 @@ fun GetCourseRecord(
 
             saveButtonState.value =
                 if (courseRec.value.mId == 0) USER_TEXT_SAVE else USER_TEXT_UPDATE
+            if (courseRec.value.mId == 0){
+                val mHandicap = IntArray(18)
+                recDetail.setHandicap(mHandicap) // clear courseDetailPlaceHolder
+            }
+
 
             recDetail.setHandicapAvailable()
             recDetail.checkForAvailableHandicaps()  // enable/disable the course save button

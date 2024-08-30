@@ -188,7 +188,6 @@ class PlayerSetupViewModel(
     private fun deleteAllPlayerRecords() {
         playerDao.deleteAllPlayersRecord()
         val zeroArray: IntArray = IntArray(18) { 0 }
-        state = state.copy(mStartingHole = "1")
         for (player in state.mPlayerRecords) {
             zeroArray.copyInto(player.mScore)
             zeroArray.copyInto(player.mTeamHole)
@@ -196,8 +195,7 @@ class PlayerSetupViewModel(
     }
 
     suspend fun savePlayersRecord() {
-        var count: Int = 0
-        for (player in state.mPlayerRecords) {
+        for ((count, player) in state.mPlayerRecords.withIndex()) {
 
             if (MINIMUM_LEN_OF_PLAYER_NAME < player.mName.length) {
                 if (player.mHandicap.length < 1) {
@@ -213,7 +211,11 @@ class PlayerSetupViewModel(
                     mId = count
                 )
                 playerDao.addUpdatePlayerRecord(playerRecord)
-                count++
+            } else {
+                val playerRecord: PlayerRecord = PlayerRecord(
+                    mId = count
+                )
+                playerDao.deleteDeletePlayerRecord(playerRecord)
             }
             Log.d("VIN", "savePlayersRecord ${player.mName}")
         }

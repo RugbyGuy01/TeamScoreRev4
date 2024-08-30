@@ -15,8 +15,8 @@ class CourseDetailViewModel (){
         if(state.mCoursename.length > COURSE_NAME_MINIMUM)
             checkForAvailableHandicaps()  // will set the course save button
     }
-    fun setHandicap(Handicap: IntArray) {
-        state = state.copy(mHandicap = Handicap)
+    fun setHandicap(handicap: IntArray) {
+        state = state.copy(mHandicap = handicap)
     }
     fun setPar(newValue: IntArray) {
         state = state.copy(mPar = newValue)
@@ -51,6 +51,9 @@ class CourseDetailViewModel (){
     }
     // end of par configuration
     // Configure course Handicap
+    fun clearHandicap(){
+
+    }
     fun getPopupSelectHoleHandicap(): Int {
         return (state.isPopupSelectHoleHdcp)
     }
