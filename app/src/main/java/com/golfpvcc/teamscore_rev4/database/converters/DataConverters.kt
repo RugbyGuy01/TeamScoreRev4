@@ -1,12 +1,10 @@
 package com.golfpvcc.teamscore_rev4.database.converters
 
 import androidx.room.TypeConverter
-import java.util.Date
-
 
 open class DataConverter {
     @TypeConverter
-    fun arrayToString(myArray: IntArray): String? {
+    fun arrayToString(myArray: IntArray): String {
         if (myArray.isEmpty()) {
             return ""
         }
@@ -19,24 +17,25 @@ open class DataConverter {
 
     @TypeConverter
     fun stringToArray(arrayString: String): IntArray {
-        var holesList: List<String> = arrayString.split(",") // return a list of strings
+        val holesList: List<String> = arrayString.split(",") // return a list of strings
 
         val holeInts = IntArray(holesList.size) { holesList[it].toInt() }
 
         return holeInts
     }
 
-    @TypeConverter
-    fun toDate(date: Long?): Date? {
-        return date?.let { Date(it) }
-    }
+//    @TypeConverter
+//    fun toDate(date: Long?): Date? {
+//        return date?.let { Date(it) }
+//    }
 
-    @TypeConverter
-    fun fromDate(date: Date?): Long? {
-        return date?.time
-    }
+//    @TypeConverter
+//    fun fromDate(date: Date?): Long? {
+//        return date?.time
+//    }
+
     @TypeConverter      // used for the notes in the course file
-    fun stringArrayToString(myArray: Array<String>): String? {
+    fun stringArrayToString(myArray: Array<String>): String {
         if (myArray.isEmpty()) {
             return ""
         }

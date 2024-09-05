@@ -5,8 +5,6 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Upsert
-import com.golfpvcc.teamscore_rev4.database.model.CourseRecord
-import com.golfpvcc.teamscore_rev4.database.model.JunkRecord
 import com.golfpvcc.teamscore_rev4.database.model.PlayerJunkRecord
 
 @Dao

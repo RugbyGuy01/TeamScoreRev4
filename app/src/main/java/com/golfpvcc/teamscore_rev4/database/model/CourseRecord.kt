@@ -10,7 +10,7 @@ data class CourseRecord(
     val mUsstate: String? = "NC",
     val mPar: IntArray = IntArray(HOLE_ARRAY_SIZE),
     val mHandicap: IntArray = IntArray(HOLE_ARRAY_SIZE),   // gross scores,
-    val mNotes:Array<String> = Array<String>(HOLE_ARRAY_SIZE){ "" },   // gross scores,
+    val mNotes:Array<String> = Array(HOLE_ARRAY_SIZE){ "" },   // gross scores,
     @PrimaryKey(autoGenerate = true)    // default is false
     val mId: Int = 0
 )

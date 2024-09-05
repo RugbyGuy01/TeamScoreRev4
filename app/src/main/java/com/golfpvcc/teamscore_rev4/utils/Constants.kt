@@ -5,7 +5,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import com.golfpvcc.teamscore_rev4.database.model.CourseRecord
 var REV_DATE = buildTime()
-const val REVISION = 2.1
+const val REVISION = 2.2
+
 const val VIN_LIGHT_GRAY = 0xFFE0E0E0
 const val DISPLAY_HOLE_NUMBER = 0xFF48EFF0
 const val DISPLAY_NOTE_ON_HOLE = 0xFFFDAFFF
@@ -88,8 +89,6 @@ const val USER_CANCEL = 100
 const val USER_SAVE = 101
 const val USER_TEXT_SAVE = 102
 const val USER_TEXT_UPDATE = 103
-const val NINE_GAME_PLAYERS = 3
-const val BACKUP_FILE_NAME = "TeamScore.bkp"
 
 object Constants {
         val courseDetailPlaceHolder = CourseRecord(

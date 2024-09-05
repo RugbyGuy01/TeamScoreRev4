@@ -6,7 +6,6 @@ import androidx.room.Delete
 import androidx.room.Query
 import androidx.room.Upsert
 import com.golfpvcc.teamscore_rev4.database.model.CourseRecord
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface CourseDao {

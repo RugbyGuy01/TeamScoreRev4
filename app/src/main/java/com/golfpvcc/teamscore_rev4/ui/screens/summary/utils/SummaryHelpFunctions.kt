@@ -310,12 +310,12 @@ fun SummaryViewModel.calculatePlayerNineScores() {
 }
 
 fun SummaryViewModel.calculateABCD_Scores() {
-    var gameABCD = GameABCD()
+    var gameABCD = GameABCD(state.mPlayerSummary.size)
     var currentHole: Int = 0
 
     while (currentHole < TOTAL_18_HOLE) { // holes 1 to 18
         gameABCD.clear()
-        for ((idx, playerSummary) in state.mPlayerSummary.withIndex()) {       // add each player score to 9' Class
+        for ((idx, playerSummary) in state.mPlayerSummary.withIndex()) {       // add each player score to abcd Class
             if (0 < playerSummary.mPlayer.mScore[currentHole]) {
                 val playerNetScore =
                     playerSummary.mPlayer.mScore[currentHole] - playerSummary.mPlayer.mStokeHole[currentHole]

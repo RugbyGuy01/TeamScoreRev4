@@ -52,7 +52,6 @@ import com.golfpvcc.teamscore_rev4.utils.BIRDIES_ON_HOLE
 import com.golfpvcc.teamscore_rev4.utils.SCORE_CARD_REC_ID
 import com.golfpvcc.teamscore_rev4.utils.DOUBLE_TEAM_SCORE
 import com.golfpvcc.teamscore_rev4.utils.FRONT_NINE_DISPLAY
-import com.golfpvcc.teamscore_rev4.utils.FRONT_NINE_TOTAL_DISPLAYED
 import com.golfpvcc.teamscore_rev4.utils.YELLOW_GETS_1_STROKES
 import com.golfpvcc.teamscore_rev4.utils.ORANGE_GETS_2_STROKES
 import com.golfpvcc.teamscore_rev4.utils.PURPLE_TWO_UNDER_PAR

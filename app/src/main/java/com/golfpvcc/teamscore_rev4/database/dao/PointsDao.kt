@@ -3,7 +3,6 @@ package com.golfpvcc.teamscore_rev4.database.dao
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Upsert
-import com.golfpvcc.teamscore_rev4.database.model.PlayerRecord
 import com.golfpvcc.teamscore_rev4.database.model.PointsRecord
 
 @Dao

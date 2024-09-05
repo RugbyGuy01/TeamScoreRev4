@@ -1,6 +1,7 @@
 package com.golfpvcc.teamscore_rev4.database.room
 
 import android.content.Context
+import android.os.Looper
 import android.widget.Toast
 import com.golfpvcc.teamscore_rev4.TeamScoreCardApp
 import com.golfpvcc.teamscore_rev4.utils.DATABASE_NAME
@@ -24,7 +25,7 @@ class WriteReadExternalFile(val context: Context) {
 
             val bufferSize = 8 * 1024
             val buffer = ByteArray(bufferSize)
-            var bytesRead = bufferSize
+            var bytesRead: Int
             val inputDb: InputStream = FileInputStream(databaseFp)
 
             while ((inputDb.read(buffer, 0, bufferSize)
@@ -35,6 +36,9 @@ class WriteReadExternalFile(val context: Context) {
             backupOutput.flush()
             backupOutput.close()    // close backup file
             inputDb.close()      // close database file
+            Looper.prepare() // to be able to make toast
+            Toast.makeText(context, "Backup file save at ${databaseFp.absoluteFile}", Toast.LENGTH_LONG).show()
+            Looper.loop()
         }
     }
 
@@ -50,7 +54,7 @@ class WriteReadExternalFile(val context: Context) {
 
                 val bufferSize = 8 * 1024
                 val buffer = ByteArray(bufferSize)
-                var bytesRead = bufferSize
+                var bytesRead: Int
                 val restoreDb: OutputStream = FileOutputStream(databaseFp)
                 while ((backupInput.read(buffer, 0, bufferSize)
                         .also { inputStream -> bytesRead = inputStream }) > 0
@@ -60,6 +64,10 @@ class WriteReadExternalFile(val context: Context) {
                 restoreDb.flush()
                 backupInput.close()    // close backup file
                 restoreDb.close()      // close database file
+                Looper.prepare() // to be able to make toast
+                Toast.makeText(context, "Restore file ${databaseFp.absoluteFile}", Toast.LENGTH_LONG).show()
+                Looper.loop()
+
             }
         }
     }
