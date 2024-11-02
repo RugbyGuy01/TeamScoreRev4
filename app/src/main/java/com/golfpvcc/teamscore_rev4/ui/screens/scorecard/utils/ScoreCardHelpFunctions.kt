@@ -109,15 +109,13 @@ fun ScoreCardViewModel.updatePlayersTeamScoreCells(
     nineGameScores.clearTotals()
 
     for (player in playerHeading) {
-        if (0 < player.mScore[currentHole]) {
-            this.updatePlayerDisplayScore(
-                player,
-                displayScreenMode,
-                currentHole,
-                holePar,
-                nineGameScores
-            )
-        }
+        this.updatePlayerDisplayScore(
+            player,
+            displayScreenMode,
+            currentHole,
+            holePar,
+            nineGameScores
+        )
 
         updateTeamDisplayScore(
             displayScreenMode,
@@ -171,7 +169,7 @@ fun updateTeamDisplayScore(
 
         DISPLAY_MODE_STABLEFORD,
         DISPLAY_MODE_POINT_QUOTA,
-        -> {   // used field are score flags value, Team are all player score added
+            -> {   // used field are score flags value, Team are all player score added
             teamPlayerScoreCells[currentHole] += player.mDisplayScore[currentHole]
 
             if (0 < teamUsedMask) {
@@ -186,6 +184,7 @@ fun updateTeamDisplayScore(
         }
     }
 }
+
 //End of score card 9 hole score card
 //current hole 8 Set total = true
 //current hole 17 Set total = true
@@ -194,7 +193,7 @@ fun updateTeamDisplayScore(
 //current hole 5 Set total = true
 //current hole 11 Set total = true
 //current hole 17 Set total = true
-fun ScoreCardViewModel.setShowTotalsFlag(){
+fun ScoreCardViewModel.setShowTotalsFlag() {
     when (state.mWhatHoleIsBeingDisplayed) {
 
         FRONT_NINE_IS_DISPLAYED, BACK_NINE_IS_DISPLAYED -> {
@@ -243,6 +242,7 @@ fun ScoreCardViewModel.setShowTotalsFlag(){
         }
     }
 }
+
 //End of score card 9 hole score card
 //current hole 8 Set total = true
 //current hole 17 Set total = true
@@ -251,30 +251,32 @@ fun ScoreCardViewModel.setShowTotalsFlag(){
 //current hole 5 Set total = true
 //current hole 11 Set total = true
 //current hole 17 Set total = true
-fun ScoreCardViewModel.setWhatIsBeingDisplayed(){
+fun ScoreCardViewModel.setWhatIsBeingDisplayed() {
 
     when (state.mWhatHoleIsBeingDisplayed) {
         FRONT_NINE_IS_DISPLAYED, BACK_NINE_IS_DISPLAYED -> {
             if (state.mCurrentHole < FRONT_NINE_DISPLAY) {
                 state.mWhatHoleIsBeingDisplayed = FRONT_NINE_IS_DISPLAYED
             } else
-                state.mWhatHoleIsBeingDisplayed  = BACK_NINE_IS_DISPLAYED
+                state.mWhatHoleIsBeingDisplayed = BACK_NINE_IS_DISPLAYED
         }
 
         DISPLAY_MODE_X_6_6, DISPLAY_MODE_6_X_6, DISPLAY_MODE_6_6_X -> {
             if (state.mCurrentHole < 6) {
-                state.mWhatHoleIsBeingDisplayed  = DISPLAY_MODE_X_6_6
+                state.mWhatHoleIsBeingDisplayed = DISPLAY_MODE_X_6_6
             } else if (state.mCurrentHole < 12) {
-                state.mWhatHoleIsBeingDisplayed  = DISPLAY_MODE_6_X_6
+                state.mWhatHoleIsBeingDisplayed = DISPLAY_MODE_6_X_6
             } else {
-                state.mWhatHoleIsBeingDisplayed  = DISPLAY_MODE_6_6_X
+                state.mWhatHoleIsBeingDisplayed = DISPLAY_MODE_6_6_X
             }
         }
+
         else -> {
             state.mWhatHoleIsBeingDisplayed = FRONT_NINE_IS_DISPLAYED
         }
     }
 }
+
 fun displayTeamGrossScore(
     teamPlayerScoreCells: IntArray,
     teamUsedCells: IntArray,
@@ -350,15 +352,16 @@ fun ScoreCardViewModel.updatePlayerDisplayScore(
 ) {
     when (displayScreenMode) {
         DISPLAY_MODE_GROSS -> {
-            if (0 < playerHeading.mScore[currentHole]) {
-                playerHeading.mDisplayScore[currentHole] =
-                    playerHeading.mScore[currentHole]
-            }
+            playerHeading.mDisplayScore[currentHole] =
+                playerHeading.mScore[currentHole]
         }
 
         DISPLAY_MODE_NET -> {
             playerHeading.mDisplayScore[currentHole] =
                 playerHeading.mScore[currentHole] - playerHeading.mStokeHole[currentHole]
+
+            if(playerHeading.mDisplayScore[currentHole] < 0)
+                playerHeading.mDisplayScore[currentHole] = 0
         }
 
         DISPLAY_MODE_POINT_QUOTA -> {

@@ -186,8 +186,8 @@ open class ScoreCardViewModel() : ViewModel() {
     }
 
     fun changeScreen6_6_6_Mode() {
-        state = state.copy(mDisplayScreenModeText = "6 - 6 - 6")
         state.mWhatHoleIsBeingDisplayed = toggle_6_ScoreCard(state.mWhatHoleIsBeingDisplayed)
+        setWhatIsBeingDisplayed()   // what is being displayed on the screen
         repaintScreen()
     }
 
@@ -203,7 +203,7 @@ open class ScoreCardViewModel() : ViewModel() {
     fun getPlayerHoleScore(
         playerIdx: Int,
         idx: Int,
-    ): String { //display the player's score on the score card, howerver display 0 for point quota
+    ): String { //display the player's score on the score card, however display 0 for point quota
         val playerHoleScore: Int =
             (state.mPlayerHeading[playerIdx].mDisplayScore[idx])
         var displayPlayerHoleScore: String = "  "
@@ -301,6 +301,16 @@ open class ScoreCardViewModel() : ViewModel() {
             else -> "Error"
         }
         return (displayHoleText)
+    }
+
+    fun getDisplayModeText(): String {
+
+        val displayModeText: String = when (state.mWhatHoleIsBeingDisplayed) {
+            FRONT_NINE_IS_DISPLAYED, BACK_NINE_IS_DISPLAYED -> "6 - 6 - 6"
+            DISPLAY_MODE_X_6_6,DISPLAY_MODE_6_X_6, DISPLAY_MODE_6_6_X  -> "9 - 9"
+            else -> "Error 101"
+        }
+        return (displayModeText)
     }
 
     fun getStokeOnHolePlayerColor(playerDisplayHole: Int): Color {
@@ -586,15 +596,31 @@ open class ScoreCardViewModel() : ViewModel() {
     private fun doneScoringDialog() { //  Dialog Enter player scores function are below
         Log.d("HOLE", "doneScoringDialog current hole ${state.mCurrentHole}")
         state = state.copy(mDisplayEnterScoresDialog = false)
-        updatePlayersTeamScoreCells( // doneScoringDialog
-            state.mDisplayScreenMode,
-            state.mCurrentHole,
-            getParForHole(state.mCurrentHole),
-            state.mPlayerHeading
-        )
-        clearGrossAndNetButtons()   // clear the color button array
-        savePlayersScoresRecord()
-        setShowTotalsFlag()
+        if(playersScoreAreNotZero(state.mCurrentHole,state.mPlayerHeading))
+        {
+            updatePlayersTeamScoreCells( // doneScoringDialog
+                state.mDisplayScreenMode,
+                state.mCurrentHole,
+                getParForHole(state.mCurrentHole),
+                state.mPlayerHeading
+            )
+            clearGrossAndNetButtons()   // clear the color button array
+            savePlayersScoresRecord()
+            setShowTotalsFlag()         // advance to the next hole here
+        }
+    }
+
+    private fun playersScoreAreNotZero( // if no scores are entered, do not move to the next hole
+        currentHole:Int,
+        playerHeading: List<PlayerHeading>
+    ): Boolean {
+        var playersScoreEntered: Boolean = false
+
+        for (player in playerHeading) {
+            if(player.mScore[currentHole] > 0)
+                playersScoreEntered = true
+        }
+        return (playersScoreEntered)
     }
 
     private fun configureDialogGrossAndNetButtonColors() { //  Dialog Enter player scores function are below
@@ -665,8 +691,15 @@ open class ScoreCardViewModel() : ViewModel() {
     }
 
     private fun clearOneScore() { //  Dialog Enter player scores function are below
+        val playerIdx: Int = getDialogCurrentPlayer()
+        val currentHole = getCurrentHole()
+        state.mPlayerHeading[playerIdx].mTeamHole[currentHole] = TEAM_CLEAR_SCORE
+        state.mGrossButtonColor[playerIdx] = Color.LightGray
+        state.mNetButtonColor[playerIdx] = Color.LightGray
+
         scoreEnter(0)
         Log.d("VIN", "clearOneScore")
+        repaintScreen()
     }
 
     fun scoreEnter(score: Int) {    //  Dialog Enter player scores function are below
@@ -692,7 +725,7 @@ open class ScoreCardViewModel() : ViewModel() {
 
     fun getHighLiteActivePlayerColor(idx: Int): Color { //  Dialog Enter player scores function are below
         return if (idx == state.mDialogCurrentPlayer) {
-            Color.Yellow
+            Color.Red
         } else {
             Color.Transparent
         }

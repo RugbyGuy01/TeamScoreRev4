@@ -133,7 +133,7 @@ fun DisplayControlButtons(scoreCardViewModel: ScoreCardViewModel, navController:
     Spacer(modifier = Modifier.size(25.dp))
     DisplaySummaryButton(navController)
     Spacer(modifier = Modifier.size(20.dp))
-    DisplayModeDropDown(scoreCardViewModel::scoreCardActions, scoreCardViewModel.state.mGameNines)
+    DisplayModeDropDown(scoreCardViewModel::scoreCardActions, scoreCardViewModel.state.mGameNines, scoreCardViewModel.getDisplayModeText())
 
 }
 

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -21,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.ScoreCardActions
 
 @Composable
-fun DisplayModeDropDown(onAction: (ScoreCardActions) -> Unit, gameNines: Boolean) {
+fun DisplayModeDropDown(onAction: (ScoreCardActions) -> Unit, gameNines: Boolean, displayScoreText: String) {
 
     var expanded by remember { mutableStateOf(false) }
 
@@ -64,16 +65,17 @@ fun DisplayModeDropDown(onAction: (ScoreCardActions) -> Unit, gameNines: Boolean
                     onAction(ScoreCardActions.ScreenModePtQuote)
                     expanded = false
                 })
-            DropdownMenuItem({ Text(text = "6 - 6 - 6") }, onClick = {
-                onAction(ScoreCardActions.Screen6_6_6_Mode)
-                expanded = false
-            }
-            )
             if (gameNines) {
                 DropdownMenuItem(
                     { Text(text = "Nine Game") },
                     onClick = { onAction(ScoreCardActions.ScreenModeNineGame) })
             }
+            HorizontalDivider(thickness = 2.dp)
+            DropdownMenuItem({ Text(text = displayScoreText) }, onClick = {
+                onAction(ScoreCardActions.Screen6_6_6_Mode)
+                expanded = false
+            }
+            )
         }
     }
 }

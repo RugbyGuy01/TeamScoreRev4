@@ -39,7 +39,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
@@ -240,6 +239,8 @@ fun ConfigureJunkDialog(onAction: (SummaryActions) -> Unit, summaryViewModel: Su
                     .width(250.dp)
                     .padding(10.dp)
             ) {
+                Text(text = "Delete junk text to delete entry",
+                    maxLines = 3)
                 if (recToEdit != -1) {     // the function is called many time, if click junk record button then recToEdit record will be set
                     DisplayJunkRecordEditField(summaryViewModel, recToEdit)
                     { onAction(SummaryActions.UpdateJunkRecord(-1)) }

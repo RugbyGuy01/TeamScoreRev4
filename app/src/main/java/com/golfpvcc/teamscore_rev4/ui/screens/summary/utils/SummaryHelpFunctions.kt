@@ -336,15 +336,14 @@ fun SummaryViewModel.calculateABCD_Scores() {
 }
 
 fun toggle_6_ScoreCard(currentDisplayMode: Int): Int {
-    val newScreenMode: Int
-    newScreenMode =
-        if (currentDisplayMode == FRONT_NINE_IS_DISPLAYED || currentDisplayMode == BACK_NINE_IS_DISPLAYED)
+    val newScreenMode: Int = if (currentDisplayMode == FRONT_NINE_IS_DISPLAYED || currentDisplayMode == BACK_NINE_IS_DISPLAYED)
             DISPLAY_MODE_X_6_6
         else
             FRONT_NINE_IS_DISPLAYED
 
     return (newScreenMode)
 }
+
 
 // This function will calculate the summary of the player's round used by the summary page functions
 fun SummaryViewModel.calculatePlayerScoreSummary(
@@ -379,7 +378,8 @@ fun SummaryViewModel.calculatePlayerScoreSummary(
             PAR_ON_HOLE -> playerHeading.mPars++
             BOGGY_ON_HOLE -> playerHeading.mBogeys++
             DOUBLE_ON_HOLE -> playerHeading.mDouble++
-            else -> playerHeading.mOthers++
+            else -> if( playerHoleScore > DOUBLE_ON_HOLE )
+                playerHeading.mOthers++
         }
         currentHole++
     }

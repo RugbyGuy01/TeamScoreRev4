@@ -99,7 +99,7 @@ fun EnterPlayersScores(
     val state = scoreCardViewModel.state
     val currentHole: Int = state.mCurrentHole
     val holeHandicap: Int = scoreCardViewModel.getHoleHandicap(currentHole)
-
+    val par:Int = scoreCardViewModel.getParForHole(currentHole)
 
     if (state.mDisplayEnterScoresDialog) {
         if (state.mDialogDisplayJunkSelection) {
@@ -118,7 +118,7 @@ fun EnterPlayersScores(
                     Row(horizontalArrangement = Arrangement.Start) { // put the header test here
 
                         Column(modifier = Modifier.weight(.75f)) {
-                            DisplayCurrentHoleHeading(currentHole, holeHandicap)
+                            DisplayCurrentHoleHeading(currentHole, holeHandicap, par)
                             DisplayPlayerNameAndScoreHeading()
                             for (idx in rowPlayerNames.indices) {
                                 if (idx < MAX_PLAYERS) {
@@ -255,15 +255,15 @@ fun DisplayPlayerNameAndScoreHeading() {
 }
 
 @Composable
-fun DisplayCurrentHoleHeading(currentHole: Int, holeHandicap: Int) {
+fun DisplayCurrentHoleHeading(currentHole: Int, holeHandicap: Int, par: Int) {
     Row(
         modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "Current Hole ${currentHole + 1} Handicap $holeHandicap",
-            textAlign = TextAlign.Center,
+            text = "Current Hole ${currentHole + 1} Handicap $holeHandicap  Par $par",
+            textAlign = TextAlign.Left,
             modifier = Modifier
-                .width(300.dp)
+                .width(330.dp)
                 .padding(vertical = 5.dp),
             fontSize = 20.sp
         )
@@ -291,7 +291,6 @@ fun DisplayActionButtons(
     onAction: (DialogAction) -> Unit,
     modifier: Modifier,
 ) {
-
     Row(
         modifier = Modifier
             .padding(bottom = ROW_BOTTOM_PAD.dp)

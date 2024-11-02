@@ -1,9 +1,19 @@
+Revision 2.3 - 11/02/2024
+Fixed
+- On Junk screen - - How to delete Junk entries
+- Score Enter Screen - Add Par to the Enter Score screen
+- Score Enter Screen - Changed enter score cursor to Red.
+- Score Enter Screen - Clearing score should also clear the player's score card record and net/gross buttons
+- The 6-6-6 switching screen doesn't display current back nine
+- Change the 6-6-6 to 9-9 when displaying the 6-6-6 screen.
+- If enter scores are blank, don't move to the next hole.
+- Summary shouldn't include holes with zero score
 
-Revision 2.02 - 8/31/2024
+Revision 2.2 - 8/31/2024
 Fixed
 - On summary screen - ABCD game show A with zero with 3 players
 
-Revision 2.01 - 8/29/2024
+Revision 2.1 - 8/29/2024
 Fixed
 - Removing player from player setup does not remove the player from the score card.
 - Add course screen doesn't clear handicaps values when cancelled.
