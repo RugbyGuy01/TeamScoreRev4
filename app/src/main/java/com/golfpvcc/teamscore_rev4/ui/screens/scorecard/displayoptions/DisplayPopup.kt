@@ -19,7 +19,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.ScoreCardActions
+import com.golfpvcc.teamscore_rev4.utils.SCORE_CARD_COURSE_NAME_TEXT
 
 @Composable
 fun DisplayModeDropDown(onAction: (ScoreCardActions) -> Unit, gameNines: Boolean, displayScoreText: String) {
@@ -28,14 +30,15 @@ fun DisplayModeDropDown(onAction: (ScoreCardActions) -> Unit, gameNines: Boolean
 
     Box(
         modifier = Modifier
-            .height(40.dp)
-            .width(110.dp)
+            .height(25.dp)  // 40
+            .width(110.dp)  // 110
             .padding(2.dp)
             .clickable { expanded = true }      // this causes the popup to be displayed
             .background(color = Color.Yellow),
         contentAlignment = Alignment.Center
     ) {
-        Text(text = "Display Mode")
+        Text(text = "Display Mode",
+            fontSize = SCORE_CARD_COURSE_NAME_TEXT.sp)
 
         DropdownMenu(
             expanded = expanded,

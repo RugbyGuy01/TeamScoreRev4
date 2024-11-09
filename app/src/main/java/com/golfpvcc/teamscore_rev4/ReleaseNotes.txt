@@ -1,3 +1,12 @@
+Revision 2.5 - XX/XX/XXXX
+Fixed
+
+Revision 2.4 - 11/09/2024
+Fixed
+- Move display mode button to the top of the screen
+- COLOR_ENTER_SCORE_CURSOR Changed the enter player score color
+- Add five some to the Player's screen.
+
 Revision 2.3 - 11/02/2024
 Fixed
 - On Junk screen - - How to delete Junk entries

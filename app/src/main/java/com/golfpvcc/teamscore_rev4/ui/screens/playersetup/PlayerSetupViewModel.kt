@@ -15,8 +15,10 @@ import com.golfpvcc.teamscore_rev4.database.model.ScoreCardRecord
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.getLocalDate
 import com.golfpvcc.teamscore_rev4.utils.BACK_NINE_TOTAL_DISPLAYED
 import com.golfpvcc.teamscore_rev4.utils.DISPLAY_SCORE_CARD_SCREEN
+import com.golfpvcc.teamscore_rev4.utils.MAX_PLAYERS
 import com.golfpvcc.teamscore_rev4.utils.MINIMUM_LEN_OF_PLAYER_NAME
 import com.golfpvcc.teamscore_rev4.utils.SCORE_CARD_REC_ID
+import com.golfpvcc.teamscore_rev4.utils.TOTAL_18_HOLE
 import com.golfpvcc.teamscore_rev4.utils.USER_CANCEL
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -231,14 +233,15 @@ data class ScoreCardState(
     val mCourseId: Int = 0,      // the current course we are using for the score card
     val mCurrentHole: Int = 0,      // the current hole being played in the game
     val mStartingHole: String = "1",
-    val mPar: IntArray = IntArray(18),        // the current course Par,         // the current course Par
-    val mHandicap: IntArray = IntArray(18),        // the current course Par,       // current course handicap
-    val mTeamHoleScore: IntArray = IntArray(18),
-    val mTeamTotalScore: IntArray = IntArray(18),
-    val mHoleUsedByPlayers: IntArray = IntArray(18),
-    val mPlayerRecords: Array<PlayerRecord> = Array<PlayerRecord>(4) { PlayerRecord() },
+    val mPar: IntArray = IntArray(TOTAL_18_HOLE),        // the current course Par,         // the current course Par
+    val mHandicap: IntArray = IntArray(TOTAL_18_HOLE),        // the current course Par,       // current course handicap
+    val mTeamHoleScore: IntArray = IntArray(TOTAL_18_HOLE),
+    val mTeamTotalScore: IntArray = IntArray(TOTAL_18_HOLE),
+    val mHoleUsedByPlayers: IntArray = IntArray(TOTAL_18_HOLE),
+    val mPlayerRecords: Array<PlayerRecord> = Array<PlayerRecord>(MAX_PLAYERS) { PlayerRecord() },
     val scoreCardRecId: Int = SCORE_CARD_REC_ID,    // score card record ID
     val observer: Boolean = false,
     val mNextScreen: Int = 0,
 )
 
+// Have points table

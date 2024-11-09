@@ -32,6 +32,7 @@ import com.golfpvcc.teamscore_rev4.ui.navigation.TeamScoreScreen
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.PlayerHeading
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.ScoreCardViewModel
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.dialogenterscore.DialogAction
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.displayoptions.DisplayModeDropDown
 import com.golfpvcc.teamscore_rev4.utils.COLOR_NEXT_HOLE
 import com.golfpvcc.teamscore_rev4.utils.COLOR_PREV_HOLE
 import com.golfpvcc.teamscore_rev4.utils.COLOR_SCREEN_MODE
@@ -58,18 +59,20 @@ sealed class ScoreCardActions {
 @Composable
 fun DisplayCourseName(scoreCardViewModel: ScoreCardViewModel) {
     Row {
+        DisplayModeDropDown(scoreCardViewModel::scoreCardActions, scoreCardViewModel.state.mGameNines, scoreCardViewModel.getDisplayModeText())
+        Spacer(modifier = Modifier.size(10.dp))
         Text(
             text = scoreCardViewModel.state.mCourseName,
             fontSize = SCORE_CARD_COURSE_NAME_TEXT.sp,
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(4.dp),
+            modifier = Modifier.padding(2.dp),
         )
         Spacer(modifier = Modifier.size(10.dp))
         Text(
             text = "Display: ${scoreCardViewModel.state.mDisplayScreenModeText}",
             fontSize = SCORE_CARD_COURSE_NAME_TEXT.sp,
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(4.dp),
+            modifier = Modifier.padding(2.dp),
         )
     }
 }

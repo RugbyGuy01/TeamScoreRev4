@@ -5,7 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import com.golfpvcc.teamscore_rev4.database.model.CourseRecord
 var REV_DATE = buildTime()
-const val REVISION = 2.3
+const val REVISION = 2.4
 
 const val VIN_LIGHT_GRAY = 0xFFE0E0E0
 const val DISPLAY_HOLE_NUMBER = 0xFF48EFF0
@@ -19,6 +19,8 @@ const val MENU_ROW_LIGHT_GRAY = 0xFFDBDBD8
 const val COLOR_NEXT_HOLE = 0xFF5BC23F
 const val COLOR_PREV_HOLE = 0xFFAB3654
 const val COLOR_SCREEN_MODE = 0xFF8389C2
+const val COLOR_ENTER_SCORE_CURSOR = 0xFFF0A1C5
+                                   //0xFFF0A1C5
 
 // Colors
 const val TEAM_SINGLE_NET_SCORE = 0xFF1BD914
@@ -56,7 +58,7 @@ const val BOGGY_ON_HOLE = 1
 const val DOUBLE_ON_HOLE = 2
 const val OTHER_ON_HOLE = 3
 const val SCORE_CARD_REC_ID = 2024
-const val MAX_PLAYERS = 4
+const val MAX_PLAYERS = 5
 const val MAX_PLAYER_NAME = 8
 const val MAX_HANDICAP = 2
 const val MAX_COURSE_YARDAGE = 5

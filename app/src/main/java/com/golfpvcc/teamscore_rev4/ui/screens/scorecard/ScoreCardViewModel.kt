@@ -48,6 +48,7 @@ import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.toggle_6_ScoreCard
 import com.golfpvcc.teamscore_rev4.utils.BACK_NINE_DISPLAY
 import com.golfpvcc.teamscore_rev4.utils.BACK_NINE_TOTAL_DISPLAYED
 import com.golfpvcc.teamscore_rev4.utils.BIRDIES_ON_HOLE
+import com.golfpvcc.teamscore_rev4.utils.COLOR_ENTER_SCORE_CURSOR
 
 import com.golfpvcc.teamscore_rev4.utils.SCORE_CARD_REC_ID
 import com.golfpvcc.teamscore_rev4.utils.DOUBLE_TEAM_SCORE
@@ -64,6 +65,7 @@ import com.golfpvcc.teamscore_rev4.utils.DISPLAY_HOLE_NUMBER
 import com.golfpvcc.teamscore_rev4.utils.DISPLAY_NOTE_ON_HOLE
 import com.golfpvcc.teamscore_rev4.utils.EAGLE_ON_HOLE
 import com.golfpvcc.teamscore_rev4.utils.HOLE_ARRAY_SIZE
+import com.golfpvcc.teamscore_rev4.utils.MAX_PLAYERS
 import com.golfpvcc.teamscore_rev4.utils.PQ_TARGET
 import com.golfpvcc.teamscore_rev4.utils.TEAM_CLEAR_SCORE
 import kotlinx.coroutines.Dispatchers
@@ -725,7 +727,7 @@ open class ScoreCardViewModel() : ViewModel() {
 
     fun getHighLiteActivePlayerColor(idx: Int): Color { //  Dialog Enter player scores function are below
         return if (idx == state.mDialogCurrentPlayer) {
-            Color.Red
+            Color(COLOR_ENTER_SCORE_CURSOR)
         } else {
             Color.Transparent
         }
@@ -735,9 +737,9 @@ open class ScoreCardViewModel() : ViewModel() {
 data class ScoreCard(
     var mGamePointsTable: List<PointsRecord> = emptyList(),
     var mHasDatabaseBeenRead: Boolean = false,
-    val mGrossButtonColor: Array<Color> = Array(4) { Color.LightGray },
-    val mNetButtonColor: Array<Color> = Array(4) { Color.LightGray },
-    val mJunkButtonColor: Array<Color> = Array(4) { Color.LightGray },
+    val mGrossButtonColor: Array<Color> = Array(MAX_PLAYERS) { Color.LightGray },
+    val mNetButtonColor: Array<Color> = Array(MAX_PLAYERS) { Color.LightGray },
+    val mJunkButtonColor: Array<Color> = Array(MAX_PLAYERS) { Color.LightGray },
     var mDisplayScreenMode: Int = DISPLAY_MODE_GROSS,
     val mDisplayScreenModeText: String = "Gross",        // what is being display now
     val mButtonScreenNextText: String = "Net",             // what will be display next

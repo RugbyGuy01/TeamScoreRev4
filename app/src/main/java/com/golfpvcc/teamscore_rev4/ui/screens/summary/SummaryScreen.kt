@@ -68,7 +68,6 @@ import com.golfpvcc.teamscore_rev4.utils.MENU_BUTTON_TEXT
 import com.golfpvcc.teamscore_rev4.utils.MENU_ROW_LIGHT_GRAY
 import com.golfpvcc.teamscore_rev4.utils.REVISION
 import com.golfpvcc.teamscore_rev4.utils.SUMMARY_BUTTON_TEXT
-import com.golfpvcc.teamscore_rev4.utils.SUMMARY_CARD_WIDTH
 import com.golfpvcc.teamscore_rev4.utils.SUMMARY_NAME_TEXT_SIZE
 import com.golfpvcc.teamscore_rev4.utils.SUMMARY_PAYOUT_COLOR
 import com.golfpvcc.teamscore_rev4.utils.SUMMARY_TEXT_SIZE
@@ -135,8 +134,10 @@ fun DisplayCourseName(summaryViewModel: SummaryViewModel) {
             .background(Color.White)
             .fillMaxWidth(),
     ) {
-        Text("Rev $REVISION Course Played: ${summaryViewModel.state.mCourseName} Played on ${summaryViewModel.state.mDatePlayed}",
-            fontSize = SUMMARY_TEXT_SIZE.sp)
+        Text(
+            "Rev $REVISION Course Played: ${summaryViewModel.state.mCourseName} Played on ${summaryViewModel.state.mDatePlayed}",
+            fontSize = SUMMARY_TEXT_SIZE.sp
+        )
     }
 }
 
@@ -168,12 +169,14 @@ fun DisplayMenuOptionDialogs(summaryViewModel: SummaryViewModel) {
 @Composable
 fun DisplayTeam18HolesScores(summaryViewModel: SummaryViewModel) {
     Card(
-        shape = RoundedCornerShape(8.dp),
+        Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(3.dp),
         colors = CardDefaults.cardColors(containerColor = Color.LightGray)
     ) {
         Column(
             Modifier
-                .padding(3.dp),
+                .fillMaxWidth()
+                .padding(5.dp),
         ) {
             TeamScore18HoleHeader()
             DisplayTeam18HolePointQuoteSummary(summaryViewModel)
@@ -186,59 +189,13 @@ fun DisplayTeam18HolesScores(summaryViewModel: SummaryViewModel) {
     }
 }
 
-@Composable
-fun Display6HolesSummary(summaryViewModel: SummaryViewModel) {
-    Row(
-        Modifier
-            .background(Color.White)
-            .width(SUMMARY_CARD_WIDTH.dp),
-    ) {
-        Text(text = "Six Six Six", Modifier.weight(2 / 4f), fontSize = SUMMARY_TEXT_SIZE.sp)
-        Text(
-            text = summaryViewModel.GetSixHoleSummary(DISPLAY_MODE_X_6_6),
-            Modifier.weight(.5f),
-            fontSize = SUMMARY_TEXT_SIZE.sp
-        )
-        Text(
-            text = summaryViewModel.GetSixHoleSummary(DISPLAY_MODE_6_X_6),
-            Modifier.weight(.5f),
-            fontSize = SUMMARY_TEXT_SIZE.sp
-        )
-        Text(
-            text = summaryViewModel.GetSixHoleSummary(DISPLAY_MODE_6_6_X),
-            Modifier.weight(.5f),
-            fontSize = SUMMARY_TEXT_SIZE.sp
-        )
-    }
-}
-
-@Composable
-fun DisplayABCDGameSummary(summaryViewModel: SummaryViewModel) {
-    val player = listOf("A", "B", "C", "D")
-    Row(
-        Modifier
-            .background(Color.White)
-            .width(SUMMARY_CARD_WIDTH.dp),
-    ) {
-        Text(text = "Game ABCD", Modifier.weight(2 / 4f), fontSize = SUMMARY_TEXT_SIZE.sp)
-        for ((idx, element) in summaryViewModel.state.mPlayerSummary.withIndex()) {
-            Text(
-                text = "${player[idx]} - ${summaryViewModel.getABCDGameScore(idx)}",
-                Modifier.weight(.5f),
-                fontSize = SUMMARY_TEXT_SIZE.sp
-            )
-        }
-    }
-}
-
 
 @Composable
 fun TeamScore18HoleHeader(modifier: Modifier = Modifier) {
     Row(
         Modifier
             .background(Color.LightGray)
-            //.fillMaxWidth()
-            .width(SUMMARY_CARD_WIDTH.dp),
+            .fillMaxWidth()
     ) {
         Text(text = "Team Summary", Modifier.weight(2 / 4f), fontSize = SUMMARY_TEXT_SIZE.sp)
         Text(text = "Front", Modifier.weight(.5f), fontSize = SUMMARY_TEXT_SIZE.sp)
@@ -252,7 +209,8 @@ fun DisplayTeam18HolePointQuoteSummary(summaryViewModel: SummaryViewModel) {
     Row(
         Modifier
             .background(Color.White)
-            .width(SUMMARY_CARD_WIDTH.dp),
+            .fillMaxWidth()
+            .padding(start = 5.dp),
     ) {
         Text(text = "Pt. Quote (used)", Modifier.weight(2 / 4f), fontSize = SUMMARY_TEXT_SIZE.sp)
         Text(
@@ -278,7 +236,8 @@ fun DisplayTeam18HolePointsSummary(summaryViewModel: SummaryViewModel) {
     Row(
         Modifier
             .background(Color.White)
-            .width(SUMMARY_CARD_WIDTH.dp),
+            .fillMaxWidth()
+            .padding(start =5.dp),
     ) {
         Text(text = "Points  (Quota)", Modifier.weight(2 / 4f), fontSize = SUMMARY_TEXT_SIZE.sp)
         Text(
@@ -304,7 +263,8 @@ fun DisplayTeam18HoleOverUnderSummary(summaryViewModel: SummaryViewModel) {
     Row(
         Modifier
             .background(Color.White)
-            .width(SUMMARY_CARD_WIDTH.dp),
+            .fillMaxWidth()
+            .padding(start =5.dp),
     ) {
         Text(text = "Score (O/U)", Modifier.weight(2 / 4f), fontSize = SUMMARY_TEXT_SIZE.sp)
         Text(
@@ -330,7 +290,8 @@ fun Display18HoleStablefordSummary(summaryViewModel: SummaryViewModel) {
     Row(
         Modifier
             .background(Color.White)
-            .width(SUMMARY_CARD_WIDTH.dp),
+            .fillMaxWidth()
+            .padding(start =5.dp),
     ) {
         Text(text = "Stableford (Used)", Modifier.weight(2 / 4f), fontSize = SUMMARY_TEXT_SIZE.sp)
         Text(
@@ -352,6 +313,53 @@ fun Display18HoleStablefordSummary(summaryViewModel: SummaryViewModel) {
 }
 
 @Composable
+fun Display6HolesSummary(summaryViewModel: SummaryViewModel) {
+    Row(
+        Modifier
+            .background(Color.White)
+            .fillMaxWidth()
+            .padding(start =5.dp),
+    ) {
+        Text(text = "Six Six Six", Modifier.weight(2 / 4f), fontSize = SUMMARY_TEXT_SIZE.sp)
+        Text(
+            text = summaryViewModel.GetSixHoleSummary(DISPLAY_MODE_X_6_6),
+            Modifier.weight(.5f),
+            fontSize = SUMMARY_TEXT_SIZE.sp
+        )
+        Text(
+            text = summaryViewModel.GetSixHoleSummary(DISPLAY_MODE_6_X_6),
+            Modifier.weight(.5f),
+            fontSize = SUMMARY_TEXT_SIZE.sp
+        )
+        Text(
+            text = summaryViewModel.GetSixHoleSummary(DISPLAY_MODE_6_6_X),
+            Modifier.weight(.5f),
+            fontSize = SUMMARY_TEXT_SIZE.sp
+        )
+    }
+}
+
+@Composable
+fun DisplayABCDGameSummary(summaryViewModel: SummaryViewModel) {
+    val player = listOf("A", "B", "C", "D", "E")    // MAX_PLAYERS
+    Row(
+        Modifier
+            .background(Color.White)
+            .fillMaxWidth()
+            .padding(start =5.dp),
+    ) {
+        Text(text = "ABCD Game", Modifier.weight(2 / 5f), fontSize = SUMMARY_TEXT_SIZE.sp)
+        for ((idx, element) in summaryViewModel.state.mPlayerSummary.withIndex()) {
+            Text(
+                text = "${player[idx]} - ${summaryViewModel.getABCDGameScore(idx)}",
+                Modifier.weight(.5f),
+                fontSize = SUMMARY_TEXT_SIZE.sp
+            )
+        }
+    }
+}
+
+@Composable
 fun DisplayPlayersTotalScore(state: State, onAction: (SummaryActions) -> Unit) {
     val playersRecord = state.mPlayerSummary
     Column(
@@ -369,7 +377,11 @@ fun DisplayPlayersTotalScore(state: State, onAction: (SummaryActions) -> Unit) {
 }
 
 @Composable
-fun DisplayPlayerScore(player: PlayerSummary, playerCount:Int, onAction: (SummaryActions) -> Unit) {
+fun DisplayPlayerScore(
+    player: PlayerSummary,
+    playerCount: Int,
+    onAction: (SummaryActions) -> Unit,
+) {
     Card(
         Modifier.fillMaxWidth(),
         border = BorderStroke(1.dp, Color.Black),
@@ -537,7 +549,7 @@ fun DisplayPlayerScoreLine2(player: PlayerSummary) {
 }
 
 @Composable
-fun DisplayPlayerScoreLine3(player: PlayerSummary, playerCount:Int) {
+fun DisplayPlayerScoreLine3(player: PlayerSummary, playerCount: Int) {
     Row(
         Modifier
             .background(Color.White)
@@ -552,7 +564,7 @@ fun DisplayPlayerScoreLine3(player: PlayerSummary, playerCount:Int) {
             text = "Quote: ${player.mQuote}",
             Modifier.weight(.5f), fontSize = SUMMARY_TEXT_SIZE.sp
         )
-        if(playerCount == NINE_PLAYERS) {
+        if (playerCount == NINE_PLAYERS) {
             Text(
                 text = "Nine Pts: ${player.mNineTotal}",
                 Modifier.weight(.5f),
