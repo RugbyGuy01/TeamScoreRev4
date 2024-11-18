@@ -3,7 +3,9 @@ package com.golfpvcc.teamscore_rev4.ui.screens.scorecard.dialogenterscore
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 
@@ -14,9 +16,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
@@ -26,7 +30,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
@@ -113,64 +119,79 @@ fun EnterPlayersScores(
                         .padding(2.dp),
                     shape = RoundedCornerShape(16.dp),
                 ) {
-                    DisplayEnterScoreHeading()
+//                    DisplayEnterScoreHeading() vpg 11/16/24
 
                     Row(horizontalArrangement = Arrangement.Start) { // put the header test here
-
-                        Column(modifier = Modifier.weight(.75f)) {
+                        Column(modifier = Modifier.weight(.75f)
+                        ) {
                             DisplayCurrentHoleHeading(currentHole, holeHandicap, par)
                             DisplayPlayerNameAndScoreHeading()
-                            for (idx in rowPlayerNames.indices) {
-                                if (idx < MAX_PLAYERS) {
-                                    Row(horizontalArrangement = Arrangement.Start) {
-                                        val playerName =
-                                            rowPlayerNames[idx].mHdcp + " - " + rowPlayerNames[idx].mName
+                            Column(modifier = Modifier
+                                .verticalScroll(rememberScrollState())) {
+                                for (idx in rowPlayerNames.indices) {
+                                    if (idx < MAX_PLAYERS) {
+                                        Row(horizontalArrangement = Arrangement.Start) {
+                                            val playerName =
+                                                rowPlayerNames[idx].mHdcp + " - " + rowPlayerNames[idx].mName
 
-                                        val playerStokeHoleColor =
-                                            scoreCardViewModel.getStokeOnHolePlayerColor( //determine the stokes a player gets on hole by the color
-                                                rowPlayerNames[idx].mStokeHole[currentHole]
-                                            )
+                                            val playerStokeHoleColor =
+                                                scoreCardViewModel.getStokeOnHolePlayerColor( //determine the stokes a player gets on hole by the color
+                                                    rowPlayerNames[idx].mStokeHole[currentHole]
+                                                )
 
 
-                                        val backgroundColorForStokes: Color =
-                                            scoreCardViewModel.getHighLiteActivePlayerColor(idx)
-                                        val playerHoleScore =
-                                            scoreCardViewModel.getDialogPlayerHoleScore(
+                                            val backgroundColorForStokes: Color =
+                                                scoreCardViewModel.getHighLiteActivePlayerColor(idx)
+                                            val playerHoleScore =
+                                                scoreCardViewModel.getDialogPlayerHoleScore(
+                                                    idx,
+                                                    currentHole
+                                                )
+
+                                            DisplayPlayerNames(
+                                                playerName,
+                                                playerStokeHoleColor,
+                                                backgroundColorForStokes,
+                                                playerHoleScore,
                                                 idx,
-                                                currentHole
+                                                onAction
                                             )
-
-                                        DisplayPlayerNames(
-                                            playerName,
-                                            playerStokeHoleColor,
-                                            backgroundColorForStokes,
-                                            playerHoleScore,
-                                            idx,
-                                            onAction
-                                        )
-                                        DisplayTeamGrossNetButton(scoreCardViewModel, idx, onAction)
-                                        DisplayJunkButton(
-                                            scoreCardViewModel,
-                                            idx,
-                                            currentHole,
-                                            onAction
-                                        )
+                                            DisplayTeamGrossNetButton(
+                                                scoreCardViewModel,
+                                                idx,
+                                                onAction
+                                            )
+                                            DisplayJunkButton(
+                                                scoreCardViewModel,
+                                                idx,
+                                                currentHole,
+                                                onAction
+                                            )
+                                        }
                                     }
                                 }
                             }
                         }
 
-                        Column(
-                            modifier = Modifier
-                                .weight(.4f)
-                                .background(Color.Cyan, shape = RoundedCornerShape(20.dp))
-                                .padding(top = 8.dp, start = 5.dp, end = 4.dp, bottom = 0.dp)
+                        Column(modifier = Modifier
+                            .weight(.4f)
                         ) {
-                            val modifier: Modifier = Modifier
-                                .width(TEXT_WIDTH.dp)
-                                .background(Color.LightGray)
-                            DisplayKeyPad(onAction, modifier)
-                            DisplayActionButtons(onAction, modifier)
+                            Spacer(modifier = Modifier.width(20.dp))
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(Color.Cyan, shape = RoundedCornerShape(20.dp))
+                            ) {
+                                DisplayEnterScoreHeading()
+                                val modifier: Modifier = Modifier
+                                    .width(TEXT_WIDTH.dp)
+                                    .background(Color.LightGray)
+                                Column(modifier = Modifier
+                                    .padding(top = 50.dp, start = 10.dp, end = 4.dp, bottom = 0.dp)) {
+                                    DisplayKeyPad(onAction, modifier)
+                                    DisplayActionButtons(onAction, modifier)
+                                }
+                            }
                         }
                     }
                 }
@@ -263,7 +284,7 @@ fun DisplayCurrentHoleHeading(currentHole: Int, holeHandicap: Int, par: Int) {
             text = "Current Hole ${currentHole + 1} Handicap $holeHandicap  Par $par",
             textAlign = TextAlign.Left,
             modifier = Modifier
-                .width(330.dp)
+                .width(340.dp)
                 .padding(vertical = 5.dp),
             fontSize = 20.sp
         )
@@ -319,6 +340,7 @@ fun DisplayActionButtons(
 fun DisplayKeyPad(
     onAction: (DialogAction) -> Unit, modifier: Modifier,
 ) {
+
     Row(
         modifier = Modifier
             .padding(bottom = ROW_BOTTOM_PAD.dp)

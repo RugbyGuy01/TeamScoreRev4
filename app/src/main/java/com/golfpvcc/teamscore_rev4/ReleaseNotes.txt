@@ -1,5 +1,10 @@
-Revision 2.5 - XX/XX/XXXX
+Revision 2.6 - xx/xx/xxxx
+
+Revision 2.5 - 11/18/2024
 Fixed
+- Enter Score Screen
+  Add scrolling to players area
+  Moved "Enter Score" text
 
 Revision 2.4 - 11/09/2024
 Fixed
