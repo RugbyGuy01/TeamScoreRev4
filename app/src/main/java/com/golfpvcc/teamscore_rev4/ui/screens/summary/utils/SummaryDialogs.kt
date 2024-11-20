@@ -426,7 +426,8 @@ fun AboutDialog(onAction: (SummaryActions) -> Unit) {
                 text = "Team Score App.\n" +
                         " Written by Vinnie Gamble\n\n" +
                         "Contact: Vgamble@golfpvcc.com\n\n" +
-                        "Revision: $REVISION $REV_DATE",
+                        "Revision: $REVISION\n" +
+                        "Compiled: $REV_DATE",
                 fontSize = SUMMARY_DIALOG_TEXT_SIZE.sp,
             )
         },

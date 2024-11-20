@@ -8,7 +8,7 @@ import com.golfpvcc.teamscore_rev4.database.model.JunkRecord
 
 @Dao
 interface JunkDao {
-    @Query("Select * FROM JunkTable")
+    @Query("Select * FROM JunkTable ORDER BY mJunkName ASC")
     fun getAllJunkRecords(): List<JunkRecord>
 
     @Insert
