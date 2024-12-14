@@ -3,7 +3,6 @@ package com.golfpvcc.teamscore_rev4.ui.screens.scorecard.dialogenterscore
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,9 +29,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
@@ -49,7 +47,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import androidx.room.util.TableInfo
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.ScoreCardViewModel
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.ScoreCardActions
 import com.golfpvcc.teamscore_rev4.ui.theme.shape
@@ -60,7 +57,7 @@ const val TEXT_WIDTH = 65
 const val ROW_WIDTH = 500
 const val CARD_ROW_WIDTH = 650
 const val ROW_BOTTOM_PAD = 8
-const val PLAYER_TEXT_SIZE = 25
+const val PLAYER_TEXT_SIZE = 23
 const val PLAYER_NAME_WIDTH = 145
 const val PLAYER_SCORE_WIDTH = 55
 const val TEAM_SCORE_WIDTH = 70
@@ -105,7 +102,7 @@ fun EnterPlayersScores(
     val state = scoreCardViewModel.state
     val currentHole: Int = state.mCurrentHole
     val holeHandicap: Int = scoreCardViewModel.getHoleHandicap(currentHole)
-    val par:Int = scoreCardViewModel.getParForHole(currentHole)
+    val par: Int = scoreCardViewModel.getParForHole(currentHole)
 
     if (state.mDisplayEnterScoresDialog) {
         if (state.mDialogDisplayJunkSelection) {
@@ -117,20 +114,22 @@ fun EnterPlayersScores(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(2.dp),
-                    shape = RoundedCornerShape(16.dp),
+                    shape = RoundedCornerShape(8.dp),
                 ) {
-//                    DisplayEnterScoreHeading() vpg 11/16/24
-
                     Row(horizontalArrangement = Arrangement.Start) { // put the header test here
-                        Column(modifier = Modifier.weight(.75f)
+                        Column(
+                            modifier = Modifier.weight(.75f)
                         ) {
                             DisplayCurrentHoleHeading(currentHole, holeHandicap, par)
                             DisplayPlayerNameAndScoreHeading()
-                            Column(modifier = Modifier
-                                .verticalScroll(rememberScrollState())) {
+                            Column(
+                                modifier = Modifier
+                                    .verticalScroll(rememberScrollState())
+                            ) {
                                 for (idx in rowPlayerNames.indices) {
                                     if (idx < MAX_PLAYERS) {
-                                        Row(horizontalArrangement = Arrangement.Start) {
+                                        Row(horizontalArrangement = Arrangement.Start,
+                                            verticalAlignment = CenterVertically) {
                                             val playerName =
                                                 rowPlayerNames[idx].mHdcp + " - " + rowPlayerNames[idx].mName
 
@@ -156,15 +155,9 @@ fun EnterPlayersScores(
                                                 idx,
                                                 onAction
                                             )
-                                            DisplayTeamGrossNetButton(
+                                            DisplayTeamGrossNetJunkButton(
                                                 scoreCardViewModel,
                                                 idx,
-                                                onAction
-                                            )
-                                            DisplayJunkButton(
-                                                scoreCardViewModel,
-                                                idx,
-                                                currentHole,
                                                 onAction
                                             )
                                         }
@@ -173,8 +166,9 @@ fun EnterPlayersScores(
                             }
                         }
 
-                        Column(modifier = Modifier
-                            .weight(.4f)
+                        Column(
+                            modifier = Modifier
+                                .weight(.4f)
                         ) {
                             Spacer(modifier = Modifier.width(20.dp))
                             Box(
@@ -186,8 +180,15 @@ fun EnterPlayersScores(
                                 val modifier: Modifier = Modifier
                                     .width(TEXT_WIDTH.dp)
                                     .background(Color.LightGray)
-                                Column(modifier = Modifier
-                                    .padding(top = 50.dp, start = 10.dp, end = 4.dp, bottom = 0.dp)) {
+                                Column(
+                                    modifier = Modifier
+                                        .padding(
+                                            top = 50.dp,
+                                            start = 10.dp,
+                                            end = 4.dp,
+                                            bottom = 0.dp
+                                        )
+                                ) {
                                     DisplayKeyPad(onAction, modifier)
                                     DisplayActionButtons(onAction, modifier)
                                 }
@@ -201,25 +202,7 @@ fun EnterPlayersScores(
 }
 
 @Composable
-fun DisplayJunkButton(
-    scoreCardViewModel: ScoreCardViewModel,
-    idx: Int,
-    currentHole: Int,
-    onAction: (DialogAction) -> Unit,
-) {
-
-    DialogCard(
-        symbol = "Junk",
-        modifier = Modifier.padding(1.dp),
-        myFontSize = BUTTON_JUNK_FONT,
-        backGround = scoreCardViewModel.state.mJunkButtonColor[idx],
-        textColor = Color.Black,
-        onClick = { onAction(DialogAction.DisplayJunkDialog(idx)) }) {
-    }
-}
-
-@Composable
-fun DisplayTeamGrossNetButton(
+fun DisplayTeamGrossNetJunkButton(
     scoreCardViewModel: ScoreCardViewModel, idx: Int, onAction: (DialogAction) -> Unit,
 ) {
 
@@ -230,7 +213,7 @@ fun DisplayTeamGrossNetButton(
         textColor = Color.Black,
         onClick = { onAction(DialogAction.Net(idx)) },
         onLongClick = { onAction(DialogAction.NetLongClick(idx)) })
-    Spacer(modifier = Modifier.width(10.dp))
+    Spacer(modifier = Modifier.width(3.dp))
     DialogCard(
         symbol = "Gross",
         modifier = Modifier.padding(1.dp),
@@ -240,6 +223,15 @@ fun DisplayTeamGrossNetButton(
         onClick = { onAction(DialogAction.Gross(idx)) },
         onLongClick = { onAction(DialogAction.GrossLongClick(idx)) },
     )
+    Spacer(modifier = Modifier.width(3.dp))
+    DialogCard(
+        symbol = "Junk",
+        modifier = Modifier.padding(1.dp),
+        myFontSize = BUTTON_JUNK_FONT,
+        backGround = scoreCardViewModel.state.mJunkButtonColor[idx],
+        textColor = Color.Black,
+        onClick = { onAction(DialogAction.DisplayJunkDialog(idx)) }) {
+    }
 }
 
 @Composable

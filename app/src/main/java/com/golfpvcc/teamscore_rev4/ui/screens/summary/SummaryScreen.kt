@@ -68,6 +68,7 @@ import com.golfpvcc.teamscore_rev4.utils.MENU_BUTTON_TEXT
 import com.golfpvcc.teamscore_rev4.utils.MENU_ROW_LIGHT_GRAY
 import com.golfpvcc.teamscore_rev4.utils.REVISION
 import com.golfpvcc.teamscore_rev4.utils.SUMMARY_BUTTON_TEXT
+import com.golfpvcc.teamscore_rev4.utils.SUMMARY_CARD_WIDTH
 import com.golfpvcc.teamscore_rev4.utils.SUMMARY_NAME_TEXT_SIZE
 import com.golfpvcc.teamscore_rev4.utils.SUMMARY_PAYOUT_COLOR
 import com.golfpvcc.teamscore_rev4.utils.SUMMARY_TEXT_SIZE
@@ -237,7 +238,7 @@ fun DisplayTeam18HolePointsSummary(summaryViewModel: SummaryViewModel) {
         Modifier
             .background(Color.White)
             .fillMaxWidth()
-            .padding(start =5.dp),
+            .padding(start = 5.dp),
     ) {
         Text(text = "Points  (Quota)", Modifier.weight(2 / 4f), fontSize = SUMMARY_TEXT_SIZE.sp)
         Text(
@@ -264,7 +265,7 @@ fun DisplayTeam18HoleOverUnderSummary(summaryViewModel: SummaryViewModel) {
         Modifier
             .background(Color.White)
             .fillMaxWidth()
-            .padding(start =5.dp),
+            .padding(start = 5.dp),
     ) {
         Text(text = "Score (O/U)", Modifier.weight(2 / 4f), fontSize = SUMMARY_TEXT_SIZE.sp)
         Text(
@@ -291,7 +292,7 @@ fun Display18HoleStablefordSummary(summaryViewModel: SummaryViewModel) {
         Modifier
             .background(Color.White)
             .fillMaxWidth()
-            .padding(start =5.dp),
+            .padding(start = 5.dp),
     ) {
         Text(text = "Stableford (Used)", Modifier.weight(2 / 4f), fontSize = SUMMARY_TEXT_SIZE.sp)
         Text(
@@ -318,7 +319,7 @@ fun Display6HolesSummary(summaryViewModel: SummaryViewModel) {
         Modifier
             .background(Color.White)
             .fillMaxWidth()
-            .padding(start =5.dp),
+            .padding(start = 5.dp),
     ) {
         Text(text = "Six Six Six", Modifier.weight(2 / 4f), fontSize = SUMMARY_TEXT_SIZE.sp)
         Text(
@@ -346,7 +347,7 @@ fun DisplayABCDGameSummary(summaryViewModel: SummaryViewModel) {
         Modifier
             .background(Color.White)
             .fillMaxWidth()
-            .padding(start =5.dp),
+            .padding(start = 5.dp),
     ) {
         Text(text = "ABCD Game", Modifier.weight(2 / 5f), fontSize = SUMMARY_TEXT_SIZE.sp)
         for ((idx, element) in summaryViewModel.state.mPlayerSummary.withIndex()) {
@@ -393,7 +394,7 @@ fun DisplayPlayerScore(
         Column(
             Modifier
                 .padding(3.dp)
-                .width(550.dp)
+                .width(SUMMARY_CARD_WIDTH.dp)
         ) {
             DisplayPlayerNameAndScore(player, onAction)
             HorizontalDivider(thickness = 2.dp)
@@ -402,6 +403,37 @@ fun DisplayPlayerScore(
             DisplayPlayerScoreLine3(player, playerCount)
             HorizontalDivider(thickness = 2.dp, color = Color.Red)
             DisplayPlayerScorePayouts(player)
+            Display9sPayout(player)
+        }
+    }
+}
+/*
+A - 11  6
+B - 8   9 3
+C - 17
+
+ */
+@Composable
+fun Display9sPayout(player: PlayerSummary) {
+
+    Row(
+        Modifier
+            .background(Color(SUMMARY_PAYOUT_COLOR))
+            .padding(4.dp)
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(20.dp)
+    ) {
+        if(player.mNinesPayOut.mFirstName.isNotEmpty()) {
+            Text(
+                text = "Owes: ${player.mNinesPayOut.mFirstName} Pts ${player.mNinesPayOut.mPayFirstAmount} ",
+                fontSize = SUMMARY_TEXT_SIZE.sp
+            )
+        }
+        if(player.mNinesPayOut.mSecondName.isNotEmpty()) {
+            Text(
+                text = "${player.mNinesPayOut.mSecondName} Pts ${player.mNinesPayOut.mPaySecondAmount}",
+                fontSize = SUMMARY_TEXT_SIZE.sp
+            )
         }
     }
 }
@@ -426,11 +458,6 @@ fun DisplayPlayerScorePayouts(player: PlayerSummary) {
         playerJunkPayoutList = player.mJunkPayoutList.subList(newStart, totalRecords)
         DisplayPayoutRow(playerJunkPayoutList)
     }
-
-}
-
-fun Row(`modifier`: Modifier, horizontalArrangement: Arrangement.HorizontalOrVertical) {
-
 }
 
 @Composable
@@ -482,7 +509,7 @@ fun DisplayPlayerNameAndScore(player: PlayerSummary, onAction: (SummaryActions) 
         Spacer(modifier = Modifier.width(15.dp))
         Text(
             text = player.mPlayer.mHdcp + "-" + player.mPlayer.mName,
-            Modifier.weight(.5f),
+            Modifier.weight(.6f),
             fontSize = SUMMARY_NAME_TEXT_SIZE.sp,
             color = Color.Blue
         )

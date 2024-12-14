@@ -20,6 +20,7 @@ import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.HDCP_HEADER
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.NINE_PLAYERS
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.NineGame
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.PAR_HEADER
+import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.NineGamePayout
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.setPlayerStrokeHoles
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.PlayerSummary
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.PlayerJunkPayoutRecord
@@ -62,7 +63,8 @@ fun SummaryViewModel.updateScoreCardState(scoreCardWithPlayers: ScoreCardWithPla
             mHdcp = scoreCardWithPlayers.playerRecords[idx].mHandicap,
             mScore = scoreCardWithPlayers.playerRecords[idx].mScore,
             mTeamHole = scoreCardWithPlayers.playerRecords[idx].mTeamHole,
-        ) // add the player's name to the score card
+
+            ) // add the player's name to the score card
         state.mPlayerSummary += PlayerSummary(mPlayer = tmpPlayer)
         if (hdcpCell != null) {
             setPlayerStrokeHoles(state.mPlayerSummary[idx].mPlayer, hdcpCell.mHole)
@@ -208,7 +210,7 @@ fun SummaryViewModel.calculate_6_6_6_Scores() {
     val parCell: HdcpParHoleHeading? = state.hdcpParHoleHeading.find { it.vinTag == PAR_HEADER }
     var teamPoints: TeamPoints
     state.mFirst_6_Holes = 0
-    state.mSecond_6_Holes =0
+    state.mSecond_6_Holes = 0
     state.mThird_6_Holes = 0
 
     if (parCell != null) {
@@ -218,21 +220,21 @@ fun SummaryViewModel.calculate_6_6_6_Scores() {
                 playerHeading = playerSummary,
                 holePar = parCell.mHole,
             )
-            state.mFirst_6_Holes +=  teamPoints.teamUsedPoints
+            state.mFirst_6_Holes += teamPoints.teamUsedPoints
 
             teamPoints = getTotalPlayerScore(
                 whatHoles = DISPLAY_MODE_6_X_6,
                 playerHeading = playerSummary,
                 holePar = parCell.mHole,
             )
-            state.mSecond_6_Holes +=  teamPoints.teamUsedPoints
+            state.mSecond_6_Holes += teamPoints.teamUsedPoints
 
             teamPoints = getTotalPlayerScore(
                 whatHoles = DISPLAY_MODE_6_6_X,
                 playerHeading = playerSummary,
                 holePar = parCell.mHole,
             )
-            state.mThird_6_Holes +=  teamPoints.teamUsedPoints
+            state.mThird_6_Holes += teamPoints.teamUsedPoints
         }
         Log.d("666", "calculate_6_6_6_Scores first 6 ${state.mFirst_6_Holes}")
     }
@@ -249,7 +251,8 @@ fun SummaryViewModel.playerScoreSummary(playerJunkDao: PlayerJunkDao) {
             calculatePlayerJunkSummary(playerJunkDao, playerSummary, idx, state.mJunkRecordTable)
         }
         if (state.mPlayerSummary.count() == NINE_PLAYERS) {
-            calculatePlayerNineScores()     // and ABCD game
+            calculatePlayerNineScores()
+            calculateWhoPaysWho()
         }
         calculateABCD_Scores()
     }
@@ -298,14 +301,32 @@ fun SummaryViewModel.calculatePlayerNineScores() {
                 nineGameScores.addPlayerGrossScore(playerSummary.mPlayer.vinTag, playerNetScore)
             }
         }
-        nineGameScores.sort9Scores()    // calculate player's scores
-        var idx: Int = 0
+        nineGameScores.sort9Scores()  // Sort the 3 players score so the highest score is on top of the array
+//        var idx: Int = 0
 
         for (playerSummary in state.mPlayerSummary) {
             playerSummary.mNineTotal += nineGameScores.get9GameScore(playerSummary.mPlayer.vinTag)
-            idx++
+//            idx++
         }
         currentHole++       // do the next hole
+    }
+}
+
+fun SummaryViewModel.calculateWhoPaysWho() {
+    val calculate9PointPayout = NineGamePayout()
+
+    for (playerSummary in state.mPlayerSummary) { // add the player 9's point to the array
+        calculate9PointPayout.addPlayerNinePoints(
+            playerSummary.mPlayer.vinTag,
+            playerSummary.mPlayer.mName,
+            playerSummary.mNineTotal
+        )
+    }
+    calculate9PointPayout.sort9Points() // sort the array
+    calculate9PointPayout.calculateWhoOwesWho()
+    for (playerSummary in state.mPlayerSummary) {
+        playerSummary.mNinesPayOut =
+            calculate9PointPayout.get9GamePayOut(playerSummary.mPlayer.vinTag)
     }
 }
 
@@ -336,7 +357,8 @@ fun SummaryViewModel.calculateABCD_Scores() {
 }
 
 fun toggle_6_ScoreCard(currentDisplayMode: Int): Int {
-    val newScreenMode: Int = if (currentDisplayMode == FRONT_NINE_IS_DISPLAYED || currentDisplayMode == BACK_NINE_IS_DISPLAYED)
+    val newScreenMode: Int =
+        if (currentDisplayMode == FRONT_NINE_IS_DISPLAYED || currentDisplayMode == BACK_NINE_IS_DISPLAYED)
             DISPLAY_MODE_X_6_6
         else
             FRONT_NINE_IS_DISPLAYED
@@ -378,7 +400,7 @@ fun SummaryViewModel.calculatePlayerScoreSummary(
             PAR_ON_HOLE -> playerHeading.mPars++
             BOGGY_ON_HOLE -> playerHeading.mBogeys++
             DOUBLE_ON_HOLE -> playerHeading.mDouble++
-            else -> if( playerHoleScore > DOUBLE_ON_HOLE )
+            else -> if (playerHoleScore > DOUBLE_ON_HOLE)
                 playerHeading.mOthers++
         }
         currentHole++

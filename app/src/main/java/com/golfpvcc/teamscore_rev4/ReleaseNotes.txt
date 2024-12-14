@@ -1,4 +1,8 @@
-Revision 2.6 - xx/xx/xxxx
+Revision 2.6 - 12/14/2024
+- Display mode for 9s game does not clear popup on selection.
+- Clearing player's scores does not clear the team score
+- Player name of 8 character cause wrap on enter score screen.
+- total the 9s game points for each pay out for each player
 
 Revision 2.5.1 - 11/18/2024
 Fixed

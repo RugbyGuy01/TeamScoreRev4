@@ -24,7 +24,11 @@ import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.ScoreCardActions
 import com.golfpvcc.teamscore_rev4.utils.SCORE_CARD_COURSE_NAME_TEXT
 
 @Composable
-fun DisplayModeDropDown(onAction: (ScoreCardActions) -> Unit, gameNines: Boolean, displayScoreText: String) {
+fun DisplayModeDropDown(
+    onAction: (ScoreCardActions) -> Unit,
+    gameNines: Boolean,
+    displayScoreText: String,
+) {
 
     var expanded by remember { mutableStateOf(false) }
 
@@ -37,8 +41,10 @@ fun DisplayModeDropDown(onAction: (ScoreCardActions) -> Unit, gameNines: Boolean
             .background(color = Color.Yellow),
         contentAlignment = Alignment.Center
     ) {
-        Text(text = "Display Mode",
-            fontSize = SCORE_CARD_COURSE_NAME_TEXT.sp)
+        Text(
+            text = "Display Mode",
+            fontSize = SCORE_CARD_COURSE_NAME_TEXT.sp
+        )
 
         DropdownMenu(
             expanded = expanded,
@@ -71,7 +77,10 @@ fun DisplayModeDropDown(onAction: (ScoreCardActions) -> Unit, gameNines: Boolean
             if (gameNines) {
                 DropdownMenuItem(
                     { Text(text = "Nine Game") },
-                    onClick = { onAction(ScoreCardActions.ScreenModeNineGame) })
+                    onClick = {
+                        onAction(ScoreCardActions.ScreenModeNineGame)
+                        expanded = false
+                    })
             }
             HorizontalDivider(thickness = 2.dp)
             DropdownMenuItem({ Text(text = displayScoreText) }, onClick = {

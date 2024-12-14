@@ -1,11 +1,9 @@
 package com.golfpvcc.teamscore_rev4.ui.screens.summary
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.util.Log
 import android.util.Patterns
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
@@ -550,8 +548,21 @@ data class PlayerSummary(
     var mQuote: Int = 0,
     var mStableford: Int = 0,
     var mNineTotal: Int = 0,
+    var mNinesPayOut: NinePlayerPayout = NinePlayerPayout(), // What a player will get or payout to the other players
     var mPlayerJunkRecords: List<PlayerJunkRecord> = emptyList(),
     var mJunkPayoutList: MutableList<PlayerJunkPayoutRecord> = mutableListOf(),
+)
+
+data class NinePlayerPayout(
+    var mPlayerInx: Int = 0,
+    var mName:String = "",
+    var mPoints: Int = 0,
+    var mPayFirstInx: Int = 0,
+    var mFirstName:String ="",
+    var mPayFirstAmount: Int = 0,
+    var mPaySecondInx: Int = 0,
+    var mSecondName:String ="",
+    var mPaySecondAmount: Int = 0,
 )
 
 data class PlayerJunkPayoutRecord(

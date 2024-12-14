@@ -309,7 +309,7 @@ open class ScoreCardViewModel() : ViewModel() {
 
         val displayModeText: String = when (state.mWhatHoleIsBeingDisplayed) {
             FRONT_NINE_IS_DISPLAYED, BACK_NINE_IS_DISPLAYED -> "6 - 6 - 6"
-            DISPLAY_MODE_X_6_6,DISPLAY_MODE_6_X_6, DISPLAY_MODE_6_6_X  -> "9 - 9"
+            DISPLAY_MODE_X_6_6, DISPLAY_MODE_6_X_6, DISPLAY_MODE_6_6_X -> "9 - 9"
             else -> "Error 101"
         }
         return (displayModeText)
@@ -423,10 +423,10 @@ open class ScoreCardViewModel() : ViewModel() {
 
     fun advanceToTheNextHole() { // zero base, user is one the 9 nine hole
         Log.d("VIN", "advanceToTheNextHole  current hole ${state.mCurrentHole}")
-         if ((state.mCurrentHole + 1) < TOTAL_18_HOLE) {
+        if ((state.mCurrentHole + 1) < TOTAL_18_HOLE) {
             state = state.copy(mCurrentHole = (state.mCurrentHole + 1))
         } else {
-             state = state.copy(mCurrentHole = 0)
+            state = state.copy(mCurrentHole = 0)
         }
         if (state.mShowTotals) {
             state = state.copy(mShowTotals = false)
@@ -598,28 +598,28 @@ open class ScoreCardViewModel() : ViewModel() {
     private fun doneScoringDialog() { //  Dialog Enter player scores function are below
         Log.d("HOLE", "doneScoringDialog current hole ${state.mCurrentHole}")
         state = state.copy(mDisplayEnterScoresDialog = false)
-        if(playersScoreAreNotZero(state.mCurrentHole,state.mPlayerHeading))
-        {
-            updatePlayersTeamScoreCells( // doneScoringDialog
-                state.mDisplayScreenMode,
-                state.mCurrentHole,
-                getParForHole(state.mCurrentHole),
-                state.mPlayerHeading
-            )
+        updatePlayersTeamScoreCells( // doneScoringDialog
+            state.mDisplayScreenMode,
+            state.mCurrentHole,
+            getParForHole(state.mCurrentHole),
+            state.mPlayerHeading
+        )
+        if (playersScoreAreNotZero(state.mCurrentHole, state.mPlayerHeading)) {
             clearGrossAndNetButtons()   // clear the color button array
             savePlayersScoresRecord()
             setShowTotalsFlag()         // advance to the next hole here
         }
     }
 
-    private fun playersScoreAreNotZero( // if no scores are entered, do not move to the next hole
-        currentHole:Int,
-        playerHeading: List<PlayerHeading>
+    private fun playersScoreAreNotZero(
+        // if no scores are entered, do not move to the next hole
+        currentHole: Int,
+        playerHeading: List<PlayerHeading>,
     ): Boolean {
         var playersScoreEntered: Boolean = false
 
         for (player in playerHeading) {
-            if(player.mScore[currentHole] > 0)
+            if (player.mScore[currentHole] > 0)
                 playersScoreEntered = true
         }
         return (playersScoreEntered)

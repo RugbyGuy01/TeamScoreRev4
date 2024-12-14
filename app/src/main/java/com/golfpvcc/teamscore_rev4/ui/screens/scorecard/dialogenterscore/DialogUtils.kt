@@ -128,12 +128,12 @@ fun getTeamButtonColor(teamHoleMask: Int): Color {
     return resultColor
 }
 
-fun teamScoreTypeNet(teamHoleMask: Int): Boolean {        // return True if the score is a net score else false for a gross score
+fun teamScoreTypeNet(teamHoleMask: Int): Boolean {        // return True if the score is a Gross score else false for a Net score
 
     val grossSingle: Boolean = (teamHoleMask == TEAM_GROSS_SCORE)
     val grossDouble: Boolean = (teamHoleMask == (TEAM_GROSS_SCORE + DOUBLE_TEAM_SCORE))
 
-    return if (grossSingle or grossDouble) (true) else (false)
+    return if (grossSingle or grossDouble) (true) else (false)  // this warning is false, will return false if the mask is Team Net Score
 }
 
 @Composable
@@ -149,7 +149,7 @@ fun DisplayPlayerNames(
         text = playerName,
         modifier = Modifier
             .padding(5.dp)
-            .width(PLAYER_NAME_WIDTH.dp),
+            .width(PLAYER_NAME_WIDTH.dp),   // space used by the player's name
         style = TextStyle(background = playerStokeHoleColor),
         fontSize = PLAYER_TEXT_SIZE.sp
     )

@@ -1,6 +1,9 @@
 package com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils
+import com.golfpvcc.teamscore_rev4.ui.screens.summary.NinePlayerPayout
 
-
+const val HIGHEST_POINTS = 0
+const val MIDDLE_POINTS = 1
+const val LOWEST_POINTS = 2
 
 /*
 Sort scores  h = 5 M = 3  L = 1
@@ -96,18 +99,18 @@ Constructor
         if (0 < playerScoreArray[PLAYER_1_INX]!!.holeScore) {
             if (playerScoreArray[PLAYER_1_INX]!!.holeScore == playerScoreArray[PLAYER_2_INX]!!.holeScore) {
                 if (playerScoreArray[PLAYER_1_INX]!!.holeScore == playerScoreArray[PLAYER_3_INX]!!.holeScore) {
-                    playerScoreArray[PLAYER_1_INX]!!.updatePlayerNineScore(3)
+                    playerScoreArray[PLAYER_1_INX]!!.updatePlayerNineScore(3) //all three player have the same score
                     playerScoreArray[PLAYER_2_INX]!!.updatePlayerNineScore(3)
                     playerScoreArray[PLAYER_3_INX]!!.updatePlayerNineScore(3)
                 } else {
-                    playerScoreArray[PLAYER_1_INX]!!.updatePlayerNineScore(4)
+                    playerScoreArray[PLAYER_1_INX]!!.updatePlayerNineScore(4) // top 2 players have the same score
                     playerScoreArray[PLAYER_2_INX]!!.updatePlayerNineScore(4)
                     playerScoreArray[PLAYER_3_INX]!!.updatePlayerNineScore(1)
                 }
             } else {
                 playerScoreArray[PLAYER_1_INX]!!.updatePlayerNineScore(5) // lowest score of the three players
                 if (playerScoreArray[PLAYER_2_INX]!!.holeScore == playerScoreArray[PLAYER_3_INX]!!.holeScore) {
-                    playerScoreArray[PLAYER_2_INX]!!.updatePlayerNineScore(2)
+                    playerScoreArray[PLAYER_2_INX]!!.updatePlayerNineScore(2) // bottom 2 players have the save score
                     playerScoreArray[PLAYER_3_INX]!!.updatePlayerNineScore(2)
                 } else {
                     playerScoreArray[PLAYER_2_INX]!!.updatePlayerNineScore(3)
@@ -118,11 +121,11 @@ Constructor
         // else hole not scored yet
     }
 
-    fun get9GameScore(inx: Int): Int {
+    fun get9GameScore(inx: Int): Int { // the index is the player
         var score = 0
 
         for (x in 0..<NINE_PLAYERS) {
-            if (playerScoreArray[x]!!.playerInx == inx) {
+            if (playerScoreArray[x]!!.playerInx == inx) { // playerScoreArray calculated the player's 9 score
                 score = playerScoreArray[x]!!.playerNineScore
             }
         }
@@ -159,6 +162,112 @@ Constructor
 
         fun updatePlayerNineScore(nineScore: Int) {
             this.playerNineScore = nineScore
+        }
+    }
+}
+
+class NineGamePayout() {
+    var playerNineArray = arrayOf(NinePlayerPayout(), NinePlayerPayout(), NinePlayerPayout())
+
+    init {
+        for (x in 0..<NINE_PLAYERS) {
+            playerNineArray[x] = NinePlayerPayout() // allocate the player's class for the 9 game
+        }
+    }
+    fun addPlayerNinePoints(playerInx: Int, playerName:String, points: Int) { // add each players points to the internal array
+        playerNineArray[playerInx].mPoints  = points
+        playerNineArray[playerInx].mPlayerInx = playerInx
+        playerNineArray[playerInx].mName = playerName // player name is the index
+    }
+
+    fun sort9Points() { // sort the internal array with the highest points in index 0 and the lowest points in index 2
+        var inLoop: Int
+        var inPoints: Int
+        var outPoints: Int
+
+        var outLoop: Int = NINE_PLAYERS - 1
+        while (outLoop > 0) {
+            // outer loop (backward)
+            inLoop = 0
+            while (inLoop < outLoop) {
+                inPoints = playerNineArray[inLoop]!!.mPoints
+                outPoints = playerNineArray[inLoop + 1].mPoints
+                if (inPoints < outPoints) // out of order?
+                    swap(inLoop, inLoop + 1) // swap them
+
+                inLoop++
+            }
+            outLoop--
+        }
+    }
+    fun get9GamePayOut(inx: Int): NinePlayerPayout { // the index is the player
+        var playerPayout = NinePlayerPayout()
+
+        for (x in 0..<NINE_PLAYERS) {
+            if (playerNineArray[x].mPlayerInx == inx) { // playerScoreArray calculated the player's 9 score
+                playerPayout = playerNineArray[x]
+            }
+        }
+
+        return playerPayout
+    }
+
+    /*      This function will swap the two classes       */
+    private fun swap(one: Int, two: Int) {
+        val temp = playerNineArray[one]
+        playerNineArray[one] = playerNineArray[two]
+        playerNineArray[two] = temp
+    }
+    /*
+    The HIGHEST_POINTS player owes nothing to any player
+    The MIDDLE_POINTS player only owes the HIGHEST_POINTS player
+    The LOWEST_POINTS player owes HIGHEST_POINTS player and MIDDLE_POINTS player
+    Now the rub - if the LOWEST_POINTS player owes MIDDLE_POINTS player and MIDDLE_POINTS player owes HIGHEST_POINTS player,
+        do the following
+        substrate what the LOWEST_POINTS player owes MIDDLE_POINTS player from what the MIDDLE_POINTS player owes
+            the HIGHEST_POINTS player and add that amount to what LOWEST_POINTS player owes the HIGHEST_POINTS player
+    player 0 Player owes  2 30 // owes 20 to 3 and owes 10 to 2
+    player 0 Player owes  1 10
+
+    player 1 Player owes  2 0 // owes 10 to 3
+    player 1 Player owes  0 0
+
+    player 2 Player owes  0 0
+    player 2 Player owes  0 0
+     */
+    fun calculateWhoOwesWho(){
+        // highest point player get money from the second place player
+        if(playerNineArray[HIGHEST_POINTS].mPoints != playerNineArray[MIDDLE_POINTS].mPoints){
+            playerNineArray[MIDDLE_POINTS].mPayFirstInx  = playerNineArray[HIGHEST_POINTS].mPlayerInx // we owe the highest point player some money
+            playerNineArray[MIDDLE_POINTS].mFirstName = playerNineArray[HIGHEST_POINTS].mName
+            playerNineArray[MIDDLE_POINTS].mPayFirstAmount = playerNineArray[HIGHEST_POINTS].mPoints - playerNineArray[MIDDLE_POINTS].mPoints
+        }
+        // highest point player get money from the third place player
+        if(playerNineArray[HIGHEST_POINTS].mPoints != playerNineArray[LOWEST_POINTS].mPoints){
+            playerNineArray[LOWEST_POINTS].mPayFirstInx  = playerNineArray[HIGHEST_POINTS].mPlayerInx // we owe the highest point player some money
+            playerNineArray[LOWEST_POINTS].mFirstName  = playerNineArray[HIGHEST_POINTS].mName // we owe the highest point player some money
+            playerNineArray[LOWEST_POINTS].mPayFirstAmount = playerNineArray[HIGHEST_POINTS].mPoints - playerNineArray[LOWEST_POINTS].mPoints
+        }
+        // Second point player get money from the third place player
+        if(playerNineArray[MIDDLE_POINTS].mPoints != playerNineArray[LOWEST_POINTS].mPoints){
+            playerNineArray[LOWEST_POINTS].mPaySecondInx  = playerNineArray[MIDDLE_POINTS].mPlayerInx // we owe the highest point player some money
+            playerNineArray[LOWEST_POINTS].mSecondName  = playerNineArray[MIDDLE_POINTS].mName // we owe the highest point player some money
+            playerNineArray[LOWEST_POINTS].mPaySecondAmount = playerNineArray[MIDDLE_POINTS].mPoints - playerNineArray[LOWEST_POINTS].mPoints
+        }
+        // check how much credit the second place player can use for paying the first place player with the money owed by lowest place player
+        if( playerNineArray[LOWEST_POINTS].mPaySecondAmount != 0){ // does the LOWEST_POINTS player owes MIDDLE_POINTS player
+            if(0 != playerNineArray[MIDDLE_POINTS].mPayFirstAmount  ) // does MIDDLE_POINTS player owes the HIGHEST_POINTS player
+            {   // MIDDLE_POINTS guy owes more than LOWEST_POINTS owes to the MIDDLE_POINTS guy
+                if(playerNineArray[MIDDLE_POINTS].mPayFirstAmount >= playerNineArray[LOWEST_POINTS].mPaySecondAmount) {
+                    playerNineArray[MIDDLE_POINTS].mPayFirstAmount -= playerNineArray[LOWEST_POINTS].mPaySecondAmount
+                    playerNineArray[LOWEST_POINTS].mPayFirstAmount += playerNineArray[LOWEST_POINTS].mPaySecondAmount
+                    playerNineArray[LOWEST_POINTS].mPaySecondAmount = 0
+                } else {
+                    playerNineArray[LOWEST_POINTS].mPayFirstAmount += playerNineArray[MIDDLE_POINTS].mPayFirstAmount
+                    playerNineArray[LOWEST_POINTS].mPaySecondAmount -= playerNineArray[MIDDLE_POINTS].mPayFirstAmount
+                    playerNineArray[MIDDLE_POINTS].mPayFirstAmount = 0
+                }
+            }
         }
     }
 }
