@@ -5,6 +5,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Red
+import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -92,7 +94,7 @@ open class ScoreCardViewModel() : ViewModel() {
             val scoreCardWithPlayers: ScoreCardWithPlayers =
                 scoreCardDao.getScoreRecordWithPlayers(SCORE_CARD_REC_ID)
 
-            if (null != scoreCardWithPlayers) {     // found score record with players
+            if (scoreCardWithPlayers != null) {     // found score record with players
                 updateScoreCardState(scoreCardWithPlayers)       // located in helper function file
             } else
                 Log.d("VIN1", "getScoreCardAndPlayerRecord is empty")
@@ -101,6 +103,7 @@ open class ScoreCardViewModel() : ViewModel() {
 
             state.mJunkTableSelection.loadJunkTableRecords()
             state.mCourseRecord = courseRecordDoa.getCourseRecord(state.mCourseId)
+            repaintScreen() // repaint the screen after all of the data has been read
         }
     }
 
@@ -344,6 +347,11 @@ open class ScoreCardViewModel() : ViewModel() {
         return backGroundColor
     }
 
+    fun getPlayerJunkColor(junkRecordCnt: Int): Color {
+        val junkColor: Color = if (junkRecordCnt == 0) Transparent else Red
+        return junkColor
+    }
+
     fun getTeamColorForHole(teamScore: Int): Color {
         return setBoardColorForPlayerTeamScore(teamScore)
     }
@@ -520,13 +528,17 @@ open class ScoreCardViewModel() : ViewModel() {
         )
         Log.d("JUNKREC", "toggleJunkListItem selection  $selection rec $playerJunkRecord")
         viewModelScope.launch(Dispatchers.IO) {
+            val playerIdx = state.mCurrentJunkPlayerIdx // get the index before we lose scope
+            val currentHole = state.mCurrentHole
             if (selection) {
                 state.mJunkTableSelection.addPlayerJunkRecord(playerJunkRecord)
             } else {
                 state.mJunkTableSelection.deletePlayerJunkRecord(playerJunkRecord)
             }
+            val recCnt = state.mJunkTableSelection.getJunkRecordCnt(playerIdx, currentHole)
+            state.mPlayerHeading[playerIdx].mJunk[currentHole] = recCnt
+            repaintScreen()
         }
-        repaintScreen()
     }
 
     private fun closeJunkTableList() {
@@ -808,5 +820,6 @@ data class JunkTableList(
     var mJunkName: String = "",
     var mId: Long = 1,
     var mSelected: Boolean = false,
+    var mPlayerRecId: Long = 0, // need this player Id to delete rec.
 )
 

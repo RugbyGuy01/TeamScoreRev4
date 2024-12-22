@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -22,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -41,6 +43,8 @@ import com.golfpvcc.teamscore_rev4.utils.SCORE_CARD_COURSE_NAME_TEXT
 import com.golfpvcc.teamscore_rev4.utils.SCORE_CARD_TEXT
 import com.golfpvcc.teamscore_rev4.utils.VIN_LIGHT_GRAY
 import com.golfpvcc.teamscore_rev4.utils.DISPLAY_HOLE_NUMBER
+import com.golfpvcc.teamscore_rev4.utils.MAX_PLAYERS
+import com.golfpvcc.teamscore_rev4.utils.TOTAL_18_HOLE
 
 sealed class ScoreCardActions {
     data object ButtonEnterScore : ScoreCardActions()
@@ -259,7 +263,7 @@ fun DisplayPlayerScoreCardCell(
         val startingCell: Int = scoreCardViewModel.getStartingHole()
         val endingCell: Int = scoreCardViewModel.getEndingHole()
         val hdcpParHoleHeading = scoreCardViewModel.state.mHdcpParHoleHeading
-        var parForTheHoles: IntArray = IntArray(18) { 4 }
+        var parForTheHoles: IntArray = IntArray(TOTAL_18_HOLE) { MAX_PLAYERS }
 
         for (idx in hdcpParHoleHeading.indices) {
             if (hdcpParHoleHeading[idx].vinTag == PAR_HEADER) { // the score card par row
@@ -278,6 +282,9 @@ fun DisplayPlayerScoreCardCell(
                     playerHeading.mDisplayScore[idx],
                     parForTheHoles[idx]
                 )
+
+            val playerJunkColor = scoreCardViewModel.getPlayerJunkColor(playerHeading.mJunk[idx])
+
             val teamScoreColor =
                 scoreCardViewModel.getTeamColorForHole(playerHeading.mTeamHole[idx]) // did we use this score for the team game
             Surface(
@@ -295,9 +302,12 @@ fun DisplayPlayerScoreCardCell(
                     fontSize = SCORE_CARD_TEXT.sp,
                     textAlign = TextAlign.Center,
                     modifier = Modifier
-                        .padding(4.dp)
-                        .border(3.dp, teamScoreColor, shape = RoundedCornerShape(0.dp)),
+                        .padding(3.dp)
+                        .border(2.dp, teamScoreColor, shape = RoundedCornerShape(0.dp))
+                        .padding(3.dp)
+                        .border(1.dp, playerJunkColor, CircleShape),
                     color = playerScoreColor,
+
                     maxLines = 1,
                 )  // start at zero - get the first column of the data
             }

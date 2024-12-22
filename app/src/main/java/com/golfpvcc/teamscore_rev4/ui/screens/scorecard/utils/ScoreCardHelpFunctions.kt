@@ -73,6 +73,7 @@ fun ScoreCardViewModel.updateScoreCardState(scoreCardWithPlayers: ScoreCardWithP
 
         if (hdcpCells != null) {
             setPlayerStrokeHoles(state.mPlayerHeading[idx], hdcpCells.mHole)
+            setPlayerJunkRecordCnt(state.mPlayerHeading[idx]) // set what hole does the player have junk
         }
     }
     Log.d("VIN1", "updateScoreCardState player record count ${state.mPlayerHeading.size}")
@@ -437,6 +438,12 @@ fun setPlayerStrokeHoles(
     for (idx in playerHeading.mStokeHole.indices) {
         strokeForHole = getPlayerStrokesForHole(hdcpHoles, playerHeading.mHdcp, idx)
         playerHeading.mStokeHole[idx] = strokeForHole
+    }
+}
+// read which holes have junk records for each player
+fun ScoreCardViewModel.setPlayerJunkRecordCnt(playerHeading: PlayerHeading){
+    for (hole in playerHeading.mJunk.indices) {
+        playerHeading.mJunk[hole] = state.mJunkTableSelection.getJunkRecordCnt(playerHeading.vinTag, hole)
     }
 }
 

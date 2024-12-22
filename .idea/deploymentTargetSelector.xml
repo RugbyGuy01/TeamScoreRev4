@@ -2,12 +2,12 @@
 <project version="4">
   <component name="deploymentTargetSelector">
     <selectionStates>
-      <SelectionState runConfigName="TeamScore">
+      <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2024-11-08T13:27:15.805113500Z">
+        <DropdownSelection timestamp="2024-12-22T20:10:40.611518300Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\goodm\.android\avd\Medium_Phone_API_33.avd" />
+              <DeviceId pluginId="PhysicalDevice" identifier="serial=RF8N31TF9KY" />
             </handle>
           </Target>
         </DropdownSelection>

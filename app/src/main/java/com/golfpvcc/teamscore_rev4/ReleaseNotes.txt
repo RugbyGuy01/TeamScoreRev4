@@ -1,3 +1,8 @@
+Revision 2.8 - xx/xx/20xx
+
+Revision 2.7 - 12/22/2024
+- Add circle for junk won on player's holes on the main score card
+
 Revision 2.6 - 12/14/2024
 - Display mode for 9s game does not clear popup on selection.
 - Clearing player's scores does not clear the team score

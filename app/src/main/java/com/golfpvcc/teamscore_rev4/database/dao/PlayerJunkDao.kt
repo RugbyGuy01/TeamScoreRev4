@@ -18,6 +18,9 @@ interface PlayerJunkDao {
     @Query("SELECT * FROM PlayerJunkTable WHERE mPlayerIdx = :playerIdx AND mHoleNumber = :currentHole")
     fun getPlayerJunkTableRecords(playerIdx: Int, currentHole:Int): List<PlayerJunkRecord>
 
+    @Query("SELECT COUNT(*) FROM PlayerJunkTable WHERE mPlayerIdx = :playerIdx AND mHoleNumber = :currentHole")
+    fun getPlayerJunkRecordsCnt(playerIdx: Int, currentHole:Int): Int
+
     @Query("SELECT * FROM PlayerJunkTable WHERE mPlayerIdx = :playerIdx")
     fun getAllPlayerJunkPayoutRecords(playerIdx: Int): List<PlayerJunkRecord>
 

@@ -35,6 +35,7 @@ class JunkTableSelection(junkDao: JunkDao, playerJunkDao: PlayerJunkDao) {
             var junkTableDisplay = mJunkTableList.find { it.mId == playerJunkRecord.mJunkId }
             if (junkTableDisplay != null) {
                 junkTableDisplay.mSelected = true
+                junkTableDisplay.mPlayerRecId = playerJunkRecord.mId // this rec ID for deleting
             }
         }
     }
@@ -45,16 +46,20 @@ class JunkTableSelection(junkDao: JunkDao, playerJunkDao: PlayerJunkDao) {
         playerIdx: Int,
         currentHole: Int,
     ): PlayerJunkRecord {
-        var junkListItem = mJunkTableList[listIdx]
+        val junkListItem = mJunkTableList[listIdx]
         junkListItem.mSelected = selection
-        val playerJunkRecord = PlayerJunkRecord(playerIdx, currentHole, junkListItem.mId)
+        val playerJunkRecord = PlayerJunkRecord(
+            playerIdx, currentHole, junkListItem.mId, junkListItem.mPlayerRecId)
         return (playerJunkRecord)
     }
 
     fun deletePlayerJunkRecord(playerJunkRecord: PlayerJunkRecord) {
         mPlayerJunkDao.deleteJunkTableRecord(playerJunkRecord)
     }
-
+    fun getJunkRecordCnt(playerIdx: Int, currentHole: Int) : Int{
+        val junkRecordCnt = mPlayerJunkDao.getPlayerJunkRecordsCnt(playerIdx, currentHole)
+        return(junkRecordCnt)
+    }
     suspend fun addPlayerJunkRecord(playerJunkRecord: PlayerJunkRecord) {
         mPlayerJunkDao.insertJunkTableRecord(playerJunkRecord)
     }
@@ -62,6 +67,7 @@ class JunkTableSelection(junkDao: JunkDao, playerJunkDao: PlayerJunkDao) {
     private fun clearJunkTableListSelections() {
         for (junkTableList in mJunkTableList) {
             junkTableList.mSelected = false
+            junkTableList.mPlayerRecId = 0
         }
     }
 }

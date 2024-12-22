@@ -201,7 +201,7 @@ fun DisplayJunkDialog(
                         .clickable { onAction(DialogAction.CloseJunkTableList) },
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    Text(text = "Done")
+                    Text(text = "Done", fontSize = PLAYER_TEXT_SIZE.sp)
                 }
             }
         }
