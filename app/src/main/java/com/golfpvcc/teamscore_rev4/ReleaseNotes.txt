@@ -1,4 +1,7 @@
-Revision 2.8 - xx/xx/20xx
+Revision 2.9 - xx/xx/20xx
+
+Revision 2.8 - 01/15/2025
+Fixed the course list screen so you can delete the last course in the list
 
 Revision 2.7 - 12/22/2024
 - Add circle for junk won on player's holes on the main score card

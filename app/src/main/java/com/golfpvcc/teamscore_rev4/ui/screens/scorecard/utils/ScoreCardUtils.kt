@@ -35,6 +35,7 @@ import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.PlayerHeading
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.ScoreCardViewModel
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.dialogenterscore.DialogAction
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.displayoptions.DisplayModeDropDown
+import com.golfpvcc.teamscore_rev4.utils.CARD_CELL_HEIGHT
 import com.golfpvcc.teamscore_rev4.utils.COLOR_NEXT_HOLE
 import com.golfpvcc.teamscore_rev4.utils.COLOR_PREV_HOLE
 import com.golfpvcc.teamscore_rev4.utils.COLOR_SCREEN_MODE
@@ -86,7 +87,7 @@ fun DisplayScoreCardHeader(
     scoreCardViewModel: ScoreCardViewModel,
 ) {
     val hdcpParHoleHeading = scoreCardViewModel.state.mHdcpParHoleHeading
-    var modifier = Modifier.width(100.dp)
+    var modifier = Modifier.width(100.dp).height(CARD_CELL_HEIGHT.dp)
 
     Column {
         Row(
@@ -116,7 +117,7 @@ fun DisplayScoreCardHeader(
                 }
             }
             Column {    // display the total column notes par total and "Total"
-                modifier = Modifier.width(COLUMN_TOTAL_WIDTH.dp)
+                modifier = Modifier.width(COLUMN_TOTAL_WIDTH.dp).height(CARD_CELL_HEIGHT.dp)
                 for (idx in hdcpParHoleHeading.indices) {       // indices = 3
                     if (hdcpParHoleHeading[idx].vinTag == PAR_HEADER) { // the score card par row - show the total for par
                         hdcpParHoleHeading[idx].mTotal =
@@ -140,7 +141,7 @@ fun DisplayScoreCardNames(
     scoreCardViewModel: ScoreCardViewModel,
 ) {
     val playerHeading = scoreCardViewModel.state.mPlayerHeading
-    var modifier = Modifier.width(100.dp)
+    var modifier = Modifier.width(100.dp).height(CARD_CELL_HEIGHT.dp)
 
     Column {
         Row {
@@ -161,7 +162,7 @@ fun DisplayScoreCardNames(
                 }
             }
             Column {
-                modifier = Modifier.width(COLUMN_TOTAL_WIDTH.dp)
+                modifier = Modifier.width(COLUMN_TOTAL_WIDTH.dp).height(CARD_CELL_HEIGHT.dp) //.height(CARD_CELL_HEIGHT.dp) // display totals
                 for (idx in playerHeading.indices) {
                     playerHeading[idx].mTotal =
                         scoreCardViewModel.getTotalForNineCell(playerHeading[idx].mDisplayScore)
@@ -183,7 +184,7 @@ fun DisplayScoreCardTeams(
     scoreCardViewModel: ScoreCardViewModel,
 ) {
     val teamUsedHeading = scoreCardViewModel.state.mTeamUsedHeading
-    var modifier = Modifier.width(100.dp)
+    var modifier = Modifier.width(100.dp).height(CARD_CELL_HEIGHT.dp)
 
     Column {
         Row {
@@ -205,7 +206,7 @@ fun DisplayScoreCardTeams(
                 }
             }
             Column {
-                modifier = Modifier.width(COLUMN_TOTAL_WIDTH.dp)
+                modifier = Modifier.width(COLUMN_TOTAL_WIDTH.dp).height(CARD_CELL_HEIGHT.dp)
                 for (idx in teamUsedHeading.indices) {
                     teamUsedHeading[idx].mTotal =       // Calculate "Team" and "Used" score totals
                         scoreCardViewModel.getTotalForNineCell(teamUsedHeading[idx].mHole)
@@ -233,7 +234,7 @@ fun DisplayScoreCardCell(
         val endingCell: Int = scoreCardViewModel.getEndingHole()
         for (idx in startingCell until endingCell) {
             Surface(
-                modifier = modifier.width(45.dp),
+                modifier = modifier.width(45.dp).height(CARD_CELL_HEIGHT.dp),
                 border = BorderStroke(Dp.Hairline, color = Color.Blue),
                 color = Color(scoreCardViewModel.setHighLightCurrentHole(idx, color)),
                 contentColor = contentColorFor(Color.Transparent),
@@ -288,7 +289,7 @@ fun DisplayPlayerScoreCardCell(
             val teamScoreColor =
                 scoreCardViewModel.getTeamColorForHole(playerHeading.mTeamHole[idx]) // did we use this score for the team game
             Surface(
-                modifier = modifier.width(45.dp),
+                modifier = modifier.width(45.dp).height(CARD_CELL_HEIGHT.dp),
                 border = BorderStroke(Dp.Hairline, color = Color.Blue),
                 color = playerStokeHoleColor,
                 contentColor = contentColorFor(Color.Transparent),
@@ -346,7 +347,6 @@ fun DisplayRowHeadingOnClick(
     color: Color,
     onAction: (DialogAction) -> Unit,
 ) {
-
     Surface(
         modifier = modifier
             .clickable { onAction(DialogAction.DisplayHoleNote) }, // modifier.width(100.dp),

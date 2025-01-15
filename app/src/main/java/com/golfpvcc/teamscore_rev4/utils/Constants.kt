@@ -5,7 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import com.golfpvcc.teamscore_rev4.database.model.CourseRecord
 var REV_DATE = buildTime()
-const val REVISION = "2.7"
+const val REVISION = "2.8"
 
 const val VIN_LIGHT_GRAY = 0xFFE0E0E0
 const val DISPLAY_HOLE_NUMBER = 0xFF48EFF0
@@ -65,7 +65,7 @@ const val MAX_COURSE_YARDAGE = 5
 const val MAX_STARTING_HOLE = 2
 const val LAST_PLAYER = MAX_PLAYERS - 1
 const val DISPLAY_SCORE_CARD_SCREEN = 6
-const val MINIMUM_LEN_OF_PLAYER_NAME = 2
+const val MINIMUM_LEN_OF_PLAYER_NAME = 1
 const val MAX_EMAIL_NAME_LEN = 25
 const val MAX_EMAIL_ADDRESS_LEN = 50
 const val MAX_JUNK_TEXT_LEN = 15
@@ -79,6 +79,7 @@ const val COURSE_NAME_MINIMUM =5
 const val SUMMARY_BUTTON_TEXT = 20
 const val MENU_BUTTON_TEXT = 20
 const val COLUMN_TOTAL_WIDTH = 65
+const val CARD_CELL_HEIGHT = 33
 const val SUMMARY_TEXT_SIZE = 20
 const val SUMMARY_NAME_TEXT_SIZE = 22
 const val SUMMARY_DIALOG_TEXT_SIZE = 20

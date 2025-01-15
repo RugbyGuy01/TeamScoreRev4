@@ -188,15 +188,8 @@ fun CourseItem(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(15.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = course.mCoursename,
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Normal
-            )
-            Spacer(modifier = Modifier.size(14.dp))
             IconButton(
                 onClick = {
                     Log.d("VIN", "CourseDetail?id={${course.mId}}")
@@ -236,6 +229,13 @@ fun CourseItem(
                     tint = MaterialTheme.colorScheme.onPrimaryContainer
                 )
             }
+            Spacer(modifier = Modifier.size(14.dp))
+            Text(
+                text = course.mCoursename,
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Normal
+            )
+
         } // end of row
     } // end of card
 }
