@@ -196,7 +196,7 @@ class NineGamePayout() {
             // outer loop (backward)
             inLoop = 0
             while (inLoop < outLoop) {
-                inPoints = playerNineArray[inLoop]!!.mPoints
+                inPoints = playerNineArray[inLoop].mPoints
                 outPoints = playerNineArray[inLoop + 1].mPoints
                 if (inPoints < outPoints) // out of order?
                     swap(inLoop, inLoop + 1) // swap them

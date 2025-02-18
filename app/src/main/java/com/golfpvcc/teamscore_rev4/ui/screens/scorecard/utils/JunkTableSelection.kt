@@ -1,14 +1,9 @@
 package com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils
 
-import android.util.Log
-import androidx.lifecycle.viewModelScope
 import com.golfpvcc.teamscore_rev4.database.dao.JunkDao
 import com.golfpvcc.teamscore_rev4.database.dao.PlayerJunkDao
-import com.golfpvcc.teamscore_rev4.database.model.JunkRecord
 import com.golfpvcc.teamscore_rev4.database.model.PlayerJunkRecord
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.JunkTableList
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 class JunkTableSelection(junkDao: JunkDao, playerJunkDao: PlayerJunkDao) {
     private val mJunkDao = junkDao    // file descriptor for junk record file
@@ -24,7 +19,6 @@ class JunkTableSelection(junkDao: JunkDao, playerJunkDao: PlayerJunkDao) {
             val junkTableList = JunkTableList(junkRecord.mJunkName, junkRecord.mId, false)
             mJunkTableList += (junkTableList)
         }
-        Log.d("JUNKREC", "Junk Table Load Rec ${mJunkTableList}")
     }
 
     fun loadPlayerJunkRecords(playerIdx: Int, currentHole: Int) {

@@ -44,7 +44,7 @@ fun DropDownSelectHolePar(
     recDetail: CourseDetailViewModel,
     holeIdx: Int,
 ) {
-    var expanded = if (recDetail.getPopupSelectHolePar() < 0) false else true
+  //  var expanded = if (recDetail.getPopupSelectHolePar() < 0) false else true
     val currentHolePar = recDetail.getHolePar(holeIdx)
 
     Popup(
@@ -99,19 +99,16 @@ fun DropDownSelectHoleHandicap(
     courseDetailViewModel: CourseDetailViewModel,
     holeIdx: Int,
 ) {
-    var expanded = if (courseDetailViewModel.getPopupSelectHoleHandicap() < 0) false else true
+ //   var expanded = if (courseDetailViewModel.getPopupSelectHoleHandicap() < 0) false else true
     val currentHoleHdcp = courseDetailViewModel.getHoleHandicap(holeIdx)
     val courseHdcp = courseDetailViewModel.state.availableHandicap
     val flipHdcps = courseDetailViewModel.getFlipHdcps()
-    val displayFrontNineHdcp: Int
     var selectedHdcp: Int = -1
 
-    if (flipHdcps) {
-        displayFrontNineHdcp =
-            if (holeIdx < 9) 0 else 1 // used to display the handicap holes to select
+    val displayFrontNineHdcp: Int = if (flipHdcps) {
+        if (holeIdx < 9) 0 else 1 // used to display the handicap holes to select
     } else {
-        displayFrontNineHdcp =
-            if (holeIdx < 9) 1 else 0 // used to display the handicap holes to select
+        if (holeIdx < 9) 1 else 0 // used to display the handicap holes to select
     }
 
     Popup(

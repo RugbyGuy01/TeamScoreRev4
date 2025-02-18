@@ -66,7 +66,7 @@ fun DeleteDialog(
                 { Text(text = "Cancel") }
             },
             title = { Text(text = "Delete Course") },
-            text = {  Column() {
+            text = {  Column {
                 Text(text.value)
             } }
         )

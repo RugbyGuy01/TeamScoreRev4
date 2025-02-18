@@ -23,7 +23,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -43,7 +42,6 @@ import com.golfpvcc.teamscore_rev4.utils.COLUMN_TOTAL_WIDTH
 import com.golfpvcc.teamscore_rev4.utils.SCORE_CARD_COURSE_NAME_TEXT
 import com.golfpvcc.teamscore_rev4.utils.SCORE_CARD_TEXT
 import com.golfpvcc.teamscore_rev4.utils.VIN_LIGHT_GRAY
-import com.golfpvcc.teamscore_rev4.utils.DISPLAY_HOLE_NUMBER
 import com.golfpvcc.teamscore_rev4.utils.MAX_PLAYERS
 import com.golfpvcc.teamscore_rev4.utils.TOTAL_18_HOLE
 
@@ -55,7 +53,7 @@ sealed class ScoreCardActions {
     data object ScreenModeNet : ScoreCardActions()
     data object ScreenModeStableford : ScoreCardActions()
     data object ScreenModePtQuote : ScoreCardActions()
-    data object Screen6_6_6_Mode : ScoreCardActions()
+    data object Screen666Mode : ScoreCardActions()
     data object ScreenModeNineGame : ScoreCardActions()
     data object SetDialogCurrentPlayer : ScoreCardActions()
     data object FlipFrontBackNine : ScoreCardActions()
@@ -64,8 +62,6 @@ sealed class ScoreCardActions {
 @Composable
 fun DisplayCourseName(scoreCardViewModel: ScoreCardViewModel) {
     Row {
-        DisplayModeDropDown(scoreCardViewModel::scoreCardActions, scoreCardViewModel.state.mGameNines, scoreCardViewModel.getDisplayModeText())
-        Spacer(modifier = Modifier.size(10.dp))
         Text(
             text = scoreCardViewModel.state.mCourseName,
             fontSize = SCORE_CARD_COURSE_NAME_TEXT.sp,
@@ -73,12 +69,16 @@ fun DisplayCourseName(scoreCardViewModel: ScoreCardViewModel) {
             modifier = Modifier.padding(2.dp),
         )
         Spacer(modifier = Modifier.size(10.dp))
+        DisplayModeDropDown(scoreCardViewModel::scoreCardActions, scoreCardViewModel.state.mGameNines, scoreCardViewModel.getDisplayModeText())
+        Spacer(modifier = Modifier.size(10.dp))
         Text(
-            text = "Display: ${scoreCardViewModel.state.mDisplayScreenModeText}",
+            text = " ${scoreCardViewModel.state.mDisplayScreenModeText}",
             fontSize = SCORE_CARD_COURSE_NAME_TEXT.sp,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(2.dp),
         )
+
+
     }
 }
 
@@ -151,12 +151,10 @@ fun DisplayScoreCardNames(
                 }
             }
             Column {
-                val holeHdcpCells = scoreCardViewModel.getHoleHdcpCells()
                 for (idx in playerHeading.indices) {        // here's the score card player's loop of scores
                     DisplayPlayerScoreCardCell(
                         Modifier,
                         playerHeading[idx],
-                        holeHdcpCells,      // the course handicap for the holes
                         scoreCardViewModel
                     )
                 }
@@ -256,7 +254,7 @@ fun DisplayScoreCardCell(
 fun DisplayPlayerScoreCardCell(
     modifier: Modifier,
     playerHeading: PlayerHeading,
-    holeHdcps: IntArray,
+//    holeHdcps: IntArray,
     scoreCardViewModel: ScoreCardViewModel,
 ) {
     Row()

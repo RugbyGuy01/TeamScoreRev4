@@ -207,7 +207,7 @@ fun DisplayTeamGrossNetJunkButton(
 ) {
 
     DialogCard(symbol = "Net",
-        modifier = Modifier.padding(1.dp),
+ //       modifier = Modifier.padding(1.dp),
         myFontSize = BUTTON_NET_GROSS_FONT,
         backGround = scoreCardViewModel.state.mNetButtonColor[idx],
         textColor = Color.Black,
@@ -216,7 +216,7 @@ fun DisplayTeamGrossNetJunkButton(
     Spacer(modifier = Modifier.width(3.dp))
     DialogCard(
         symbol = "Gross",
-        modifier = Modifier.padding(1.dp),
+ //       modifier = Modifier.padding(1.dp),
         myFontSize = BUTTON_NET_GROSS_FONT,
         backGround = scoreCardViewModel.state.mGrossButtonColor[idx],
         textColor = Color.Black,
@@ -226,7 +226,7 @@ fun DisplayTeamGrossNetJunkButton(
     Spacer(modifier = Modifier.width(3.dp))
     DialogCard(
         symbol = "Junk",
-        modifier = Modifier.padding(1.dp),
+ //       modifier = Modifier.padding(1.dp),
         myFontSize = BUTTON_JUNK_FONT,
         backGround = scoreCardViewModel.state.mJunkButtonColor[idx],
         textColor = Color.Black,
@@ -311,7 +311,7 @@ fun DisplayActionButtons(
         horizontalArrangement = Arrangement.Start,
     ) {
         DialogCard(symbol = "Clear",
-            modifier = Modifier.padding(start = 10.dp, top = 2.dp, bottom = 2.dp, end = 10.dp),
+//            modifier = Modifier.padding(start = 10.dp, top = 2.dp, bottom = 2.dp, end = 10.dp),
             myFontSize = BUTTON_ACTION_FONT,
             backGround = Color.DarkGray,
             textColor = Color.White,
@@ -319,7 +319,7 @@ fun DisplayActionButtons(
             onLongClick = {})
         Spacer(modifier = Modifier.width(30.dp))
         DialogCard(symbol = "Done",
-            modifier = Modifier.width(80.dp),
+//            modifier = Modifier.width(80.dp),
             myFontSize = BUTTON_ACTION_FONT,
             backGround = Color.DarkGray,
             textColor = Color.White,
@@ -427,12 +427,12 @@ fun EnterHoleNote(
                     .padding(10.dp),
             ) {
                 DialogCard(symbol = "Cancel",
-                    modifier = Modifier.padding(
-                        start = 10.dp,
-                        top = 2.dp,
-                        bottom = 2.dp,
-                        end = 10.dp
-                    ),
+            //        modifier = Modifier.padding(
+            //            start = 10.dp,
+             //           top = 2.dp,
+             //           bottom = 2.dp,
+             //           end = 10.dp
+           //         ),
                     myFontSize = BUTTON_ACTION_FONT,
                     backGround = Color.DarkGray,
                     textColor = Color.White,
@@ -440,7 +440,7 @@ fun EnterHoleNote(
                     onLongClick = {})
                 Spacer(modifier = Modifier.width(30.dp))
                 DialogCard(symbol = "Save",
-                    modifier = Modifier.width(80.dp),
+                 //   modifier = Modifier.width(80.dp),
                     myFontSize = BUTTON_ACTION_FONT,
                     backGround = Color.DarkGray,
                     textColor = Color.White,

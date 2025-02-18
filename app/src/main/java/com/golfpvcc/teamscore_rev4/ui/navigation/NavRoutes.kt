@@ -19,13 +19,13 @@ sealed class TeamScoreScreen(val route: String) {
         }
     }
     object ScreenScoreCard : TeamScoreScreen(route = "ScoreCardScreen"){
-        fun passId(id: Int = -1): String {
-            return "ScoreCard?id=$id"
-        }
+//        fun passId(id: Int = -1): String {
+//            return "ScoreCard?id=$id"
+//        }
     }
     object ScreenSummary : TeamScoreScreen(route = "SummaryScreen"){
-        fun passId(id: Int = -1): String {
-            return "Summary?id=$id"
-        }
+//        fun passId(id: Int = -1): String {
+//            return "Summary?id=$id"
+//        }
     }
 }

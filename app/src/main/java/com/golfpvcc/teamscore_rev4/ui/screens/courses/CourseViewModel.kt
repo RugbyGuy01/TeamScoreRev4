@@ -12,7 +12,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class CoursesViewModel(
-    private val courseDao: CourseDao    // are companion object
+    private val courseDao: CourseDao,    // are companion object
 ) : ViewModel() {
 
     var courses: LiveData<List<CourseRecord>> = courseDao.getAllCoursesRecordAsc()
@@ -38,7 +38,7 @@ class CoursesViewModel(
         }
     }
 
-    suspend fun getCourseById(courseId: Int?): CourseRecord? {
+    fun getCourseById(courseId: Int?): CourseRecord? {
         Log.d("VIN", "Get course id = $courseId")
         return courseDao.getCourseRecord(courseId)
     }

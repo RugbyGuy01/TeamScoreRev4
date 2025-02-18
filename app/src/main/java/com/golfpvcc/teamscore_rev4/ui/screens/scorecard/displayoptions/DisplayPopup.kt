@@ -84,7 +84,7 @@ fun DisplayModeDropDown(
             }
             HorizontalDivider(thickness = 2.dp)
             DropdownMenuItem({ Text(text = displayScoreText) }, onClick = {
-                onAction(ScoreCardActions.Screen6_6_6_Mode)
+                onAction(ScoreCardActions.Screen666Mode)
                 expanded = false
             }
             )

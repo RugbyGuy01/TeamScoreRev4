@@ -29,10 +29,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.golfpvcc.teamscore_rev4.ui.navigation.ROOT_GRAPH_ROUTE
 import com.golfpvcc.teamscore_rev4.ui.navigation.ROUTE_CONFIGURATION
-import com.golfpvcc.teamscore_rev4.ui.navigation.ROUTE_GAME_ON
 import com.golfpvcc.teamscore_rev4.ui.navigation.TeamScoreScreen
 import com.golfpvcc.teamscore_rev4.ui.theme.shape
-import com.golfpvcc.teamscore_rev4.utils.Constants
 import com.golfpvcc.teamscore_rev4.utils.DISPLAY_SCORE_CARD_SCREEN
 import com.golfpvcc.teamscore_rev4.utils.LAST_PLAYER
 import com.golfpvcc.teamscore_rev4.utils.MAX_HANDICAP
@@ -60,9 +58,7 @@ fun EnterPlayerInfo(
             imeAction = ImeAction.Next,
             modifier = modifier.width(175.dp),
         )
-
-        val keyboardType: ImeAction
-        keyboardType = if (index == LAST_PLAYER) {
+        val keyboardType: ImeAction = if (index == LAST_PLAYER) {
             ImeAction.Done
         } else {
             ImeAction.Next
@@ -187,8 +183,6 @@ fun DisplayPlayerSetupButtons(
     onButtonSelection: () -> Unit,
     buttonText: String,
 ) {
-    var nextScreen: Int
-
     Button(
         modifier = Modifier
             .padding(top = 5.dp, start = 5.dp)
@@ -205,7 +199,6 @@ fun DisplayPlayerSetupButtons(
 fun moveToNextScreen(
     viewModel: PlayerSetupViewModel,
     navController: NavHostController,
-    scoreCardId: Int,
 ) {
 
     when (viewModel.state.mNextScreen) {

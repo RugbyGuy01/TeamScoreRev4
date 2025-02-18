@@ -31,7 +31,6 @@ class PlayerSetupViewModel(
     private val courseDao = TeamScoreCardApp.getCourseDao()
     private val scoreCardDao = TeamScoreCardApp.getScoreCardDao()
     private val playerJunkDao = TeamScoreCardApp.getPlayerJunkDao()
-
     var state by mutableStateOf(ScoreCardState())
         private set
 
@@ -70,14 +69,14 @@ class PlayerSetupViewModel(
     }
 
     private fun updateCourseRecord(courseRec: CourseRecord) {
-        if (courseRec != null) {
+//        if (courseRec != null) {
             state = state.copy(mCourseName = courseRec.mCoursename)
             state = state.copy(mPar = courseRec.mPar)
             state = state.copy(mHandicap = courseRec.mHandicap)
             state = state.copy(mCourseId = courseRec.mId)
-        } else {
-            state = state.copy(mCourseName = "No course record")
-        }
+//        } else {
+//            state = state.copy(mCourseName = "No course record")
+//        }
     }
 
     suspend fun vinScoreCardRecordUpdate() {
@@ -200,7 +199,7 @@ class PlayerSetupViewModel(
         for ((count, player) in state.mPlayerRecords.withIndex()) {
 
             if (MINIMUM_LEN_OF_PLAYER_NAME < player.mName.length) {
-                if (player.mHandicap.length < 1) {
+                if (player.mHandicap.isEmpty()) {
                     player.mHandicap = "0"
                 }
 

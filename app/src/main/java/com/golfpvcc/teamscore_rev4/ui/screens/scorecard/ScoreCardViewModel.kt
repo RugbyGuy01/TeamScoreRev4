@@ -80,7 +80,7 @@ open class ScoreCardViewModel() : ViewModel() {
     private val pointsRecordDoa = TeamScoreCardApp.getPointsDao()
     private val courseRecordDoa = TeamScoreCardApp.getCourseDao()
 
-
+    @Suppress("UNCHECKED_CAST")
     class ScoreCardViewModelFactor() : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return ScoreCardViewModel() as T
@@ -149,7 +149,7 @@ open class ScoreCardViewModel() : ViewModel() {
             ScoreCardActions.ScreenModeNet -> changeScreenNet()
             ScoreCardActions.ScreenModeStableford -> changeScreenStableford()
             ScoreCardActions.ScreenModePtQuote -> changeScreenPtQuote()
-            ScoreCardActions.Screen6_6_6_Mode -> changeScreen6_6_6_Mode()
+            ScoreCardActions.Screen666Mode -> changeScreenSixSixSixMode()
             ScoreCardActions.ScreenModeNineGame -> changeScreenNineGame()
             ScoreCardActions.ButtonEnterScore -> buttonEnterScore()
             ScoreCardActions.SetDialogCurrentPlayer -> setDialogCurrentPlayer(0)
@@ -190,7 +190,7 @@ open class ScoreCardViewModel() : ViewModel() {
         refreshScoreCard(parCells)
     }
 
-    fun changeScreen6_6_6_Mode() {
+    fun changeScreenSixSixSixMode() {
         state.mWhatHoleIsBeingDisplayed = toggle_6_ScoreCard(state.mWhatHoleIsBeingDisplayed)
         setWhatIsBeingDisplayed()   // what is being displayed on the screen
         repaintScreen()
@@ -267,10 +267,9 @@ open class ScoreCardViewModel() : ViewModel() {
         return (parCells[hole])
     }
 
-    fun getStartingHole(): Int {    // true for front nine being displayed
-        val startingHole: Int
-
-        startingHole = when (state.mWhatHoleIsBeingDisplayed) {
+    fun getStartingHole(): Int {
+        // true for front nine being displayed
+        val startingHole: Int = when (state.mWhatHoleIsBeingDisplayed) {
             FRONT_NINE_IS_DISPLAYED -> 0
             BACK_NINE_IS_DISPLAYED -> FRONT_NINE_DISPLAY
             DISPLAY_MODE_X_6_6 -> 0
@@ -282,9 +281,8 @@ open class ScoreCardViewModel() : ViewModel() {
     }
 
     fun getEndingHole(): Int {
-        val endingHole: Int
 
-        endingHole = when (state.mWhatHoleIsBeingDisplayed) {
+        val endingHole: Int = when (state.mWhatHoleIsBeingDisplayed) {
             FRONT_NINE_IS_DISPLAYED -> FRONT_NINE_DISPLAY
             BACK_NINE_IS_DISPLAYED -> BACK_NINE_DISPLAY
             DISPLAY_MODE_X_6_6 -> 6
@@ -319,7 +317,7 @@ open class ScoreCardViewModel() : ViewModel() {
     }
 
     fun getStokeOnHolePlayerColor(playerDisplayHole: Int): Color {
-        var backGroundColor: Color = Color.Transparent
+        var backGroundColor: Color = Transparent
         val strokesForHole = playerStokes(playerDisplayHole)
 
         when (strokesForHole) {
@@ -431,10 +429,10 @@ open class ScoreCardViewModel() : ViewModel() {
 
     fun advanceToTheNextHole() { // zero base, user is one the 9 nine hole
         Log.d("VIN", "advanceToTheNextHole  current hole ${state.mCurrentHole}")
-        if ((state.mCurrentHole + 1) < TOTAL_18_HOLE) {
-            state = state.copy(mCurrentHole = (state.mCurrentHole + 1))
+        state = if ((state.mCurrentHole + 1) < TOTAL_18_HOLE) {
+            state.copy(mCurrentHole = (state.mCurrentHole + 1))
         } else {
-            state = state.copy(mCurrentHole = 0)
+            state.copy(mCurrentHole = 0)
         }
         if (state.mShowTotals) {
             state = state.copy(mShowTotals = false)
@@ -467,10 +465,10 @@ open class ScoreCardViewModel() : ViewModel() {
             else
                 VIN_LIGHT_GRAY
         } else if (displayHoleColor == DISPLAY_NOTE_ON_HOLE) {
-            if (3 < state.mCourseRecord.mNotes[holeIdx].length)
-                return (DISPLAY_NOTE_ON_HOLE)
+            return if (3 < state.mCourseRecord.mNotes[holeIdx].length)
+                (DISPLAY_NOTE_ON_HOLE)
             else
-                return (VIN_LIGHT_GRAY)
+                (VIN_LIGHT_GRAY)
         }
         return (displayHoleColor)
     }
@@ -741,7 +739,7 @@ open class ScoreCardViewModel() : ViewModel() {
         return if (idx == state.mDialogCurrentPlayer) {
             Color(COLOR_ENTER_SCORE_CURSOR)
         } else {
-            Color.Transparent
+            Transparent
         }
     }
 }

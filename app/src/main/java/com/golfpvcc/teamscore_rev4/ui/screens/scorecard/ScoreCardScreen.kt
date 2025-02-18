@@ -28,7 +28,6 @@ import androidx.navigation.NavHostController
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.dialogenterscore.ButtonEnterScore
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.dialogenterscore.DialogAction
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.dialogenterscore.EnterHoleNote
-import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.displayoptions.DisplayModeDropDown
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DisplayCourseName
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DisplaySummaryButton
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DisplayPrevNextHoleButton
@@ -44,7 +43,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun ScoreCardScreen(
     navController: NavHostController,
-    id: Int?,
+//    id: Int?,
 ) {
     SetScreenOrientation(SCREEN_ORIENTATION_LANDSCAPE)
 
@@ -57,7 +56,7 @@ fun ScoreCardScreen(
         Scaffold()
         {
             Spacer(modifier = Modifier.padding(5.dp))
-            Row() {
+            Row {
                 Column(
                     modifier = Modifier
                         .padding(5.dp)
@@ -149,7 +148,7 @@ fun DisplayHoleNoteDialog(
         SetScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
         EnterHoleNote(scoreCardViewModel, onAction)
     } else {
-        SetScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
+        SetScreenOrientation(SCREEN_ORIENTATION_LANDSCAPE)
     }
 }
 

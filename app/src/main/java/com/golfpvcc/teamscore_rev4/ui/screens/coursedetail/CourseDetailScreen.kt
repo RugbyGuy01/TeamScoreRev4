@@ -1,6 +1,5 @@
 package com.golfpvcc.teamscore_rev4.ui.screens.coursedetail
 
-import android.app.Activity
 import android.content.pm.ActivityInfo
 import android.util.Log
 import android.widget.Toast
@@ -35,6 +34,7 @@ import androidx.compose.runtime.Composable
 
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -68,7 +68,7 @@ fun CourseDetailScreen(
     )
 
     val courseDetailViewModel = remember { CourseDetailViewModel() }
-    val saveButtonState = remember { mutableStateOf(USER_TEXT_SAVE) }
+    val saveButtonState = remember { mutableIntStateOf(USER_TEXT_SAVE) }
     SetScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
 
     GetCourseRecord(

@@ -1,6 +1,5 @@
 package com.golfpvcc.teamscore_rev4.ui.navigation
 
-import android.util.Log
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -43,5 +42,5 @@ fun NavGraphBuilder.teamConfiguration(navController: NavHostController) {
                 navController, id.arguments?.getInt("id")
             )
         }
-    } // end of nested navation
+    } // end of nested navigation
 }

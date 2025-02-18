@@ -12,8 +12,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -29,7 +27,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.golfpvcc.teamscore_rev4.utils.Constants
 import com.golfpvcc.teamscore_rev4.utils.MAX_COURSE_YARDAGE
 import com.golfpvcc.teamscore_rev4.utils.MAX_STARTING_HOLE
 import com.golfpvcc.teamscore_rev4.utils.SCORE_CARD_REC_ID
@@ -81,8 +78,9 @@ fun PlayerSetupScreen(
                 }
 
                 Spacer(modifier = Modifier.size(20.dp))
-                DisplayBottomButtons(modifier, viewModel, navController)
-                moveToNextScreen(viewModel, navController, scoreCardId = SCORE_CARD_REC_ID)
+                DisplayBottomButtons(viewModel)
+//                moveToNextScreen(viewModel, navController, scoreCardId = SCORE_CARD_REC_ID)
+                moveToNextScreen(viewModel, navController)
             }
         }
     }
@@ -117,7 +115,7 @@ fun DisplayCourseNameAndTeeSelection(
         }
         Spacer(modifier = Modifier.size(10.dp))
 
-        Row() {
+        Row {
             GetTeeInformation(
                 mMaxLength = MAX_STARTING_HOLE,
                 placeHolder = "Starting Hole",
@@ -134,9 +132,7 @@ fun DisplayCourseNameAndTeeSelection(
 
 @Composable
 fun DisplayBottomButtons(
-    modifier: Modifier,
     viewModel: PlayerSetupViewModel,
-    navController: NavHostController,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),

@@ -51,9 +51,6 @@ class CourseDetailViewModel (){
     }
     // end of par configuration
     // Configure course Handicap
-    fun clearHandicap(){
-
-    }
     fun getPopupSelectHoleHandicap(): Int {
         return (state.isPopupSelectHoleHdcp)
     }

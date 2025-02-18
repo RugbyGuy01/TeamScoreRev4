@@ -37,7 +37,7 @@ fun NavGraphBuilder.teamGameOn(navController: NavHostController) {
                 }
             )) { id ->
             ScoreCardScreen(
-                navController, id.arguments?.getInt("id")
+                navController
             )
         }
     }
