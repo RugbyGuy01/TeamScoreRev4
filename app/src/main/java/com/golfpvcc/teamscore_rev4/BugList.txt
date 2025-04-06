@@ -1,8 +1,5 @@
+Deleting a player after the game starts, does not remove the record from the score card.
+Sending an email score should rest starting hole to 1
 
-
-
-
-
-
-
+Set score hole numbers to white  on black
 

@@ -318,7 +318,7 @@ fun DisplayActionButtons(
             onClick = { onAction(DialogAction.Clear) },
             onLongClick = {})
         Spacer(modifier = Modifier.width(30.dp))
-        DialogCard(symbol = "Done",
+        DialogCard(symbol = "Enter",
 //            modifier = Modifier.width(80.dp),
             myFontSize = BUTTON_ACTION_FONT,
             backGround = Color.DarkGray,

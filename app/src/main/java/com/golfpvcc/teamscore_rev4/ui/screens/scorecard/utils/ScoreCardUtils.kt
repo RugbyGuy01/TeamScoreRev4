@@ -96,7 +96,7 @@ fun DisplayScoreCardHeader(
             Column {    // display the handicap row
                 for (rowHeading in hdcpParHoleHeading) {
                     DisplayRowHeading(
-                        rowHeading = rowHeading.mName,  // display hdcp, par, and hole in first column
+                        rowHeading = rowHeading.mName,  // display par, hole, and hdcp, in first column
                         modifier,
                         Color(VIN_LIGHT_GRAY)
                     )

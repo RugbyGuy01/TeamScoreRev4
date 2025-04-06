@@ -461,7 +461,7 @@ open class ScoreCardViewModel() : ViewModel() {
 
         if (displayHoleColor == DISPLAY_HOLE_NUMBER) {
             return if (holeIdx == state.mCurrentHole && !state.mShowTotals)
-                DISPLAY_HOLE_NUMBER
+                DISPLAY_HOLE_NUMBER      // current hole being play
             else
                 VIN_LIGHT_GRAY
         } else if (displayHoleColor == DISPLAY_NOTE_ON_HOLE) {
@@ -769,9 +769,9 @@ data class ScoreCard(
     var mCurrentJunkPlayerIdx: Int = 0, // set when adding player junk records
     var mWhatHoleIsBeingDisplayed: Int = FRONT_NINE_IS_DISPLAYED,
     val mHdcpParHoleHeading: List<HdcpParHoleHeading> = listOf(
-        HdcpParHoleHeading(HDCP_HEADER, "HdCp", mTotal = "Notes"),
         HdcpParHoleHeading(PAR_HEADER, "Par"),
         HdcpParHoleHeading(HOLE_HEADER, mName = "Hole", mTotal = "Total"),
+        HdcpParHoleHeading(HDCP_HEADER, "HdCp", mTotal = "Notes"),
     ),
 
     var mPlayerHeading: List<PlayerHeading> = emptyList(),

@@ -247,7 +247,7 @@ fun SummaryViewModel.playerScoreSummary(playerJunkDao: PlayerJunkDao) {
 
         state.mPlayerSummary.forEachIndexed { idx, playerSummary ->
 
-            calculatePlayerScoreSummary(playerSummary, parCell.mHole, hdcpCell.mHole)
+            calculatePlayerScoreSummary(playerSummary, parCell.mHole)
             calculatePlayerJunkSummary(playerJunkDao, playerSummary, idx, state.mJunkRecordTable)
         }
         if (state.mPlayerSummary.count() == NINE_PLAYERS) {
@@ -288,9 +288,9 @@ fun calculatePlayerJunkSummary(
 }
 
 fun SummaryViewModel.calculatePlayerNineScores() {
-    var nineGameScores = NineGame()
+    val nineGameScores = NineGame()
 
-    var currentHole: Int = 0
+    var currentHole = 0
 
     while (currentHole < TOTAL_18_HOLE) { // holes 1 to 18
         nineGameScores.clearTotals()
@@ -331,8 +331,8 @@ fun SummaryViewModel.calculateWhoPaysWho() {
 }
 
 fun SummaryViewModel.calculateABCD_Scores() {
-    var gameABCD = GameABCD(state.mPlayerSummary.size)
-    var currentHole: Int = 0
+    val gameABCD = GameABCD(state.mPlayerSummary.size)
+    var currentHole = 0
 
     while (currentHole < TOTAL_18_HOLE) { // holes 1 to 18
         gameABCD.clear()
@@ -371,7 +371,6 @@ fun toggle_6_ScoreCard(currentDisplayMode: Int): Int {
 fun SummaryViewModel.calculatePlayerScoreSummary(
     playerHeading: PlayerSummary,
     holePar: IntArray,
-    holeHdcp: IntArray,
 ) {
     var OverUnderScore: Int
     var playerHoleScore: Int
@@ -439,8 +438,8 @@ fun SummaryViewModel.sendPlayerEmail(playerIdx: Int, mContext: Context) {
         var body: String =
             getSpreadSheetScore(state.mPlayerSummary[playerIdx].mPlayer, parCell.mHole)
         body += state.mCourseName + "," // add course name, user will add the tee box or yardage
-        body += state.mTee
-
+        body += state.mTee + ","
+        body += state.mPlayerSummary[playerIdx].mPlayer.mHdcp
         myEmailApp.setEmailAddress(emailAddress)
         myEmailApp.setEmailSubject(subject)
         myEmailApp.setEmailBody(body)

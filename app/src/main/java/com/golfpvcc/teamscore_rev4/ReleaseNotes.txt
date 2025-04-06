@@ -1,4 +1,7 @@
-Revision 2.10 - xx/xx/20xx
+Revision 2.10 - 04/05/2025
+Add player's handicap to the email
+Scorecard should go line 1 par,  line 2 hole number, and line 3 handicap
+change "Done" to Enter
 
 Revision 2.9 - 02/18/2024
 Fixed "Display Mode" next to current display mode then course Name
