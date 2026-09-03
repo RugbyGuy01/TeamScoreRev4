@@ -91,7 +91,7 @@ open class ScoreCardViewModel() : ViewModel() {
         Log.d("VIN1", "getScoreCardAndPlayerRecord read records")
         if (!state.mHasDatabaseBeenRead) {
             state.mHasDatabaseBeenRead = true   // only read the database once
-            val scoreCardWithPlayers: ScoreCardWithPlayers =
+            val scoreCardWithPlayers: ScoreCardWithPlayers? =
                 scoreCardDao.getScoreRecordWithPlayers(SCORE_CARD_REC_ID)
 
             if (scoreCardWithPlayers != null) {     // found score record with players

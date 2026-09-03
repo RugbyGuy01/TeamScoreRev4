@@ -60,7 +60,7 @@ open class SummaryViewModel() : ViewModel() {
         if (!state.mHasDatabaseBeenRead) {
             state.mHasDatabaseBeenRead = true   // only read the database once
             readJunkTableRecordsFromDB()
-            val scoreCardWithPlayers: ScoreCardWithPlayers =
+            val scoreCardWithPlayers: ScoreCardWithPlayers? =
                 scoreCardDao.getScoreRecordWithPlayers(SCORE_CARD_REC_ID)
 
             if (scoreCardWithPlayers != null) {     // found score record with players

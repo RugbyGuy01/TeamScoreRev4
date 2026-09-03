@@ -18,7 +18,7 @@ interface ScoreCardDao {
 
     @Transaction
     @Query("Select * FROM ScoreCardRecord WHERE mScoreCardRecId = :scoreCardId ")
-    fun getScoreRecordWithPlayers(scoreCardId: Int?): ScoreCardWithPlayers
+    fun getScoreRecordWithPlayers(scoreCardId: Int?): ScoreCardWithPlayers?
 
     @Query("SELECT EXISTS(SELECT * FROM ScoreCardRecord WHERE mScoreCardRecId = :scoreCardId)")
     fun isRowIsExist(scoreCardId : Int) : Boolean
