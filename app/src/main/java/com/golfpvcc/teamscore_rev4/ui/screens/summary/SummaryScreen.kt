@@ -11,12 +11,15 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentSize
 
 import androidx.compose.foundation.lazy.LazyRow
@@ -60,6 +63,7 @@ import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DISPLAY_MODE_6_X_6
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.DISPLAY_MODE_X_6_6
 import com.golfpvcc.teamscore_rev4.ui.screens.scorecard.utils.NINE_PLAYERS
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.AboutDialog
+import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.DonateDialog
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.BackupANdRestoreDialog
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.ConfigureEmailDialog
 import com.golfpvcc.teamscore_rev4.ui.screens.summary.utils.ConfigureJunkDialog
@@ -94,7 +98,12 @@ fun SummaryScreen(
         "Summary GetScoreCardRecord after Id ${summaryViewModel.state.mCourseId}, ID = $id "
     )
 
-    Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.primary) {
+    Surface(
+        modifier = Modifier
+            .fillMaxSize()
+            .windowInsetsPadding(WindowInsets.systemBars),
+        color = MaterialTheme.colorScheme.primary
+    ) {
         Scaffold()
         {
             Column(
@@ -146,6 +155,9 @@ fun DisplayCourseName(summaryViewModel: SummaryViewModel) {
 fun DisplayMenuOptionDialogs(summaryViewModel: SummaryViewModel) {
     if (summaryViewModel.state.mShowAboutDialog) {
         AboutDialog(summaryViewModel::summaryActions)
+    }
+    if (summaryViewModel.state.mShowDonateDialog) {
+        DonateDialog(summaryViewModel::summaryActions)
     }
     if (summaryViewModel.state.mShowPointsDialog) {
         SetScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
@@ -711,6 +723,12 @@ fun DisplayOptionMenuDown(onAction: (SummaryActions) -> Unit) {
                 onClick = {
                     expanded = false
                     onAction(SummaryActions.DisplayAboutDialog)
+                })
+            DropdownMenuItem(
+                { Text(text = "Donate", fontSize = MENU_BUTTON_TEXT.sp) },
+                onClick = {
+                    expanded = false
+                    onAction(SummaryActions.DisplayDonateDialog)
                 })
         }
     }

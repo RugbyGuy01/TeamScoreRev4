@@ -14,5 +14,6 @@ sealed class SummaryActions {       // functions are located in summary view mod
     data object CancelPointsDialog : SummaryActions()
     data object ShowBackupRestoreDialog : SummaryActions()
     data object DisplayAboutDialog : SummaryActions()
+    data object DisplayDonateDialog : SummaryActions()
     data class SendEmailToUser(val playerIdx: Int, val context: Context) : SummaryActions()
 }

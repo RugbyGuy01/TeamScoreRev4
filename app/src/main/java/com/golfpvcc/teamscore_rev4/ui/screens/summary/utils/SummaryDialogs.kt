@@ -6,6 +6,8 @@ import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -196,7 +199,9 @@ fun UpdatePointsTable(
         singleLine = true,
         label = { Text(text = prompt) },
         onValueChange = { points ->
-            if (points.length <= mMaxLength && points != "-") updatedData(idx, points)
+            // "" and "-" are valid intermediate states while editing; rejecting them here
+            // left the field showing text that no longer matched the stored value.
+            if (points.length <= mMaxLength) updatedData(idx, points)
             else Toast.makeText(
                 mContext,
                 "Cannot be more than $mMaxLength Characters",
@@ -422,19 +427,80 @@ fun AboutDialog(onAction: (SummaryActions) -> Unit) {
         // 5
         title = { Text(text = "About Team Score") },
         text = {
-            Text(
-                text = "Team Score App.\n" +
-                        " Written by Vinnie Gamble\n\n" +
-                        "Contact: Vgamble@golfpvcc.com\n\n" +
-                        "Revision: $REVISION\n" +
-                        "Compiled: $REV_DATE",
-                fontSize = SUMMARY_DIALOG_TEXT_SIZE.sp,
-            )
+            val buildDate = REV_DATE.substringBefore(" ")
+            val buildTime = REV_DATE.substringAfter(" ")
+            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                Text(
+                    text = "Team Score App.\n Written by Vinnie Gamble",
+                    fontSize = SUMMARY_DIALOG_TEXT_SIZE.sp,
+                )
+                Spacer(modifier = Modifier.size(6.dp))
+                Text(
+                    text = "Contact: Vgamble@golfpvcc.com",
+                    fontSize = SUMMARY_DIALOG_TEXT_SIZE.sp,
+                )
+                Spacer(modifier = Modifier.size(6.dp))
+                Text(
+                    text = "Revision: $REVISION",
+                    fontSize = SUMMARY_DIALOG_TEXT_SIZE.sp,
+                )
+                Text(
+                    text = "Compiled: $buildDate",
+                    fontSize = SUMMARY_DIALOG_TEXT_SIZE.sp,
+                )
+                Text(
+                    text = buildTime,
+                    fontSize = SUMMARY_DIALOG_TEXT_SIZE.sp,
+                )
+            }
         },
         confirmButton = { // 6
             Button(
                 onClick = {
                     onAction(SummaryActions.DisplayAboutDialog)
+                }
+            ) {
+                Text(
+                    text = "Ok",
+                    fontSize = DIALOG_BUTTON_TEXT_SIZE.sp,
+                    color = Color.White
+                )
+            }
+        }
+    )
+}
+
+@Composable
+fun DonateDialog(onAction: (SummaryActions) -> Unit) {
+
+    AlertDialog(
+        onDismissRequest = {
+            // SummaryActions.DisplayDonateDialog
+        },
+        title = { Text(text = "Support Team Score") },
+        text = {
+            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                Text(
+                    text = "If you enjoy this app and would like to buy the developer a cup of coffee, " +
+                            "donations are welcome via Venmo:",
+                    fontSize = SUMMARY_DIALOG_TEXT_SIZE.sp,
+                )
+                Spacer(modifier = Modifier.size(6.dp))
+                Text(
+                    text = "@Rugbyguy01",
+                    fontSize = SUMMARY_DIALOG_TEXT_SIZE.sp,
+                )
+                Spacer(modifier = Modifier.size(6.dp))
+                Text(
+                    text = "Thank you for your support!",
+                    fontSize = SUMMARY_DIALOG_TEXT_SIZE.sp,
+                )
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    onAction(SummaryActions.DisplayDonateDialog)
                 }
             ) {
                 Text(

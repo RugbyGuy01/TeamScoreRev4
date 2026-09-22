@@ -1,4 +1,17 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.time.format.DateTimeFormatter
+import java.time.ZonedDateTime
+import java.util.Properties
+
+// Release signing credentials live in keystore.properties (git-ignored), not in this file.
+// See keystore.properties.template for the expected keys.
+val keystorePropertiesFile = rootProject.file("keystore.properties")
+val keystoreProperties = Properties().apply {
+    if (keystorePropertiesFile.exists()) {
+        keystorePropertiesFile.inputStream().use { load(it) }
+    }
+}
+val hasReleaseKeystore = keystoreProperties.getProperty("storeFile") != null
 
 plugins {
     alias(libs.plugins.android.application)
@@ -21,22 +34,43 @@ android {
         applicationId = "com.golfpvcc.teamscore_rev4"
         minSdk = 33
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "2.10"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        val buildTimestamp = ZonedDateTime.now().format(DateTimeFormatter.ofPattern("MM-dd-yyyy hh:mm a"))
+        buildConfigField("String", "BUILD_TIME", "\"$buildTimestamp\"")
+    }
+
+    signingConfigs {
+        if (hasReleaseKeystore) {
+            create("release") {
+                storeFile = rootProject.file(keystoreProperties.getProperty("storeFile"))
+                storePassword = keystoreProperties.getProperty("storePassword")
+                keyAlias = keystoreProperties.getProperty("keyAlias")
+                keyPassword = keystoreProperties.getProperty("keyPassword")
+            }
+        }
     }
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            // Falls back to unsigned when keystore.properties is absent, so the
+            // project still configures on a fresh clone.
+            signingConfig = if (hasReleaseKeystore) signingConfigs.getByName("release") else null
+        }
+        debug {
+            versionNameSuffix = "-debug"
         }
     }
     compileOptions {
@@ -50,6 +84,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 //    composeOptions {
 //        kotlinCompilerExtensionVersion = "1.5.10"

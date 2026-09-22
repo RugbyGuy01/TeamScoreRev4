@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.util.Log
 import android.util.Patterns
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
@@ -40,6 +41,7 @@ import com.golfpvcc.teamscore_rev4.utils.SCORE_CARD_REC_ID
 import com.golfpvcc.teamscore_rev4.utils.createPointTableRecords
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 open class SummaryViewModel() : ViewModel() {
@@ -113,6 +115,7 @@ open class SummaryViewModel() : ViewModel() {
     fun summaryActions(action: SummaryActions) {
         when (action) {
             SummaryActions.DisplayAboutDialog -> displayAboutDialog()
+            SummaryActions.DisplayDonateDialog -> displayDonateDialog()
             SummaryActions.DisplayJunkDialog -> displayJunkDialog()
             is SummaryActions.UpdateJunkRecord -> updateJunkRecord(action.junkRecIdx)
             SummaryActions.AddRecordJunkDialog -> addRecordJunkDialog()
@@ -159,6 +162,12 @@ open class SummaryViewModel() : ViewModel() {
         repaintScreen()
     }
 
+    fun displayDonateDialog() {
+        Log.d("VIN", "displayDonateDialog  state ${state.mShowDonateDialog}")
+        state.mShowDonateDialog = !state.mShowDonateDialog
+        repaintScreen()
+    }
+
     fun showBackupRestoreDialog() {
         Log.d("VIN", "showBackupRestoreDialog ")
         state.mShowBackupRestoreDialog = !state.mShowBackupRestoreDialog
@@ -170,19 +179,6 @@ open class SummaryViewModel() : ViewModel() {
         Log.d("VIN", "displayEmailDialog ")
         state.mShowEmailDialog = !state.mShowEmailDialog
         repaintScreen()
-    }
-
-    fun getJunkRecord() {
-        if (state.mShowJunkDialog) {
-            Log.d("VIN", "Read getJunkRecord ")
-            state.mJunkRecordTable.addAll(junkDao.getAllJunkRecords())
-
-            Log.d("VIN", "Read getJunkRecord rec cnt ${state.mJunkRecordTable.count()} ")
-
-            if (state.mJunkRecordTable.isEmpty()) {
-                addRecordJunkDialog()
-            }
-        }
     }
 
     fun displayJunkDialog() {
@@ -220,13 +216,14 @@ open class SummaryViewModel() : ViewModel() {
 
     // user want to add new record to the database or the DB is empty
     fun addRecordToDatabaseAndTable() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             val addRecord = JunkRecord("", 0) // keep this record on the top of list
-            val recId = junkDao.insertJunkTableRecord(addRecord)
-            addRecord.mId = recId
+            val recId = withContext(Dispatchers.IO) { junkDao.insertJunkTableRecord(addRecord) }
+            // Apply the list/index update on the main thread so the running composition
+            // observes it in the same frame.
             val tableIdx =
                 state.mJunkRecordTable.count()   // insert add record at the end of the list
-            state.mJunkRecordTable.add(tableIdx, addRecord)   // add record to list table
+            state.mJunkRecordTable.add(tableIdx, addRecord.copy(mId = recId))
             state.mSelectJunkRecordIndex =
                 tableIdx     // this is the index used to display record on the add record
             repaintScreen()
@@ -243,7 +240,12 @@ open class SummaryViewModel() : ViewModel() {
     }
 
     fun onJunkRecordChange(junkString: String) {
-        state.mJunkRecordTable[state.mSelectJunkRecordIndex].mJunkName = junkString
+        val recordTableIndex = state.mSelectJunkRecordIndex
+        // Replace the element instead of mutating it in place. JunkRecord is an unstable
+        // type, so under strong skipping Compose compares it by instance — mutating
+        // mJunkName on the existing object leaves JunkRecordItem skipped and stale.
+        state.mJunkRecordTable[recordTableIndex] =
+            state.mJunkRecordTable[recordTableIndex].copy(mJunkName = junkString)
         repaintScreen()
     }
 
@@ -292,11 +294,19 @@ open class SummaryViewModel() : ViewModel() {
     }
 
     private fun savePointsDialogRecords() {
-        viewModelScope.launch(Dispatchers.IO) {
-            for (ptRecord: PointTable in state.mGamePointsTable) {
-                val pointsRecord =
-                    PointsRecord(ptRecord.key, ptRecord.value.toInt(), ptRecord.label)
-                pointsRecordDoa.addUpdatePointTableRecord(pointsRecord)
+        // A field can legitimately be blank or a lone "-" while the user is mid-edit.
+        // Treat anything unparsable as 0 and write the normalised text back, so the
+        // dialog never shows a value that differs from what was saved.
+        val pointsRecords = state.mGamePointsTable.map { ptRecord ->
+            val pointsValue = ptRecord.value.toIntOrNull() ?: 0
+            ptRecord.value = pointsValue.toString()
+            PointsRecord(ptRecord.key, pointsValue, ptRecord.label)
+        }
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                for (pointsRecord in pointsRecords) {
+                    pointsRecordDoa.addUpdatePointTableRecord(pointsRecord)
+                }
             }
             displayPointsDialog()   // exit dialog
         }
@@ -483,12 +493,14 @@ data class State(
     var mShowJunkDialog: Boolean = false,
     var mSelectJunkRecordIndex: Int = -1,
     var mJunkDatabaseRecordRead: Boolean = false,
-    var mJunkRecordTable: MutableList<JunkRecord> = mutableListOf(),
+    // Snapshot-backed so add/remove is observed by Compose without a full state.copy().
+    var mJunkRecordTable: MutableList<JunkRecord> = mutableStateListOf(),
 
     var mShowPointsDialog: Boolean = false,
     var mShowBackupRestoreDialog: Boolean = false,
     var mBackupAndRestoreResults: String = "",
     var mShowAboutDialog: Boolean = false,
+    var mShowDonateDialog: Boolean = false,
     var mShowEmailDialog: Boolean = false,
     var mSendEmailToUser: Boolean = false,
     var mSendEmailToPlayerIdx: Int = -1,

@@ -10,7 +10,7 @@ import com.golfpvcc.teamscore_rev4.database.model.CourseRecord
 @Dao
 interface CourseDao {
     @Query("SELECT * FROM CourseTable WHERE mId = :courseId ")
-     fun getCourseRecord(courseId: Int?): CourseRecord
+     fun getCourseRecord(courseId: Int?): CourseRecord?
 
     @Query("Select * FROM CourseTable ORDER BY mCoursename ASC")
     fun getAllCoursesRecordAsc(): LiveData<List<CourseRecord>>

@@ -102,7 +102,7 @@ open class ScoreCardViewModel() : ViewModel() {
             state.mGamePointsTable = pointsRecordDoa.getAllPointRecords()
 
             state.mJunkTableSelection.loadJunkTableRecords()
-            state.mCourseRecord = courseRecordDoa.getCourseRecord(state.mCourseId)
+            state.mCourseRecord = courseRecordDoa.getCourseRecord(state.mCourseId) ?: CourseRecord()
             repaintScreen() // repaint the screen after all of the data has been read
         }
     }
@@ -614,9 +614,9 @@ open class ScoreCardViewModel() : ViewModel() {
             getParForHole(state.mCurrentHole),
             state.mPlayerHeading
         )
+        clearGrossAndNetButtons()   // clear the color button array
+        savePlayersScoresRecord()
         if (playersScoreAreNotZero(state.mCurrentHole, state.mPlayerHeading)) {
-            clearGrossAndNetButtons()   // clear the color button array
-            savePlayersScoresRecord()
             setShowTotalsFlag()         // advance to the next hole here
         }
     }

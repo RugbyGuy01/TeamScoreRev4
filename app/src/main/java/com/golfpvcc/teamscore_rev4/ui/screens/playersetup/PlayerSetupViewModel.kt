@@ -44,7 +44,7 @@ class PlayerSetupViewModel(
     }
 
     suspend fun getCourseById(courseId: Int?) {
-        val courseRecord: CourseRecord = courseDao.getCourseRecord(courseId)
+        val courseRecord: CourseRecord = courseDao.getCourseRecord(courseId) ?: CourseRecord()
 
         updateCourseRecord(courseRecord)
         val scoreCardRecord: ScoreCardRecord

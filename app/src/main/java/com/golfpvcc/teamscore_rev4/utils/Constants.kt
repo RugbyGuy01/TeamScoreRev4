@@ -1,11 +1,11 @@
 package com.golfpvcc.teamscore_rev4.utils
 
-import android.app.Activity
+import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
 import com.golfpvcc.teamscore_rev4.database.model.CourseRecord
-var REV_DATE = buildTime()
-const val REVISION = "2.2 "
+import com.golfpvcc.teamscore_rev4.BuildConfig
+val REV_DATE = BuildConfig.BUILD_TIME
+val REVISION = BuildConfig.VERSION_NAME   // single source of truth: app/build.gradle.kts versionName
 
 const val VIN_LIGHT_GRAY = 0xFFE0E0E0
 const val DISPLAY_HOLE_NUMBER = 0xFF48EFF0  // current hole being play
@@ -82,7 +82,7 @@ const val COLUMN_TOTAL_WIDTH = 65
 const val CARD_CELL_HEIGHT = 33
 const val SUMMARY_TEXT_SIZE = 20
 const val SUMMARY_NAME_TEXT_SIZE = 22
-const val SUMMARY_DIALOG_TEXT_SIZE = 20
+const val SUMMARY_DIALOG_TEXT_SIZE = 18
 const val DIALOG_BUTTON_TEXT_SIZE = 20
 const val DIALOG_BACKUP_RESTORE_TEXT_SIZE = 20
 const val DIALOG_NOTE_HEADER_SIZE = 20
@@ -119,8 +119,8 @@ object Constants {
 
 @Composable
 fun SetScreenOrientation(orientation : Int) {
-    val activity = LocalContext.current as Activity
-    activity.requestedOrientation = orientation
+    val activity = LocalActivity.current
+    activity?.requestedOrientation = orientation
 }
 
 

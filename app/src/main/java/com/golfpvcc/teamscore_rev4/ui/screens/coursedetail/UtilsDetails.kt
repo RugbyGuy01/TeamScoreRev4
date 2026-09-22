@@ -26,10 +26,13 @@ import com.golfpvcc.teamscore_rev4.utils.TeamObjects
 
 @Composable
 fun DisplayFlipHdcpsButtons(recDetail: CourseDetailViewModel) {
+    val hasAssignedHandicaps = recDetail.state.mHandicap.any { it != 0 }
+
     Button(
         modifier = Modifier
             .padding(top = 20.dp, start = 20.dp)
             .height(40.dp),
+        enabled = !hasAssignedHandicaps,
         onClick = {
             recDetail.setFlipHdcpsChange(recDetail.state.mFlipHdcps)
         },
