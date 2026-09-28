@@ -4,6 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,6 +22,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -185,7 +187,10 @@ fun DisplayJunkDialog(
                         .padding(2.dp)
                         .weight(.9f)
                 ) {
-                    itemsIndexed(scoreCardViewModel.state.mJunkTableSelection.mJunkTableList) { index, junkList ->
+                    itemsIndexed(
+                        scoreCardViewModel.state.mJunkTableSelection.mJunkTableList,
+                        key = { _, junkList -> junkList.mId },
+                    ) { index, junkList ->
                         JunkListItem(junkList, index, onAction)
                     }
                 } // end of junk selection list
@@ -221,7 +226,12 @@ fun JunkListItem(
             .fillMaxWidth()
             .padding(5.dp)
             .height(30.dp)
-            .clickable { onAction(DialogAction.ToggleJunkListItem(listIdx)) },
+            // Selection is drawn explicitly via backGround above; the default ripple/focus
+            // indication is suppressed so it can't leave a stray tint on the row.
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+            ) { onAction(DialogAction.ToggleJunkListItem(listIdx)) },
         border = BorderStroke(1.dp, Color.Black),
         colors = CardDefaults.cardColors(
             containerColor = backGround, //Card background color

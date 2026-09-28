@@ -63,7 +63,7 @@ fun DisplayModeDropDown(
                     expanded = false
                 })
             DropdownMenuItem(
-                { Text(text = "Standford") },
+                { Text(text = "Stableford") },
                 onClick = {
                     onAction(ScoreCardActions.ScreenModeStableford)
                     expanded = false

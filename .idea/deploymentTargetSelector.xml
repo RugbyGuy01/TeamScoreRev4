@@ -4,10 +4,10 @@
     <selectionStates>
       <SelectionState runConfigName="TeamScore">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2026-09-19T17:25:38.274701700Z">
+        <DropdownSelection timestamp="2026-09-24T17:49:30.033030800Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="PhysicalDevice" identifier="serial=RFCXA1XMSVH" />
+              <DeviceId pluginId="PhysicalDevice" identifier="serial=R58MB0BK39N" />
             </handle>
           </Target>
         </DropdownSelection>

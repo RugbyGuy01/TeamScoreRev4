@@ -32,10 +32,10 @@ android {
 
     defaultConfig {
         applicationId = "com.golfpvcc.teamscore_rev4"
-        minSdk = 33
+        minSdk = 30
         targetSdk = 36
-        versionCode = 2
-        versionName = "2.10"
+        versionCode = 3
+        versionName = "3.00"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

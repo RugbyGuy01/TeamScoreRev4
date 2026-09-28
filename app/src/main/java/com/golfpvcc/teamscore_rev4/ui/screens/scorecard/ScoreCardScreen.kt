@@ -9,11 +9,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
@@ -64,12 +66,15 @@ fun ScoreCardScreen(
         Scaffold()
         {
             Spacer(modifier = Modifier.padding(5.dp))
-            Row {
+            Row(modifier = Modifier.fillMaxWidth()) {
                 Column(
                     modifier = Modifier
                         .padding(5.dp)
-                        // .weight(.8f)   // size of score card with
                         .fillMaxHeight()
+                        // Measured after the buttons column below, so the scorecard (which
+                        // can scroll sideways) absorbs any extra width instead of squeezing
+                        // the buttons' natural size.
+                        .weight(1f)
                 ) {
                     DisplayMainScoreCard(scoreCardViewModel)
                     Spacer(modifier = Modifier.size(12.dp))
@@ -78,7 +83,6 @@ fun ScoreCardScreen(
                     modifier = Modifier
                         .padding(5.dp)
                         .fillMaxHeight(),
-                    // .weight(.2f),  // size of score card with
                     horizontalAlignment = Alignment.End
                 ) {
                     DisplayControlButtons(
@@ -111,7 +115,13 @@ fun GetScoreCardRecord(
 fun DisplayMainScoreCard(
     scoreCardViewModel: ScoreCardViewModel,
 ) {
-    Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+    Column(
+        modifier = Modifier
+            .verticalScroll(rememberScrollState())
+            // The added 18-hole total column can push the grid wider than the screen on
+            // some devices; scroll sideways rather than clipping it or the side buttons.
+            .horizontalScroll(rememberScrollState())
+    ) {
         DisplayCourseName(scoreCardViewModel)
         DisplayScoreCardHeader(scoreCardViewModel)
         DisplayScoreCardNames(scoreCardViewModel)

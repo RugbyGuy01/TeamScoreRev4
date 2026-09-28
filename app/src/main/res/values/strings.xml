@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">TeamScore_Rev4</string>
+    <string name="app_name">TeamScore</string>
     <string name="delete_course">Delete Course</string>
     <string name="edit_course">Edit Course</string>
     <string name="save_course">Save Course</string>

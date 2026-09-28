@@ -362,15 +362,27 @@ open class ScoreCardViewModel() : ViewModel() {
         return (totalScoreStr)
     }
 
-    fun getPlayerScoreAdjustedForPtQuote(playerTotalScore: String, playerHdcp: Int): String {
+    // Front nine + back nine combined, regardless of which nine is currently displayed.
+    fun getTotalForAllHoles(holes: IntArray): String {
+        return (getTotalScore(holes, 0, TOTAL_18_HOLE))
+    }
+
+    // holesTotaled: how many holes playerTotalScore covers (9 for a front/back subtotal,
+    // 18 for the combined column) so the quota - which is defined for a full round - scales
+    // to match instead of always being halved.
+    fun getPlayerScoreAdjustedForPtQuote(
+        playerTotalScore: String,
+        playerHdcp: Int,
+        holesTotaled: Int = FRONT_NINE_DISPLAY,
+    ): String {
         var playerAdjustScore: String = playerTotalScore
 
         if (state.mDisplayScreenMode == DISPLAY_MODE_POINT_QUOTA)
-            playerAdjustScore = adjustPlayerPtQuoteScore(playerTotalScore, playerHdcp)
+            playerAdjustScore = adjustPlayerPtQuoteScore(playerTotalScore, playerHdcp, holesTotaled)
         return (playerAdjustScore)
     }
 
-    private fun adjustPlayerPtQuoteScore(playerScore: String, playerHdcp: Int): String {
+    private fun adjustPlayerPtQuoteScore(playerScore: String, playerHdcp: Int, holesTotaled: Int): String {
         var adjustedScore: Float = 0f
         val ptQuota = state.mGamePointsTable.filter { it.mId == PQ_TARGET }
         var playerAdjustedScore: String = playerScore
@@ -379,7 +391,7 @@ open class ScoreCardViewModel() : ViewModel() {
             val targetPoint: Int = ptQuota.first().mPoints
 
             adjustedScore = (targetPoint - playerHdcp).toFloat()
-            adjustedScore /= 2
+            adjustedScore = adjustedScore * holesTotaled / TOTAL_18_HOLE
             adjustedScore = (playerScore.toInt() - adjustedScore)
 
             Log.d("VIN", "Target $targetPoint hdcp $playerHdcp, player score $playerScore, ")
@@ -450,6 +462,16 @@ open class ScoreCardViewModel() : ViewModel() {
         } else {
             state.copy(mCurrentHole = BACK_NINE_TOTAL_DISPLAYED)
         }
+        if (state.mShowTotals) {
+            state = state.copy(mShowTotals = false)
+            highLiteTotalColumn(VIN_LIGHT_GRAY)
+        }
+        displayFrontOrBackOfScoreCard()
+    }
+
+    // Jump directly to a hole by tapping its number, instead of stepping via Next/Prev.
+    fun setCurrentHole(holeIdx: Int) {
+        state = state.copy(mCurrentHole = holeIdx)
         if (state.mShowTotals) {
             state = state.copy(mShowTotals = false)
             highLiteTotalColumn(VIN_LIGHT_GRAY)
@@ -529,7 +551,7 @@ open class ScoreCardViewModel() : ViewModel() {
             val playerIdx = state.mCurrentJunkPlayerIdx // get the index before we lose scope
             val currentHole = state.mCurrentHole
             if (selection) {
-                state.mJunkTableSelection.addPlayerJunkRecord(playerJunkRecord)
+                state.mJunkTableSelection.addPlayerJunkRecord(listIdx, playerJunkRecord)
             } else {
                 state.mJunkTableSelection.deletePlayerJunkRecord(playerJunkRecord)
             }
@@ -771,7 +793,7 @@ data class ScoreCard(
     val mHdcpParHoleHeading: List<HdcpParHoleHeading> = listOf(
         HdcpParHoleHeading(PAR_HEADER, "Par"),
         HdcpParHoleHeading(HOLE_HEADER, mName = "Hole", mTotal = "Total"),
-        HdcpParHoleHeading(HDCP_HEADER, "HdCp", mTotal = "Notes"),
+        HdcpParHoleHeading(HDCP_HEADER, "HdCp", mTotal = "Notes", mColor = Color(0xFFFFA500)),
     ),
 
     var mPlayerHeading: List<PlayerHeading> = emptyList(),

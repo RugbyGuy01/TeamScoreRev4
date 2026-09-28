@@ -67,7 +67,7 @@ fun EnterPlayerInfo(
         GetPlayerSetupInformation(
             index = index,
             mMaxLength = MAX_HANDICAP,
-            placeHolder = "Handicap",
+            placeHolder = "Strokes",
             nameOrHandicap = viewModel.state.mPlayerRecords[index].mHandicap.toString(),
             updatedData = viewModel::onPlayerHandicapChange,
             KeyboardType.Number,

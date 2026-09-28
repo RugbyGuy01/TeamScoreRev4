@@ -38,6 +38,7 @@ import com.golfpvcc.teamscore_rev4.utils.CARD_CELL_HEIGHT
 import com.golfpvcc.teamscore_rev4.utils.COLOR_NEXT_HOLE
 import com.golfpvcc.teamscore_rev4.utils.COLOR_PREV_HOLE
 import com.golfpvcc.teamscore_rev4.utils.COLOR_SCREEN_MODE
+import com.golfpvcc.teamscore_rev4.utils.DISPLAY_HOLE_NUMBER
 import com.golfpvcc.teamscore_rev4.utils.COLUMN_TOTAL_WIDTH
 import com.golfpvcc.teamscore_rev4.utils.SCORE_CARD_COURSE_NAME_TEXT
 import com.golfpvcc.teamscore_rev4.utils.SCORE_CARD_TEXT
@@ -132,6 +133,17 @@ fun DisplayScoreCardHeader(
                     )
                 }
             }
+            Column {    // front nine + back nine combined total, regardless of which is shown
+                modifier = Modifier.width(COLUMN_TOTAL_WIDTH.dp).height(CARD_CELL_HEIGHT.dp)
+                for (idx in hdcpParHoleHeading.indices) {
+                    val allHolesTotal = when (hdcpParHoleHeading[idx].vinTag) {
+                        PAR_HEADER -> scoreCardViewModel.getTotalForAllHoles(hdcpParHoleHeading[idx].mHole)
+                        HOLE_HEADER -> "18 Tot"
+                        else -> ""
+                    }
+                    DisplayRowHeading(allHolesTotal, modifier, Color(VIN_LIGHT_GRAY))
+                }
+            }
         }
     }
 }
@@ -171,6 +183,21 @@ fun DisplayScoreCardNames(
                     )
 
                     DisplayRowHeading(playerHeading[idx].mTotal, modifier, Color(VIN_LIGHT_GRAY))
+                }
+            }
+            Column {    // front nine + back nine combined total for each player
+                modifier = Modifier.width(COLUMN_TOTAL_WIDTH.dp).height(CARD_CELL_HEIGHT.dp)
+                for (idx in playerHeading.indices) {
+                    var playerAllHolesTotal =
+                        scoreCardViewModel.getTotalForAllHoles(playerHeading[idx].mDisplayScore)
+
+                    playerAllHolesTotal = scoreCardViewModel.getPlayerScoreAdjustedForPtQuote(
+                        playerAllHolesTotal,
+                        playerHeading[idx].mHdcp.toInt(),
+                        TOTAL_18_HOLE,
+                    )
+
+                    DisplayRowHeading(playerAllHolesTotal, modifier, Color(VIN_LIGHT_GRAY))
                 }
             }
         }
@@ -215,6 +242,14 @@ fun DisplayScoreCardTeams(
                     DisplayRowHeading(teamUsedHeading[idx].mTotal, modifier, Color(VIN_LIGHT_GRAY))
                 }
             }
+            Column {    // front nine + back nine combined total for "Team" and "Used"
+                modifier = Modifier.width(COLUMN_TOTAL_WIDTH.dp).height(CARD_CELL_HEIGHT.dp)
+                for (idx in teamUsedHeading.indices) {
+                    val teamUsedAllHolesTotal =
+                        scoreCardViewModel.getTotalForAllHoles(teamUsedHeading[idx].mHole)
+                    DisplayRowHeading(teamUsedAllHolesTotal, modifier, Color(VIN_LIGHT_GRAY))
+                }
+            }
         }
     }
 }
@@ -232,7 +267,16 @@ fun DisplayScoreCardCell(
         val endingCell: Int = scoreCardViewModel.getEndingHole()
         for (idx in startingCell until endingCell) {
             Surface(
-                modifier = modifier.width(45.dp).height(CARD_CELL_HEIGHT.dp),
+                modifier = modifier
+                    .width(45.dp)
+                    .height(CARD_CELL_HEIGHT.dp)
+                    // Only the Hole row (color == DISPLAY_HOLE_NUMBER) sets the current hole
+                    // being scored; Par/HdCp cells reuse this same composable and stay inert.
+                    .let {
+                        if (color == DISPLAY_HOLE_NUMBER)
+                            it.clickable { scoreCardViewModel.setCurrentHole(idx) }
+                        else it
+                    },
                 border = BorderStroke(Dp.Hairline, color = Color.Blue),
                 color = Color(scoreCardViewModel.setHighLightCurrentHole(idx, color)),
                 contentColor = contentColorFor(Color.Transparent),

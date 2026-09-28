@@ -6,6 +6,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -26,6 +27,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -75,6 +77,7 @@ import com.golfpvcc.teamscore_rev4.utils.REVISION
 import com.golfpvcc.teamscore_rev4.utils.REV_DATE
 import com.golfpvcc.teamscore_rev4.utils.SUMMARY_DIALOG_TEXT_SIZE
 import com.golfpvcc.teamscore_rev4.utils.USER_TEXT_SAVE
+import com.golfpvcc.teamscore_rev4.utils.VIN_LIGHT_GRAY
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import com.golfpvcc.teamscore_rev4.database.room.buildBackupLauncher as buildBackupLauncher1
@@ -255,11 +258,23 @@ fun ConfigureJunkDialog(onAction: (SummaryActions) -> Unit, summaryViewModel: Su
                         .padding(2.dp)
                         .weight(1f)
                 ) {
-                    itemsIndexed(summaryViewModel.state.mJunkRecordTable) { index, junkRecord ->
+                    itemsIndexed(
+                        summaryViewModel.state.mJunkRecordTable,
+                        // Stable key per row so ripple/interaction state can't leak onto a
+                        // different record when the list is mutated (add/delete).
+                        key = { _, junkRecord -> junkRecord.mId },
+                    ) { index, junkRecord ->
+                        val isSelected = index == summaryViewModel.state.mSelectJunkRecordIndex
                         JunkRecordItem(
                             junkRecord,
+                            isSelected,
                         )
-                        { onAction(SummaryActions.UpdateJunkRecord(index)) }
+                        {
+                            // Tapping the already-selected item deselects it (-1 saves/closes
+                            // the edit field); tapping another item selects that one instead.
+                            val newIdx = if (isSelected) -1 else index
+                            onAction(SummaryActions.UpdateJunkRecord(newIdx))
+                        }
                         Spacer(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -285,6 +300,7 @@ fun ConfigureJunkDialog(onAction: (SummaryActions) -> Unit, summaryViewModel: Su
 @Composable //Display the Junk record in a Card
 fun JunkRecordItem(
     junkRecord: JunkRecord,
+    isSelected: Boolean,
     onClick: () -> Unit,
 ) {
     Card(
@@ -292,8 +308,17 @@ fun JunkRecordItem(
             .fillMaxWidth()
             .padding(5.dp)
             .height(50.dp)
-            .clickable { onClick() },
-        border = BorderStroke(1.dp, Color.Black),
+            // Selection is drawn explicitly via isSelected below; the default ripple/focus
+            // indication is suppressed so it can't leave a stray tint on the row (e.g. when
+            // the system auto-focuses this Card after the edit field above it closes).
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+            ) { onClick() },
+        border = BorderStroke(if (isSelected) 2.dp else 1.dp, if (isSelected) Color.Red else Color.Black),
+        colors = CardDefaults.cardColors(
+            containerColor = if (isSelected) Color(VIN_LIGHT_GRAY) else Color.White,
+        ),
     ) {
         Row(
             modifier = Modifier
@@ -320,43 +345,44 @@ fun DisplayJunkRecordEditField(
     recToEdit: Int,
     onClick: () -> Unit,
 ) {
-    Dialog(properties = DialogProperties(usePlatformDefaultWidth = false),
-        onDismissRequest = { }) {
-        Card(
-            modifier = Modifier
-                .width(400.dp)
+    // Rendered inline (not in its own Dialog/window) so the list underneath stays reachable
+    // for taps — a second stacked window here previously caused a visible flash on every
+    // selection and swallowed the tap needed to deselect the row again.
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 5.dp),
+        shape = RoundedCornerShape(16.dp),
+        border = BorderStroke(1.dp, Color.Red),
+    ) {
+        Column(
+            Modifier
+                .fillMaxWidth()
                 .padding(10.dp),
-            shape = RoundedCornerShape(16.dp),
+            Arrangement.SpaceEvenly
         ) {
-            Column(
+            Log.d("VIN", "DisplayJunkRecordEditField Index $recToEdit")
+            val focusRequester = remember { FocusRequester() }
+            LaunchedEffect(Unit) {
+                focusRequester.requestFocus()
+            }
+
+            GetJunkInformation(
+                mMaxLength = MAX_JUNK_TEXT_LEN,
+                placeHolder = "New Junk Text",
+                label = "Junk Text",
+                playerData = summaryViewModel.getJunkTableValue(recToEdit),
+                updatedData = summaryViewModel::onJunkRecordChange,
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Done,
                 Modifier
                     .fillMaxWidth()
-                    .padding(10.dp),
-                Arrangement.SpaceEvenly
-            ) {
-                Log.d("VIN", "DisplayJunkRecordEditField Index $recToEdit")
-                val focusRequester = remember { FocusRequester() }
-                LaunchedEffect(Unit) {
-                    focusRequester.requestFocus()
-                }
-
-                GetJunkInformation(
-                    mMaxLength = MAX_JUNK_TEXT_LEN,
-                    placeHolder = "New Junk Text",
-                    label = "Junk Text",
-                    playerData = summaryViewModel.getJunkTableValue(recToEdit),
-                    updatedData = summaryViewModel::onJunkRecordChange,
-                    keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Done,
-                    Modifier
-                        .fillMaxWidth()
-                        .focusRequester(focusRequester),
-                )
-                {
-                    onClick()   // set record recToEdit back to -1
-                }
-                Log.d("VIN", "done DisplayJunkRecordEditField Index $recToEdit")
+                    .focusRequester(focusRequester),
+            )
+            {
+                onClick()   // set record recToEdit back to -1
             }
+            Log.d("VIN", "done DisplayJunkRecordEditField Index $recToEdit")
         }
     }
 }
