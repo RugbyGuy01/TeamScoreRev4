@@ -1,3 +1,17 @@
+Revision 3.00 - 09/28/2026
+Added
+- Score card: new "18 Tot" column shows the front nine + back nine combined total for Par, each player, Team, and Used
+- Score card: tap a hole number to jump scoring directly to that hole
+- Summary screen: added a Donate option
+Fixed
+- Junk selection (both the Options Junk list and picking CTP/OB/Sandy/etc. while entering a score) didn't stay highlighted when selected
+- Deselecting a junk item right after selecting it could leave it in the database
+- "Standford" typo in the score card Display Mode menu, now "Stableford"
+- Player's Quota Target dialog crashed if a field was cleared and saved
+- Score card: highlighted the "Notes" header in orange
+- Player setup: renamed "Handicap" field to "Strokes"
+- App name changed to "TeamScore"
+
 Revision 2.10 - 04/05/2025
 Add player's handicap to the email
 Scorecard should go line 1 par,  line 2 hole number, and line 3 handicap
